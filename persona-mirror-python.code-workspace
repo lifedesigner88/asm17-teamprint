@@ -1,0 +1,16 @@
+{
+  "folders": [
+    {
+      "name": "backend",
+      "path": "apps/backend"
+    },
+    {
+      "name": "ai-worker",
+      "path": "apps/ai-worker"
+    }
+  ],
+  "settings": {
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+    "python.terminal.activateEnvironment": true
+  }
+}

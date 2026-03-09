@@ -36,3 +36,8 @@
 - `pnpm-workspace.yaml` 추가
 - `apps/backend` 의존성 관리를 `requirements.txt`에서 `pyproject.toml`로 전환
 - `docker-compose.yml`과 Nx 실행 명령을 `pnpm/uv` 기준으로 수정
+
+### 8) VS Code Python 인터프리터 고정
+- `persona-mirror-python.code-workspace` 추가 (backend, ai-worker 멀티 루트)
+- 각 폴더에 `.vscode/settings.json` 추가
+- 인터프리터를 `${workspaceFolder}/.venv/bin/python`으로 고정
