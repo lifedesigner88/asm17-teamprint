@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Form,
   NavLink,
@@ -5,7 +6,10 @@ import {
   redirect,
   useActionData,
   useLoaderData,
+  useNavigate,
   useNavigation,
+  useRevalidator,
+  useRouteLoaderData,
   useRouteError
 } from "react-router-dom";
 
@@ -48,12 +52,43 @@ export async function rootLoader(): Promise<RootLoaderData> {
   };
 }
 
+function LogoutButton({
+  className,
+  variant = "outline",
+}: {
+  className?: string;
+  variant?: "default" | "secondary" | "outline" | "ghost";
+}) {
+  const navigate = useNavigate();
+  const revalidator = useRevalidator();
+  const [loading, setLoading] = useState(false);
+
+  const handleLogout = async () => {
+    setLoading(true);
+    try {
+      await fetch(`${API_BASE_URL}/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+      revalidator.revalidate();
+      navigate("/", { replace: true });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Button className={className} disabled={loading} onClick={handleLogout} type="button" variant={variant}>
+      {loading ? "Logging out..." : "Logout"}
+    </Button>
+  );
+}
+
 export function App() {
   const { sessionUser } = useLoaderData() as RootLoaderData;
   const navigationItems = [
     { to: "/", label: "Overview" },
-    { to: "/auth/signup", label: "Sign up" },
-    { to: "/auth/login", label: "Login" },
+    ...(!sessionUser ? [{ to: "/auth/signup", label: "Sign up" }, { to: "/auth/login", label: "Login" }] : []),
     ...(sessionUser?.is_admin ? [{ to: "/admin/users", label: "Admin users" }] : []),
     { to: "/capture", label: "Capture" },
   ];
@@ -99,6 +134,17 @@ export function App() {
                   tone={sessionUser?.is_admin ? "success" : "default"}
                 />
               </div>
+              <div className="mt-3 rounded-2xl border border-border/70 bg-white/80 px-3 py-3">
+                <div className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Session</div>
+                <div className="mt-2 text-sm font-medium text-foreground">
+                  {sessionUser ? `Signed in as ${sessionUser.user_id}` : "Not signed in"}
+                </div>
+                {sessionUser ? (
+                  <div className="mt-3">
+                    <LogoutButton className="w-full" />
+                  </div>
+                ) : null}
+              </div>
               <div className="mt-2 text-foreground">Auth, admin list, DB seed, and dev runtime are already wired.</div>
             </div>
           </ShellCard>
@@ -127,11 +173,13 @@ export async function homeAction(): Promise<HealthActionData> {
 
 export function HomePage() {
   const loaderData = useLoaderData() as HealthLoaderData;
+  const rootData = useRouteLoaderData("root") as RootLoaderData;
   const actionData = useActionData() as HealthActionData | undefined;
   const navigation = useNavigation();
   const loading = navigation.state === "submitting";
   const result = actionData?.result ?? loaderData.initialStatus;
   const tone = result === "ok" ? "success" : result === "request failed" ? "warn" : "default";
+  const sessionUser = rootData.sessionUser;
 
   return (
     <div className="space-y-6">
@@ -146,6 +194,13 @@ export function HomePage() {
               <p className="max-w-2xl text-sm leading-7 text-muted-foreground">
                 Auth, admin permission boundaries, Postgres wiring, React Router data APIs, and local dev orchestration are already aligned.
               </p>
+              <div className="flex flex-wrap items-center gap-3">
+                <StatusPill
+                  label={sessionUser ? `logged in: ${sessionUser.user_id}` : "guest mode"}
+                  tone={sessionUser ? "success" : "default"}
+                />
+                {sessionUser?.is_admin ? <StatusPill label="admin access" tone="success" /> : null}
+              </div>
             </div>
             <div className="flex flex-wrap gap-3">
               <Form method="post">
@@ -153,11 +208,22 @@ export function HomePage() {
                   {loading ? "Checking backend..." : "Check backend health"}
                 </Button>
               </Form>
-              <NavLink to="/auth/signup">
-                <Button size="lg" variant="outline">
-                  Create test account
-                </Button>
-              </NavLink>
+              {sessionUser ? (
+                <LogoutButton />
+              ) : (
+                <>
+                  <NavLink to="/auth/signup">
+                    <Button size="lg" variant="outline">
+                      Create test account
+                    </Button>
+                  </NavLink>
+                  <NavLink to="/auth/login">
+                    <Button size="lg" variant="outline">
+                      Login
+                    </Button>
+                  </NavLink>
+                </>
+              )}
             </div>
           </div>
 
@@ -317,14 +383,6 @@ export function LoginPage() {
   );
 }
 
-export async function logoutAction(): Promise<Response> {
-  await fetch(`${API_BASE_URL}/auth/logout`, {
-    method: "POST",
-    credentials: "include",
-  });
-  return redirect("/");
-}
-
 export async function adminUsersLoader(): Promise<AdminUser[] | Response> {
   const response = await fetch(`${API_BASE_URL}/admin/users`, {
     credentials: "include",
@@ -358,11 +416,7 @@ export function AdminUsersPage() {
             </p>
           </div>
           <div className="shrink-0">
-            <Form action="/auth/logout" method="post">
-              <Button type="submit" variant="outline">
-                Logout
-              </Button>
-            </Form>
+            <LogoutButton />
           </div>
         </div>
       </div>

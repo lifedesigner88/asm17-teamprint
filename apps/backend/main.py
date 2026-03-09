@@ -126,8 +126,9 @@ def login(
 
 
 @app.post("/auth/logout", status_code=status.HTTP_204_NO_CONTENT)
-def logout(response: Response) -> Response:
+def logout() -> Response:
     cookie_settings = get_cookie_settings()
+    response = Response(status_code=status.HTTP_204_NO_CONTENT)
     response.delete_cookie(
         AUTH_COOKIE_NAME,
         path=str(cookie_settings["path"]),

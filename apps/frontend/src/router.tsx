@@ -11,7 +11,6 @@ import {
   homeAction,
   homeLoader,
   loginAction,
-  logoutAction,
   rootLoader,
   signupAction
 } from "./App";
@@ -87,10 +86,6 @@ export const router = createBrowserRouter([
         path: "auth/login",
         element: <LoginPage />,
         action: loginAction
-      },
-      {
-        path: "auth/logout",
-        action: logoutAction
       },
       {
         path: "admin/users",

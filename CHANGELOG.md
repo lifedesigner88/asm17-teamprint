@@ -170,3 +170,28 @@
 - `apps/frontend/src/common/components/index.ts`를 공용 UI 진입점으로 이동
 - `features/capture/components/index.ts`는 유지하고, 실제 TSX는 `components/*`로 평탄화
 - 외부 import는 `@/common/components`, `../components` 기준으로만 보이도록 정리
+
+### 37) shadcn schema 경고 제거
+- `apps/frontend/components.json`에서 원격 `$schema` 참조를 제거
+- VS Code의 untrusted remote schema 경고 없이 설정 파일을 유지하도록 조정
+
+### 38) 로그인 상태 UI 반영
+- 로그인 성공 시 사이드바에서 `Sign up`/`Login` 메뉴를 숨기고 `Logout` 버튼을 표시
+- 홈 화면에 현재 세션 사용자 표시를 추가하고, guest/로그인 상태에 따라 CTA를 분기
+
+### 39) VS Code 포트 추천 우선순위 조정
+- `.vscode/settings.json`에 포트 속성 추가
+- `3000`은 `PersonaMirror Frontend`로 브라우저 열기 우선
+- `8000`은 backend 포트로 표시하되 자동 추천은 조용히 처리
+
+### 40) 로그아웃 루트 이동 버그 수정
+- route action 기반 로그아웃을 공용 `LogoutButton` 흐름으로 교체
+- 로그아웃 시 backend 호출 후 세션 revalidate와 `"/"` 이동을 명시적으로 수행
+
+### 41) backend logout 204 응답 수정
+- `/auth/logout`가 주입된 `Response`를 그대로 반환하던 문제 수정
+- 명시적인 `Response(status_code=204)`를 생성해 `KeyError: None` 응답 오류를 제거
+
+### 42) 멀티 루트 Python 인터프리터 경고 정리
+- `persona-mirror-python.code-workspace`의 전역 `python.defaultInterpreterPath` 제거
+- backend/ai-worker는 폴더별 `.vscode/settings.json`만 사용하고, `infra`/`frontend`/`root`에서는 잘못된 `.venv` 경고가 뜨지 않도록 조정
