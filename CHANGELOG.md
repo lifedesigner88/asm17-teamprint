@@ -24,3 +24,9 @@
 ### 5) 런타임 정책 정리
 - Node 기준을 최신 LTS(`24`)로 통일
 - `.nvmrc`, `docker-compose.yml`, `AGENTS.md`에 반영
+
+### 6) Nx + 앱 스캐폴드 확장
+- 루트 `package.json` 추가 및 Nx 실행 스크립트 구성
+- `apps/backend` FastAPI 최소 앱 추가 (`/health`)
+- `apps/frontend` React + React Router 기반 최소 구조 추가
+- `docker-compose.yml`을 placeholder에서 실제 dev 명령으로 변경
