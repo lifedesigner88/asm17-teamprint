@@ -12,34 +12,16 @@ import {
 import { Button } from "@/components/ui/button";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
-const TOKEN_KEY = "pm_access_token";
 
 type HealthLoaderData = { initialStatus: string };
 type HealthActionData = { result: string };
 type AuthActionData = { error?: string };
 type AdminUser = { user_id: string; is_admin: boolean; created_at: string };
 
-function getToken(): string | null {
-  if (typeof window === "undefined") {
-    return null;
-  }
-  return window.localStorage.getItem(TOKEN_KEY);
-}
-
-function setToken(token: string): void {
-  if (typeof window !== "undefined") {
-    window.localStorage.setItem(TOKEN_KEY, token);
-  }
-}
-
-function clearToken(): void {
-  if (typeof window !== "undefined") {
-    window.localStorage.removeItem(TOKEN_KEY);
-  }
-}
-
 async function requestHealthStatus(): Promise<string> {
-  const response = await fetch(`${API_BASE_URL}/health`);
+  const response = await fetch(`${API_BASE_URL}/health`, {
+    credentials: "include",
+  });
   if (!response.ok) {
     throw new Error(`Backend request failed: ${response.status}`);
   }
@@ -114,7 +96,8 @@ export async function signupAction({ request }: { request: Request }): Promise<A
   const response = await fetch(`${API_BASE_URL}/auth/signup`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ user_id, password })
+    body: JSON.stringify({ user_id, password }),
+    credentials: "include",
   });
 
   if (response.ok) {
@@ -134,11 +117,23 @@ export function SignupPage() {
       <Form className="space-y-3" method="post">
         <label className="block text-sm">
           User ID
-          <input className="mt-1 w-full rounded-md border px-3 py-2" name="user_id" required />
+          <input
+            autoComplete="username"
+            className="mt-1 w-full rounded-md border px-3 py-2"
+            name="user_id"
+            required
+          />
         </label>
         <label className="block text-sm">
           Password
-          <input className="mt-1 w-full rounded-md border px-3 py-2" name="password" required type="password" />
+          <input
+            autoComplete="new-password"
+            className="mt-1 w-full rounded-md border px-3 py-2"
+            minLength={8}
+            name="password"
+            required
+            type="password"
+          />
         </label>
         <Button type="submit">Create Account</Button>
       </Form>
@@ -155,7 +150,8 @@ export async function loginAction({ request }: { request: Request }): Promise<Au
   const response = await fetch(`${API_BASE_URL}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ user_id, password })
+    body: JSON.stringify({ user_id, password }),
+    credentials: "include",
   });
 
   if (!response.ok) {
@@ -163,8 +159,6 @@ export async function loginAction({ request }: { request: Request }): Promise<Au
     return { error: data?.detail ?? "Login failed" };
   }
 
-  const data = (await response.json()) as { access_token: string };
-  setToken(data.access_token);
   return redirect("/");
 }
 
@@ -177,11 +171,23 @@ export function LoginPage() {
       <Form className="space-y-3" method="post">
         <label className="block text-sm">
           User ID
-          <input className="mt-1 w-full rounded-md border px-3 py-2" name="user_id" required />
+          <input
+            autoComplete="username"
+            className="mt-1 w-full rounded-md border px-3 py-2"
+            name="user_id"
+            required
+          />
         </label>
         <label className="block text-sm">
           Password
-          <input className="mt-1 w-full rounded-md border px-3 py-2" name="password" required type="password" />
+          <input
+            autoComplete="current-password"
+            className="mt-1 w-full rounded-md border px-3 py-2"
+            minLength={8}
+            name="password"
+            required
+            type="password"
+          />
         </label>
         <Button type="submit">Login</Button>
       </Form>
@@ -191,22 +197,19 @@ export function LoginPage() {
 }
 
 export async function logoutAction(): Promise<Response> {
-  clearToken();
+  await fetch(`${API_BASE_URL}/auth/logout`, {
+    method: "POST",
+    credentials: "include",
+  });
   return redirect("/");
 }
 
 export async function adminUsersLoader(): Promise<AdminUser[] | Response> {
-  const token = getToken();
-  if (!token) {
-    return redirect("/auth/login");
-  }
-
   const response = await fetch(`${API_BASE_URL}/admin/users`, {
-    headers: { Authorization: `Bearer ${token}` }
+    credentials: "include",
   });
 
   if (response.status === 401) {
-    clearToken();
     return redirect("/auth/login");
   }
   if (response.status === 403) {
@@ -278,4 +281,3 @@ export function RouteErrorBoundary() {
 export function CapturePage() {
   return <p className="text-sm text-muted-foreground">Camera/Mic capture UI will be implemented after auth.</p>;
 }
-

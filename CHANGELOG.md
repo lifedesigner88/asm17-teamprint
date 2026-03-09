@@ -120,3 +120,14 @@
 ### 26) JWT secret 기본값 강화
 - JWT 기본 secret을 32바이트 이상 값으로 상향
 - `.env.example`, docker-compose, README에 동일 기준 반영
+
+### 27) 인증/템플릿 보안 하드닝
+- 로그인 토큰 저장을 `localStorage`에서 `httpOnly` cookie 기반으로 전환
+- 회원가입/로그인 입력값은 공백 제거 후 길이 검증하도록 정규화
+- admin 시드 계정은 startup 시 비밀번호/권한을 환경값과 동기화
+- JWT secret은 fallback 없이 필수 환경변수로 강제
+
+### 28) 개발 환경 호환성 개선
+- frontend/backend `dev` 대기를 bash `/dev/tcp`에서 Node 기반 포트 대기 스크립트로 전환
+- Windows/macOS/Linux에서 같은 `pnpm dev` 흐름을 사용할 수 있도록 조정
+- Docker DB는 healthcheck 기반으로 backend 시작을 지연하도록 보강

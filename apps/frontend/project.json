@@ -7,7 +7,15 @@
     "dev": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "bash -lc 'until (echo > /dev/tcp/127.0.0.1/8000) >/dev/null 2>&1; do echo \"waiting for backend:8000\"; sleep 1; done; pnpm --dir apps/frontend dev'"
+        "commands": [
+          {
+            "command": "node scripts/wait-for-port.mjs 8000 127.0.0.1 60000"
+          },
+          {
+            "command": "pnpm --dir apps/frontend dev"
+          }
+        ],
+        "parallel": false
       }
     }
   }

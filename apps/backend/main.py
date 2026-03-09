@@ -1,6 +1,6 @@
 import os
 
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import select
@@ -9,11 +9,18 @@ from sqlalchemy.orm import Session
 
 from db import Base, SessionLocal, engine, get_db
 from models import User
-from schemas import LoginRequest, SignupRequest, TokenResponse, UserResponse
-from security import create_access_token, decode_access_token, hash_password, verify_password
+from schemas import LoginRequest, SessionResponse, SignupRequest, UserResponse
+from security import (
+    AUTH_COOKIE_NAME,
+    create_access_token,
+    decode_access_token,
+    get_cookie_settings,
+    hash_password,
+    verify_password,
+)
 
 app = FastAPI(title="PersonaMirror Backend")
-security_scheme = HTTPBearer()
+security_scheme = HTTPBearer(auto_error=False)
 ADMIN_SEED_USER_ID = os.getenv("ADMIN_SEED_USER_ID", "admin")
 ADMIN_SEED_PASSWORD = os.getenv("ADMIN_SEED_PASSWORD", "Admin#2026!Mirror")
 
@@ -42,14 +49,22 @@ def on_startup() -> None:
                     is_admin=True,
                 )
             )
-            db.commit()
+        else:
+            admin.is_admin = True
+            if not verify_password(ADMIN_SEED_PASSWORD, admin.password_hash):
+                admin.password_hash = hash_password(ADMIN_SEED_PASSWORD)
+        db.commit()
 
 
 def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security_scheme),
+    request: Request,
+    credentials: HTTPAuthorizationCredentials | None = Depends(security_scheme),
     db: Session = Depends(get_db),
 ) -> User:
-    token = credentials.credentials
+    token = credentials.credentials if credentials else request.cookies.get(AUTH_COOKIE_NAME)
+    if not token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required")
+
     try:
         payload = decode_access_token(token)
     except Exception as exc:  # noqa: BLE001
@@ -81,7 +96,7 @@ def health() -> dict[str, str]:
 @app.post("/auth/signup", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 def signup(payload: SignupRequest, db: Session = Depends(get_db)) -> UserResponse:
     user = User(
-        user_id=payload.user_id.strip(),
+        user_id=payload.user_id,
         password_hash=hash_password(payload.password),
         is_admin=False,
     )
@@ -95,18 +110,32 @@ def signup(payload: SignupRequest, db: Session = Depends(get_db)) -> UserRespons
     return UserResponse(user_id=user.user_id, is_admin=user.is_admin, created_at=user.created_at)
 
 
-@app.post("/auth/login", response_model=TokenResponse)
-def login(payload: LoginRequest, db: Session = Depends(get_db)) -> TokenResponse:
-    user = db.scalar(select(User).where(User.user_id == payload.user_id.strip()))
+@app.post("/auth/login", response_model=SessionResponse)
+def login(
+    payload: LoginRequest,
+    response: Response,
+    db: Session = Depends(get_db),
+) -> SessionResponse:
+    user = db.scalar(select(User).where(User.user_id == payload.user_id))
     if user is None or not verify_password(payload.password, user.password_hash):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
     access_token = create_access_token(subject=user.user_id, is_admin=user.is_admin)
-    return TokenResponse(
-        access_token=access_token,
-        user_id=user.user_id,
-        is_admin=user.is_admin,
+    response.set_cookie(AUTH_COOKIE_NAME, access_token, **get_cookie_settings())
+    return SessionResponse(user_id=user.user_id, is_admin=user.is_admin)
+
+
+@app.post("/auth/logout", status_code=status.HTTP_204_NO_CONTENT)
+def logout(response: Response) -> Response:
+    cookie_settings = get_cookie_settings()
+    response.delete_cookie(
+        AUTH_COOKIE_NAME,
+        path=str(cookie_settings["path"]),
+        secure=bool(cookie_settings["secure"]),
+        httponly=bool(cookie_settings["httponly"]),
+        samesite=str(cookie_settings["samesite"]),
     )
+    return response
 
 
 @app.get("/auth/me", response_model=UserResponse)
