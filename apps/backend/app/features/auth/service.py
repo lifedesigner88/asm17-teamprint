@@ -13,7 +13,7 @@ from app.common.security import (
     decode_access_token,
     get_cookie_settings,
     hash_password,
-    verify_password,
+    verify_password_and_update,
 )
 
 from .models import User
@@ -40,8 +40,11 @@ def sync_admin_seed(db: Session) -> None:
         )
     else:
         admin.is_admin = True
-        if not verify_password(ADMIN_SEED_PASSWORD, admin.password_hash):
+        is_valid, updated_hash = verify_password_and_update(ADMIN_SEED_PASSWORD, admin.password_hash)
+        if not is_valid:
             admin.password_hash = hash_password(ADMIN_SEED_PASSWORD)
+        elif updated_hash:
+            admin.password_hash = updated_hash
     db.commit()
 
 
@@ -63,8 +66,16 @@ def create_user(payload: SignupRequest, db: Session) -> UserResponse:
 
 def build_session(payload: LoginRequest, response: Response, db: Session) -> SessionResponse:
     user = db.scalar(select(User).where(User.user_id == payload.user_id))
-    if user is None or not verify_password(payload.password, user.password_hash):
+    if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+
+    is_valid, updated_hash = verify_password_and_update(payload.password, user.password_hash)
+    if not is_valid:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+
+    if updated_hash:
+        user.password_hash = updated_hash
+        db.commit()
 
     access_token = create_access_token(subject=user.user_id, is_admin=user.is_admin)
     response.set_cookie(AUTH_COOKIE_NAME, access_token, **get_cookie_settings())

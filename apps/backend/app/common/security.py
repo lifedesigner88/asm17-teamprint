@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Literal, cast
 
 import jwt
-from passlib.context import CryptContext
+from pwdlib import PasswordHash
 
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 JWT_ALGORITHM = "HS256"
@@ -12,7 +12,7 @@ AUTH_COOKIE_NAME = os.getenv("AUTH_COOKIE_NAME", "pm_access_token")
 AUTH_COOKIE_SAMESITE = os.getenv("AUTH_COOKIE_SAMESITE", "lax").lower()
 AUTH_COOKIE_SECURE = os.getenv("AUTH_COOKIE_SECURE", "false").lower() == "true"
 
-pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
+password_hasher = PasswordHash.recommended()
 
 if not JWT_SECRET_KEY:
     raise RuntimeError("JWT_SECRET_KEY must be set")
@@ -25,11 +25,16 @@ if AUTH_COOKIE_SAMESITE not in {"lax", "strict", "none"}:
 
 
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    return password_hasher.hash(password)
 
 
 def verify_password(plain_password: str, password_hash: str) -> bool:
-    return pwd_context.verify(plain_password, password_hash)
+    return password_hasher.verify(plain_password, password_hash)
+
+
+def verify_password_and_update(plain_password: str, password_hash: str) -> tuple[bool, str | None]:
+    is_valid, updated_hash = password_hasher.verify_and_update(plain_password, password_hash)
+    return is_valid, updated_hash
 
 
 def create_access_token(*, subject: str, is_admin: bool) -> str:
