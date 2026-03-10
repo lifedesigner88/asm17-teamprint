@@ -15,6 +15,8 @@
 - 설명은 추상적 개념보다 실제 파일과 코드 기준으로 한다.
 - 임시 우회 코드를 남기면 제거 조건을 같이 적는다.
 - 브랜치명은 `feat/ai`, `feat/auth`, `study/prompt-exp`처럼 짧고 도메인 중심으로 유지한다.
+- PR은 항상 `main` 최신 기준으로 새 브랜치를 파서 만든다.
+- 이미 PR을 올린 브랜치는 다음 작업에 재사용하지 않는다.
 
 ## Architecture Rules
 ### Monorepo
@@ -89,6 +91,7 @@
   - compose demo: `compose.env`
 
 ## Quality Rules
+- backend test: `pnpm test:backend`
 - frontend lint: `pnpm lint:frontend`
 - python lint: `uvx ruff check`
 - python format: `uvx ruff format`
@@ -105,6 +108,9 @@
   - 작업 중: 한 줄 메모 누적
   - 최종 커밋 직전: 이번 커밋 범위 기준으로 다시 요약
 - changelog 인덱스는 `docs/changelog/README.md`를 사용한다.
+- backend API의 실행 시점 정본은 FastAPI OpenAPI(`/docs`, `/openapi.json`)로 본다.
+- 수동 backend API endpoint 문서는 기본적으로 유지하지 않는다.
+- backend 테스트 계획은 README가 아니라 `apps/backend/docs/api/testing.md`에서 관리한다.
 - 사용자가 설명을 따로 요청하지 않아도, 큰 구조 변경이면 변경 이유를 짧게 남긴다.
 
 ## Response Style
@@ -119,6 +125,7 @@
 - 기존 변경사항을 임의로 되돌리지 않는다.
 - 최종 커밋 전에는 변경사항 요약을 먼저 공유하고 사용자 승인을 받은 뒤 커밋한다.
 - 사용자가 커밋을 승인하면, 현재 작업 브랜치에 커밋한 뒤 같은 브랜치 이름으로 원격(`origin`)까지 푸시한다.
+- PR을 다시 올릴 때는 기존 PR 브랜치를 이어붙이지 않고 `main`에서 새 브랜치를 만들어 필요한 커밋만 옮긴다.
 
 ## Default Start-of-Task Checklist
 1. `README.md`에서 현재 단계와 우선순위 확인

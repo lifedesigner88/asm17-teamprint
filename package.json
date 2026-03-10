@@ -11,6 +11,7 @@
     "docker": "node scripts/ensure-dev-env.mjs && pnpm infra:up && nx run-many -t docker -p backend,frontend --output-style=stream",
     "docker:down": "node scripts/docker-down.mjs",
     "docker:logs": "node scripts/docker-logs.mjs",
+    "test:backend": "node scripts/test-backend.mjs",
     "lint:frontend": "pnpm exec eslint apps/frontend/src --ext .ts,.tsx --max-warnings=0",
     "lint:python": "uvx ruff check apps/backend apps/ai-worker",
     "lint": "pnpm lint:frontend && pnpm lint:python",
