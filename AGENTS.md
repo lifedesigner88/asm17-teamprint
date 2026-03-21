@@ -1,152 +1,122 @@
 # AGENTS.md
 
 ## Purpose
-This repository is a project for understanding and learning the full structure of `PersonaMirror` by actually implementing it.
-The agent aims not just for fast implementation, but for implementation that makes the structure and intent understandable.
-
-## Source of Truth
-- Always read `README.md` first at the start of any task to check the current state and priorities.
-- If there is a conflict in structure, execution method, or runtime policy, align with `README.md`.
-- When a major structural change occurs, update `README.md` alongside the code.
-
-## Working Principles
-- Implement in small units.
-- For complex tasks, follow the order: design → implement → verify.
-- Explanations are based on actual files and code, not abstract concepts.
-- If temporary workaround code is left in, include the condition for removing it.
-- Branch names are kept short and domain-focused: `feat/ai`, `feat/auth`, `study/prompt-exp`.
-- Independent work starts a new branch from the latest `origin/main`.
-- Work that depends on a not-yet-merged previous task starts a new branch from that previous branch.
-- Do not reuse a branch that already has an open PR for the next task; create a new child branch from it if needed.
-
-## Architecture Rules
-### Monorepo
-The root structure is maintained as follows:
-- `apps/frontend`: UI, camera/mic control
-- `apps/backend`: FastAPI API, orchestration, DB access
-- `apps/ai-worker`: heavy inference worker
-- `libs/shared-interfaces`: frontend-backend contracts
-- `libs/ai-models`: model loading/inference wrappers
-- `libs/ui-components`: reusable UI components
-- `infrastructure/terraform`: IaC
-
-### Frontend
-- Use React Router `loader` / `action` pattern as the default.
-- Shared UI lives under `apps/frontend/src/common/components`.
-- shadcn/ui-based shared components go in `apps/frontend/src/common/components/ui/*`; the external entry point is unified at `apps/frontend/src/common/components/index.ts`.
-- When creating a new page or section, first check if it can be composed from shared UI in `apps/frontend/src/common/components`; only add new feature components if that is insufficient.
-- If the same pattern repeats more than once, do not copy-paste it inline — lift it to feature `components/` or `common/components`.
-- Feature code lives under `apps/frontend/src/features/<domain>`.
-- Feature `index.ts` is only responsible for the entry point.
-- Actual `.tsx` files go in role-revealing folders: `components/`, `pages/`, `layout/`, `utils/`.
-- Do not create unnecessary nested structures.
-
-### Backend
-- Common infrastructure/config code lives under `apps/backend/app/common`.
-- Feature code lives under `apps/backend/app/features/<domain>`.
-- Each feature is split into `router.py`, `service.py`, `schemas.py`, `models.py` as needed.
-- Root `apps/backend/main.py` is only the uvicorn entry point.
-- Actual app assembly is done in `apps/backend/app/main.py`.
-- Frontend and backend share the same domain names (`auth`, `admin`, `capture`) wherever possible.
-
-## Security and Data Rules
-- Prefer `httpOnly` cookies over `localStorage` for browser token storage.
-- Auth secrets are enforced via environment variables with no code fallback.
-- Input normalization (strip/validate) before storage is the default.
-- Personal data (voice, images, interview text) is handled conservatively.
-- Long AI tasks are separated from web requests and handled asynchronously by default.
-
-## Runtime and Execution Rules
-- Node is pinned to the patch version defined in `.nvmrc`.
-  - Current value: `24.11.0`
-- Python is pinned to the patch version defined in `.python-version`.
-  - Current value: `3.11.15`
-- Node package manager: `pnpm`.
-- Python package/virtual environment management: `uv`.
-- Local, Dockerfile, and Docker Compose maintain the same patch-level runtime wherever possible.
-
-### Official Commands
-Only the following commands are used:
-- `pnpm setup`
-- `pnpm dev`
-- `pnpm infra:up`
-- `pnpm infra:down`
-- `pnpm docker`
-- `pnpm docker:logs`
-- `pnpm docker:down`
-
-### Script Organization
-- Root `package.json` scripts are kept in this order: `setup → dev → infra → docker → quality → raw tool`.
-- Use prefix and order for grouping in `package.json` instead of comments.
-- Prefer a single entry command like `pnpm setup` for initial install/sync.
-- Prefer Node/Python scripts over bash-only tricks for Windows/macOS/Linux compatibility.
-- Ensure Docker and local dev environments do not share the same cache/virtual environment directories.
-
-## Environment Variable Rules
-- Docker Compose demo defaults are kept in the root `compose.env`.
-- Per-app local env files (`apps/frontend/.env`, `apps/backend/.env`) are not committed to Git.
-- Only per-app example files (`apps/frontend/.env.example`, `apps/backend/.env.example`) are tracked.
-- `pnpm setup`, `pnpm dev`, and `pnpm docker` auto-generate `.env` from `.env.example` when needed.
-- Do not mix the roles of different execution paths:
-  - Local dev / local docker test: app `.env`
-  - Compose demo: `compose.env`
-
-## Quality Rules
-- Backend test: `pnpm test:backend`
-- Frontend lint: `pnpm lint:frontend`
-- Python lint: `uvx ruff check`
-- Python format: `uvx ruff format`
-- Common format: `pnpm format`
-- pre-commit is maintained based on `.pre-commit-config.yaml`.
-
-## Documentation Rules
-- When a feature is added, update the following:
-  - `README.md` if needed
-  - Related docs if the execution method changes
-  - Request/response examples if the API changes
-  - `docs/changelog/YYYY-MM-DD.md`
-- The authoritative changelog rules are in `docs/changelog/README.md`.
-- Changelog is managed in two stages:
-  - While working: accumulate one-line notes in the date file
-  - Just before the final commit: summarize based on the commit scope
-- The changelog index and rules document is `docs/changelog/README.md`.
-- After committing, do not leave interim notes — keep only the final summary that matches the commit history.
-- The authoritative backend API reference at runtime is FastAPI OpenAPI (`/docs`, `/openapi.json`).
-- Manual backend API endpoint documentation is not maintained by default.
-- Backend test plans are managed in `apps/backend/docs/api/testing.md`, not in the README.
-- Even without an explicit request, briefly note the reason for major structural changes.
-
-## Response Style
-The agent briefly explains the following by default:
-- What was changed
-- Why it was changed that way
-- Which file to look at
-- 1–2 points worth checking next
-
-## Safety and Git Rules
-- Do not run destructive commands (`reset --hard`, mass deletion, etc.) without user instruction.
-- Do not arbitrarily revert existing changes.
-- Before the final commit, share a summary of changes and get user approval before committing.
-- Once the user approves a commit, commit to the current branch and push to remote (`origin`) under the same branch name.
-- PRs are managed with the principle: one PR = one branch.
-- If a stacked branch is needed, branch off from the previous work branch; rebase to `main` only when necessary.
-- Before creating a new PR or pushing additional commits to an existing branch, verify the current branch is not already a merged PR branch.
-- Do not add new commits to an already-merged PR branch. If needed, create a new branch from the correct base and cherry-pick only the necessary commits.
-- Before opening a new PR, confirm that already-merged branches are identified as cleanup targets.
-- Unless a stacked child is still using the parent branch as its base, deleting merged branches from both local and remote is the default policy.
-
-## Memory Files
-These files store context about the user and collaboration preferences so the agent can maintain consistency across sessions.
-
-- `MEMORY.md` — index of all memory files with brief descriptions
-- `user_profile.md` — user background and communication preferences (e.g. English correction preference)
-
-The agent reads these at the start of each session to restore context. New memory entries are added here when the user shares preferences or relevant personal context.
+Build PersonaMirror step by step — not just fast, but in a way that makes structure and intent understandable.
 
 ## Default Start-of-Task Checklist
-1. Check current stage and priorities in `README.md`
+1. Read `README.md` — check current state and priorities
 2. Explore relevant directories/code
-3. Plan changes
-4. Implement
-5. Verify with tests/execution
-6. Share results and next steps
+3. Design → implement → verify
+4. Write changelog automatically (see Documentation Rules)
+5. Share results and next steps
+
+## Source of Truth
+- `README.md` is the authority on current state, priorities, and runtime policy.
+- On conflict between docs and code, align with `README.md`.
+- On major structural change, update `README.md` alongside the code.
+
+## Architecture Rules
+
+### Monorepo Layout
+- `apps/frontend` — UI, camera/mic control
+- `apps/backend` — FastAPI API, orchestration, DB access
+- `apps/ai-worker` — LangGraph inference worker (Claude API)
+- `libs/shared-interfaces` — frontend-backend contracts
+- `libs/ai-models` — model loading/inference wrappers
+- `libs/ui-components` — reusable UI components
+- `infrastructure/terraform` — IaC
+
+### Frontend
+- React Router `loader` / `action` pattern is the default.
+- Shared UI: `apps/frontend/src/common/components` (shadcn/ui under `ui/*`, unified export via `index.ts`).
+- Feature code: `apps/frontend/src/features/<domain>` → subfolders `components/`, `pages/`, `layout/`, `utils/`.
+- Before adding a new component, check if shared UI already covers it.
+- If a pattern repeats more than once, lift it — do not inline copy-paste.
+- `index.ts` is the entry point only; no logic.
+
+### Backend
+- Common code: `apps/backend/app/common`.
+- Feature code: `apps/backend/app/features/<domain>` → split into `router.py`, `service.py`, `schemas.py`, `models.py` as needed.
+- `apps/backend/main.py` — uvicorn entry only. App assembly in `apps/backend/app/main.py`.
+- Domain names are shared with frontend: `auth`, `admin`, `capture`.
+
+## Runtime and Execution Rules
+- Node `24.11.0` (`.nvmrc`), Python `3.11.15` (`.python-version`) — pinned to patch.
+- Package managers: `pnpm` (Node), `uv` (Python).
+- Local, Dockerfile, and Docker Compose use the same patch-level versions.
+
+### Official Commands
+| Command | Purpose |
+|---------|---------|
+| `pnpm setup` | Initial install + env generation |
+| `pnpm dev` | Local dev server |
+| `pnpm infra:up/down` | Start/stop db + redis |
+| `pnpm docker` | Build and run Dockerfiles |
+| `pnpm docker:logs` | View container logs |
+| `pnpm docker:down` | Stop all containers |
+
+### Script Organization
+- `package.json` script order: `setup → dev → infra → docker → quality → raw tool`.
+- Prefer Node/Python scripts over bash-only for cross-platform compatibility.
+- Docker and local dev must not share the same cache/venv directories.
+
+## Environment Variable Rules
+- `apps/frontend/.env` and `apps/backend/.env` are not committed — only `.env.example` files are tracked.
+- `compose.env` holds Docker Compose demo defaults and is tracked.
+- `pnpm setup/dev/docker` auto-generate `.env` from `.env.example` when needed.
+- Do not mix env roles: local dev/docker → app `.env`; compose demo → `compose.env`.
+
+## Security and Data Rules
+- Browser tokens: `httpOnly` cookies preferred over `localStorage`.
+- Auth secrets: environment variables only — no code fallback.
+- Input: strip/validate before storage.
+- Personal data (voice, images, interview text): handled conservatively.
+- Heavy AI tasks: async, separated from web request cycle.
+
+## Quality Rules
+| Task | Command |
+|------|---------|
+| Backend test | `pnpm test:backend` |
+| Frontend lint | `pnpm lint:frontend` |
+| Python lint | `uvx ruff check` |
+| Python format | `uvx ruff format` |
+| Common format | `pnpm format` |
+
+- pre-commit config: `.pre-commit-config.yaml`.
+
+## Documentation Rules
+- On any feature, structural, or API change: update `README.md` (if needed) and `docs/changelog/YYYY-MM-DD.md`.
+- Full changelog rules: `docs/changelog/README.md`.
+- API reference at runtime: FastAPI OpenAPI (`/docs`, `/openapi.json`) — no manual endpoint docs.
+- Backend test plans: `apps/backend/docs/api/testing.md`.
+
+### Automatic Changelog (no user prompt needed)
+After any task that changes `README.md`, `AGENTS.md`, or project structure:
+1. Check if `docs/changelog/YYYY-MM-DD.md` exists; create it if not.
+2. Append a numbered section (`## 1.`, `## 2.`, …) with: `What Changed` / `Why It Mattered` / `Files To Read`.
+3. Update `docs/changelog/README.md` file list if a new date file was created.
+
+## Safety and Git Rules
+- No destructive commands (`reset --hard`, mass deletion) without explicit user instruction.
+- Before the final commit, share a change summary and get user approval.
+- On approval: commit to current branch and push to `origin` under the same branch name.
+
+### Branch Policy
+- Independent work → new branch from latest `origin/main`.
+- Dependent work → new branch from the unmerged parent branch.
+- Branch names: short and domain-focused — `feat/ai`, `feat/auth`, `study/prompt-exp`.
+- Do not reuse a branch that already has an open PR; create a child branch instead.
+
+### PR Policy
+- One PR = one branch.
+- Merge the previous PR before starting the next branch whenever possible; use stacked branches if not.
+- A stacked PR targets the parent branch; rebase to `main` after the parent merges.
+- Never add commits to an already-merged PR branch — create a new branch and cherry-pick if needed.
+- Clean up merged branches (local + remote) before opening a new PR, unless a stacked child still depends on the parent.
+
+## Response Style
+After each task, briefly state:
+- What changed
+- Why
+- Which file to check
+- 1–2 next steps

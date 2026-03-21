@@ -1,13 +1,25 @@
 # PersonaMirror
 
-`A multimodal AI digital persona generation service that captures not just your appearance, but your values and speaking style`
+`A resume shows what you've done. PersonaMirror shows who you are.`
 
 ## What This Repository Is
-PersonaMirror is a learning monorepo that incrementally implements a service for generating a user's digital persona from text, voice, and image inputs.
+PersonaMirror is a monorepo that builds a **Progressive Persona Dashboard** — a service that extracts a user's values, speaking patterns, and archetypes from text (and later voice/image) inputs, generating a richer persona as more answers are accumulated.
 
 This repository has two goals:
-- Build a project with a real service structure, step by step.
-- Document both the code and the reasoning behind architectural decisions, so the choices are understandable.
+- Build a real service structure step by step, targeting a public MVP by April 1, 2026.
+- Document both the code and the reasoning behind architectural decisions.
+
+## Product Concept: Progressive Persona Dashboard
+
+The dashboard grows richer as the user provides more input:
+
+| Level | Input | Output |
+|-------|-------|--------|
+| Level 1 | 3–5 questions | Archetype · Top 3 values · One-line summary |
+| Level 2 | 10–15 questions | + Language patterns · Decision-making tendencies · Career direction |
+| Level N | Hupository-scale | + Life timeline · Goal hierarchy tree · Value evolution · SDG alignment |
+
+Park Sejong's own Hupository data serves as the **"final vision" demo** — what PersonaMirror looks like when fed years of accumulated data.
 
 ## Current Status
 Features that are currently working:
@@ -22,23 +34,45 @@ Features that are currently working:
   - Dockerfile test: `pnpm docker`
   - Docker Compose demo: `docker compose up`
 
-Core features not yet implemented:
-- LangChain-based persona extraction
-- Whisper-based voice analysis
-- Stable Diffusion / ControlNet-based image generation
-- Async job processing between ai-worker and backend
+Core features not yet implemented (April 1 MVP targets):
+- LangGraph-based persona extraction via Claude API
+- Progressive dashboard frontend (Level 1 card)
+- Public shareable URL (`/persona/{id}`)
+- Hupository demo account (Park Sejong's preset data)
+- Whisper-based voice analysis (Phase 2)
+- Stable Diffusion / ControlNet-based image generation (Phase 2)
+- Async job processing between ai-worker and backend (Phase 2)
 
 ## Tech Stack
 - Monorepo: Nx
 - Frontend: React Router 7, TypeScript, Tailwind CSS, shadcn/ui
 - Backend: FastAPI, SQLAlchemy, PostgreSQL
-- Worker: Python, uv
+- Worker: Python, uv, **LangGraph**, Claude API
 - Package manager:
   - Node: pnpm
   - Python: uv
 - Infra / local runtime:
   - Docker Compose
   - Terraform
+
+## AI Architecture (ai-worker)
+
+```
+Input (text / later: voice · image)
+    ↓
+LangGraph workflow
+    ├── [Node 1] extract_values    (Claude)  ← MVP
+    ├── [Node 2] extract_speaking  (Claude)  ← Phase 2
+    ├── [Node 3] extract_archetype (Claude)  ← Phase 2
+    └── [Node 4] generate_card     (Claude)  ← Phase 2
+    ↓
+backend (FastAPI) → Persona JSON → frontend dashboard
+```
+
+Why LangGraph:
+- Each node has an independent role — easy to extend or swap
+- Pluggable LLM backends (Claude, GPT, Gemini)
+- Conditional routing based on answer depth
 
 ## Runtime Policy
 For reproducibility, local and Docker runtime versions are pinned to the patch level:
@@ -247,33 +281,41 @@ Current main domains:
 - `capture`
 
 ## Roadmap
-### Phase 0. Foundation Setup
+### Phase 0. Foundation Setup (Done)
 - [x] Nx workspace initialization
 - [x] Common runtime / lint / format / pre-commit setup
 - [x] Local / docker / compose execution paths
 - [x] Frontend / backend base structure
 
-### Phase 1. MVP Core Flow
+### Phase 1. March 25 MVP — G-PM-01 (Active)
 - [x] Basic authentication
 - [x] Admin user list screen
 - [x] Capture UI draft
 - [x] Capture job API
-- [x] Capture review -> backend job API connection
-- [ ] File upload handling
-- [ ] AI analysis / generation pipeline connection
+- [x] Capture review → backend job API connection
+- [ ] LangGraph single-node: Capture text → Claude API → Persona JSON
+- [ ] Progressive dashboard frontend (Level 1 card: archetype · values · one-liner)
+- [ ] Public shareable URL — `/persona/{id}`
+- [ ] Hupository demo account (Park Sejong's preset data → final vision)
+- [ ] File upload scaffolding (voice · image prep)
 
-### Phase 2+
+### Phase 2. Enriched Analysis (Planned)
+- [ ] Whisper voice analysis node
+- [ ] Image analysis node
+- [ ] Async job processing (ai-worker ↔ backend)
+- [ ] Multi-LLM backend support (GPT, Gemini)
 - [ ] Quality improvements
-- [ ] Async job separation
-- [ ] Infrastructure automation
-- [ ] Operational observability
 
-## Next Recommended Work
-- Add backend auth / capture smoke tests
-- Add Postgres-based backend integration tests
-- Add frontend route state branch tests
-- Draft async job interface between ai-worker and backend
-- Add real file upload handling (audio / image)
+### Phase 3. Operations (Planned)
+- [ ] Infrastructure automation
+- [ ] Operational observability (logging · monitoring)
+
+## Next Recommended Work (toward March 25 MVP)
+1. **LangGraph single-node in ai-worker** — Capture text → Claude API → Persona JSON
+2. **Progressive dashboard frontend** — Level 1 card (archetype · values · one-liner)
+3. **Public shareable URL** — `/persona/{id}` read-only page
+4. **Hupository demo account** — preset persona data for Park Sejong
+5. **File upload scaffolding** — prepare audio/image fields for Phase 2
 
 ## Quality Commands
 ```bash
@@ -324,10 +366,19 @@ PR operation principles:
 - Clean up merged branches before opening a new PR.
 - Clean up both local and remote branches; delay only when a stacked child still depends on the parent branch.
 
+## Hupository ↔ PersonaMirror Connection
+
+| Layer | Role |
+|-------|------|
+| Hupository | Data accumulation (personal YAML repository) |
+| PersonaMirror | Service layer — a product anyone can use |
+| PersonaMirror Demo | Park Sejong's Hupository = final vision of what Level N looks like |
+
 ## Why This Repo Is Useful For Learners
 This repository is not just a tutorial — it also demonstrates:
 - Feature-based folder structure design
 - Separation of local / docker / compose execution paths
 - Environment variable policy
 - Real implementations of auth, admin, and capture flows
+- LangGraph + Claude API integration pattern
 - A structure that can be extended to ai-worker and model pipelines
