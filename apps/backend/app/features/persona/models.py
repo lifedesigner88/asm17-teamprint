@@ -16,6 +16,8 @@ class Persona(Base):
     owner_user_id: Mapped[str] = mapped_column(
         String(64), ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False, index=True
     )
+    # User-facing label — lets the owner distinguish multiple personas
+    title: Mapped[str] = mapped_column(String(128), nullable=False, default="My Persona")
     # Full PersonaProfile blob — matches frontend PersonaProfile type
     data: Mapped[dict] = mapped_column(JSON, nullable=False)
     created_at: Mapped[datetime] = mapped_column(

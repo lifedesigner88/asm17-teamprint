@@ -144,6 +144,7 @@ def sync_demo_seed(db: Session) -> None:
             Persona(
                 persona_id=DEMO_PERSONA_ID,
                 owner_user_id=DEMO_USER_ID,
+                title="Park Sejong — 2026",
                 data=_DEMO_DATA,
             )
         )

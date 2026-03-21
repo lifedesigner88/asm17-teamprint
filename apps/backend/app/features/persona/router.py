@@ -14,4 +14,4 @@ def get_persona(persona_id: str, db: Session = Depends(get_db)) -> dict:
     persona = db.scalar(select(Persona).where(Persona.persona_id == persona_id))
     if persona is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Persona not found")
-    return persona.data
+    return {"title": persona.title, **persona.data}
