@@ -11,14 +11,14 @@ export function CaptureReviewPage() {
   const actionData = useActionData() as CaptureSubmitActionData | undefined;
   const navigation = useNavigation();
   const loading = navigation.state === "submitting";
-  const ready = completion.interview && completion.voice && completion.image;
+  const ready = completion.interview;
 
   return (
     <div className="space-y-6">
       <Card className="bg-white/92">
         <CardHeader className="flex flex-wrap items-start justify-between gap-6 md:flex-row">
           <div className="space-y-3">
-            <Badge variant={ready ? "success" : "warn"}>Step 4</Badge>
+            <Badge variant={ready ? "success" : "warn"}>Step 2</Badge>
             <CardTitle className="text-2xl">Review draft package</CardTitle>
             <CardDescription className="max-w-2xl">
               This is the payload that will be sent to the backend capture job API. File uploads are still metadata-only,
@@ -42,9 +42,9 @@ export function CaptureReviewPage() {
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
-              <NavLink to="/capture/image">
+              <NavLink to="/capture/interview">
                 <Button type="button" variant="outline">
-                  Back to image step
+                  Back to interview
                 </Button>
               </NavLink>
               <Form method="post">

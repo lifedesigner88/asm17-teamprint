@@ -7,11 +7,26 @@ export function StepLink({
   to,
   title,
   done,
+  disabled = false,
 }: {
   to: string;
   title: string;
   done: boolean;
+  disabled?: boolean;
 }) {
+  if (disabled) {
+    return (
+      <div className="rounded-3xl border border-border/40 bg-card/50 px-4 py-4 text-sm opacity-50 cursor-not-allowed">
+        <div className="flex items-center justify-between gap-3">
+          <span className="font-medium text-foreground/60">{title}</span>
+          <Badge className="bg-slate-50 capitalize" variant="outline">
+            soon
+          </Badge>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <NavLink
       end

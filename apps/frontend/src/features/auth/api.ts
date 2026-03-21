@@ -25,7 +25,7 @@ export async function signupAction({ request }: { request: Request }): Promise<A
   const formData = await request.formData();
   const user_id = String(formData.get("user_id") ?? "");
   const password = String(formData.get("password") ?? "");
-  const email = String(formData.get("email") ?? "").trim() || null;
+  const email = String(formData.get("email") ?? "").trim() || undefined;
 
   const response = await fetch(`${API_BASE_URL}/auth/signup`, {
     method: "POST",

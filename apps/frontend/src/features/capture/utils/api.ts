@@ -1,4 +1,4 @@
-import type { CaptureDraft, CaptureJob } from "./types";
+import type { CaptureDraft, CaptureJob, ChatMessage } from "./types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
@@ -44,4 +44,15 @@ export async function readCaptureJobResponse(response: Response): Promise<Captur
 
 export async function readCaptureJobsResponse(response: Response): Promise<CaptureJob[]> {
   return (await response.json()) as CaptureJob[];
+}
+
+export async function requestInterviewChat(messages: ChatMessage[]): Promise<{ message: string; is_complete: boolean }> {
+  const response = await fetch(`${API_BASE_URL}/capture/interview/chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ messages }),
+    credentials: "include",
+  });
+  if (!response.ok) throw new Error("Chat request failed");
+  return response.json();
 }

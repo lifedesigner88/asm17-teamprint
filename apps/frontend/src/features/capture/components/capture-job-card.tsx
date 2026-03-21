@@ -23,7 +23,7 @@ export function CaptureJobCard({
           <CaptureJobStatusBadge status={job.status} />
         </div>
         <div className="space-y-2">
-          <CardTitle className="text-lg">{job.payload.interview.selfSummary || `Capture job ${job.id.slice(0, 8)}`}</CardTitle>
+          <CardTitle className="text-lg">{`Capture job ${job.id.slice(0, 8)}`}</CardTitle>
           <CardDescription>
             Created {formatCaptureTimestamp(job.created_at)}
             {showOwner ? ` • owner ${job.owner_user_id}` : ""}
@@ -34,7 +34,9 @@ export function CaptureJobCard({
         <div className="grid gap-3 sm:grid-cols-3">
           <div className="rounded-2xl border border-border/70 bg-background/75 px-4 py-3 text-sm">
             <div className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Interview</div>
-            <div className="mt-2 line-clamp-3 text-foreground/80">{job.payload.interview.coreValues || "No values yet."}</div>
+            <div className="mt-2 line-clamp-3 text-foreground/80">
+              {job.payload.interview.isComplete ? "Complete" : `${job.payload.interview.messages.length} messages`}
+            </div>
           </div>
           <div className="rounded-2xl border border-border/70 bg-background/75 px-4 py-3 text-sm">
             <div className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Voice</div>

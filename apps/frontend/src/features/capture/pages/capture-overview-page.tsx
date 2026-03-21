@@ -26,7 +26,7 @@ export function CaptureOverviewPage() {
               </Button>
             </NavLink>
             <NavLink to={nextPath}>
-              <Button size="lg">{completion.interview || completion.voice || completion.image ? "Continue draft" : "Start capture"}</Button>
+              <Button size="lg">{completion.interview ? "Continue draft" : "Start capture"}</Button>
             </NavLink>
           </div>
         </CardHeader>
@@ -38,28 +38,28 @@ export function CaptureOverviewPage() {
             </CardHeader>
             <CardContent>
               <p className="text-sm leading-6 text-foreground/80">
-                {draft.interview.selfSummary || "Describe how the user sees themselves, their values, and their speaking texture."}
+                {draft.interview.isComplete
+                  ? "Interview complete — ready to submit."
+                  : draft.interview.messages.length > 0
+                    ? `${draft.interview.messages.length} messages so far — continue the conversation.`
+                    : "Claude will guide you through 5 questions to understand who you are."}
               </p>
             </CardContent>
           </Card>
-          <Card className="bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(240,247,246,0.96))]">
+          <Card className="bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(240,247,246,0.96))] opacity-60">
             <CardHeader className="pb-3">
               <CardTitle className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Voice</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm leading-6 text-foreground/80">
-                {draft.voice.toneNotes || "Capture either a sample filename or notes about delivery, energy, and pacing."}
-              </p>
+              <p className="text-sm leading-6 text-foreground/80">Coming soon — voice sample and tone capture.</p>
             </CardContent>
           </Card>
-          <Card className="bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(246,245,240,0.96))]">
+          <Card className="bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(246,245,240,0.96))] opacity-60">
             <CardHeader className="pb-3">
               <CardTitle className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Image</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm leading-6 text-foreground/80">
-                {draft.image.visualDirection || "Collect a reference image path, camera intent, and the artistic direction you want."}
-              </p>
+              <p className="text-sm leading-6 text-foreground/80">Coming soon — reference image and visual direction.</p>
             </CardContent>
           </Card>
         </CardContent>

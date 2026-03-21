@@ -5,14 +5,11 @@ let captureDraft: CaptureDraft = cloneDraft(EMPTY_DRAFT);
 function cloneDraft(draft: CaptureDraft): CaptureDraft {
   return {
     interview: {
-      ...draft.interview,
+      messages: [...draft.interview.messages],
+      isComplete: draft.interview.isComplete,
     },
-    voice: {
-      ...draft.voice,
-    },
-    image: {
-      ...draft.image,
-    },
+    voice: { ...draft.voice },
+    image: { ...draft.image },
     updatedAt: draft.updatedAt,
   };
 }
@@ -37,37 +34,16 @@ export function saveDraft(nextDraft: CaptureDraft) {
 }
 
 export function getCompletion(draft: CaptureDraft): CaptureCompletion {
-  const interviewDone =
-    draft.interview.selfSummary.trim().length > 0 &&
-    draft.interview.coreValues.trim().length > 0 &&
-    draft.interview.speakingStyle.trim().length > 0;
-
-  const voiceDone =
-    draft.voice.inputMode === "later" ||
-    draft.voice.sampleFileName.trim().length > 0 ||
-    draft.voice.toneNotes.trim().length > 0;
-
-  const imageDone =
-    draft.image.inputMode === "later" ||
-    (draft.image.visualDirection.trim().length > 0 &&
-      (draft.image.referenceFileName.trim().length > 0 || draft.image.framingNotes.trim().length > 0));
-
   return {
-    interview: interviewDone,
-    voice: voiceDone,
-    image: imageDone,
+    interview: draft.interview.isComplete,
+    voice: false,  // coming soon
+    image: false,  // coming soon
   };
 }
 
 export function getNextPath(completion: CaptureCompletion) {
   if (!completion.interview) {
     return "/capture/interview";
-  }
-  if (!completion.voice) {
-    return "/capture/voice";
-  }
-  if (!completion.image) {
-    return "/capture/image";
   }
   return "/capture/review";
 }

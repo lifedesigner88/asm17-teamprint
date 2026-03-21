@@ -1,11 +1,14 @@
 export type CaptureStep = "interview" | "voice" | "image";
 
+export type ChatMessage = {
+  role: "assistant" | "user";
+  content: string;
+};
+
 export type CaptureDraft = {
   interview: {
-    selfSummary: string;
-    coreValues: string;
-    speakingStyle: string;
-    keywords: string;
+    messages: ChatMessage[];
+    isComplete: boolean;
   };
   voice: {
     inputMode: "upload" | "record" | "later";
@@ -68,10 +71,8 @@ export type CaptureJobActionData = {
 
 export const EMPTY_DRAFT: CaptureDraft = {
   interview: {
-    selfSummary: "",
-    coreValues: "",
-    speakingStyle: "",
-    keywords: "",
+    messages: [],
+    isComplete: false,
   },
   voice: {
     inputMode: "later",

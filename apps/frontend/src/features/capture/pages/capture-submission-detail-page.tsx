@@ -59,7 +59,7 @@ export function CaptureSubmissionDetailPage() {
                 <span className="text-xs text-muted-foreground animate-pulse">Analyzing…</span>
               ) : null}
             </div>
-            <CardTitle className="text-2xl">{job.payload.interview.selfSummary || `Capture job ${job.id.slice(0, 8)}`}</CardTitle>
+            <CardTitle className="text-2xl">{`Capture job ${job.id.slice(0, 8)}`}</CardTitle>
             <CardDescription className="max-w-2xl">
               This detail view is designed to be reusable for later admin review. The same payload summary can be shown
               whether the viewer is the owner or an administrator.

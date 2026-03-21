@@ -17,7 +17,6 @@ import {
   VoiceCapturePage,
   captureLoader,
   imageAction,
-  interviewAction,
   resetCaptureAction,
   submitCaptureAction,
   voiceAction,
@@ -62,7 +61,6 @@ export const router = createBrowserRouter([
           {
             path: "interview",
             element: <InterviewCapturePage />,
-            action: interviewAction,
           },
           {
             path: "voice",

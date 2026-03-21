@@ -4,7 +4,6 @@ export {
   captureJobsLoader,
   captureLoader,
   imageAction,
-  interviewAction,
   resetCaptureAction,
   submitCaptureAction,
   voiceAction,

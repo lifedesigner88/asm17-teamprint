@@ -74,23 +74,6 @@ export async function captureJobDetailLoader({ params, request }: LoaderFunction
   };
 }
 
-export async function interviewAction({ request }: { request: Request }) {
-  const formData = await request.formData();
-  const draft = readCaptureDraft();
-
-  saveDraft({
-    ...draft,
-    interview: {
-      selfSummary: String(formData.get("selfSummary") ?? "").trim(),
-      coreValues: String(formData.get("coreValues") ?? "").trim(),
-      speakingStyle: String(formData.get("speakingStyle") ?? "").trim(),
-      keywords: String(formData.get("keywords") ?? "").trim(),
-    },
-  });
-
-  return redirect("/capture/voice");
-}
-
 export async function voiceAction({ request }: { request: Request }) {
   const formData = await request.formData();
   const draft = readCaptureDraft();
@@ -136,8 +119,8 @@ export async function submitCaptureAction(): Promise<CaptureSubmitActionData | R
   const draft = readCaptureDraft();
   const completion = getCompletion(draft);
 
-  if (!completion.interview || !completion.voice || !completion.image) {
-    return { error: "Complete interview, voice, and image steps before submitting." };
+  if (!completion.interview) {
+    return { error: "Complete the interview before submitting." };
   }
 
   const response = await requestCreateCaptureJob(draft);
