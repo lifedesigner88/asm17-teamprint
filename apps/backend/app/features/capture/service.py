@@ -32,6 +32,8 @@ Rules:
 def chat_interview(payload: ChatRequest) -> ChatResponse:
     client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY", ""))
     messages = [{"role": m.role, "content": m.content} for m in payload.messages]
+    if not messages:
+        messages = [{"role": "user", "content": "Hello, I'm ready to start."}]
     response = client.messages.create(
         model="claude-opus-4-6",
         max_tokens=512,
