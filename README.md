@@ -66,7 +66,7 @@ RESEND_API_KEY=...      # resend.com (optional — for email OTP)
 
 ### 4. Run
 
-**Option A — local dev** (services on host, DB + Redis in Docker)
+**Option A — local dev** (all 3 app services on host, DB + Redis in Docker)
 ```bash
 pnpm dev
 ```
