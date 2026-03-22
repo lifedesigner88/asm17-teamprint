@@ -41,6 +41,8 @@
 - Endpoint details belong in the code, OpenAPI, or separate test/doc files.
 
 ## Files
+- [ROADMAP.md](ROADMAP.md) — phase-by-phase roadmap built from project history
 - [2026-03-09.md](2026-03-09.md)
 - [2026-03-10.md](2026-03-10.md)
 - [2026-03-21.md](2026-03-21.md)
+- [2026-03-22.md](2026-03-22.md)

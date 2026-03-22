@@ -35,7 +35,7 @@ def chat_interview(payload: ChatRequest) -> ChatResponse:
     if not messages:
         messages = [{"role": "user", "content": "Hello, I'm ready to start."}]
     response = client.messages.create(
-        model="claude-opus-4-6",
+        model="claude-haiku-4-5-20251001",
         max_tokens=512,
         system=_SYSTEM_PROMPT,
         messages=messages,

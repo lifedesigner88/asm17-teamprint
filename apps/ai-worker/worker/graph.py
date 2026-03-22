@@ -10,7 +10,7 @@ from anthropic import Anthropic
 from langgraph.graph import END, StateGraph
 
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
-MODEL = "claude-opus-4-6"
+MODEL = "claude-haiku-4-5-20251001"
 
 
 class PersonaState(TypedDict):

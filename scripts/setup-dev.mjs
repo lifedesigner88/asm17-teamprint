@@ -1,4 +1,5 @@
 import { spawnSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 const rootDir = process.cwd();
 
 function commandName(command) {
@@ -19,6 +20,15 @@ function run(command, args) {
   if (result.status !== 0) {
     process.exit(result.status ?? 1);
   }
+}
+
+// Ensure pnpm is available before proceeding
+const pnpmCheck = spawnSync(commandName("pnpm"), ["--version"], { shell: false });
+if (pnpmCheck.error || pnpmCheck.status !== 0) {
+  const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url)));
+  const pnpmVersion = pkg.packageManager?.replace("pnpm@", "") ?? "latest";
+  console.log(`pnpm not found. Installing pnpm@${pnpmVersion} via npm...`);
+  run("npm", ["install", "-g", `pnpm@${pnpmVersion}`]);
 }
 
 console.log("Ensuring local app env files...");

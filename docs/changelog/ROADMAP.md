@@ -1,0 +1,87 @@
+# PersonaMirror Roadmap
+
+Built from project history. Each phase maps to what was actually done or decided.
+
+---
+
+## Phase 0 — Foundation `2026-03-09` ✅
+
+Goal: empty monorepo → runnable template
+
+- [x] Nx monorepo, pnpm + uv, `.nvmrc`, `.python-version`
+- [x] FastAPI `/health` + React Router v7 frontend scaffold
+- [x] ESLint, Prettier, Ruff, pre-commit
+- [x] httpOnly cookie-based session auth (signup / login / logout / admin)
+- [x] `capture_jobs` table + `POST /capture/jobs`, `GET`, `GET /{id}`
+- [x] Capture step UI draft (interview / voice / image / review)
+- [x] Frontend / backend aligned to same domain names: `auth`, `admin`, `capture`
+
+---
+
+## Phase 0.5 — Operational Baseline `2026-03-10` ✅
+
+Goal: loosely-running template → reproducible and verifiable
+
+- [x] Three execution paths stabilized: `pnpm dev` / `pnpm docker` / `docker compose up`
+- [x] Runtime pinned to patch version (Node 24.11.0, Python 3.11.15, Postgres 16.13, Redis 7.4.7)
+- [x] `.env.example` tracked; actual `.env` auto-generated; `compose.env` consolidated
+- [x] 10 backend smoke tests (auth, admin, capture)
+- [x] `capture_jobs.owner_id` → FK to `users.id`
+- [x] Capture submit → submission list / detail / delete full cycle working
+- [x] Per-date changelog + stacked branch policy documented
+
+---
+
+## Phase 1 — March 25 MVP `2026-03-21` 🔄
+
+Goal: full AI pipeline → shareable Level 1 persona card
+
+- [x] Email signup with OTP verification (Resend) + 4-digit PIN login
+- [x] Reset PIN via email OTP
+- [x] Admin account seed + admin user list
+- [x] AI chat interview — Claude asks 5 adaptive questions (`POST /capture/interview/chat`)
+- [x] `capture_jobs.result` (JSON) + `persona_id` (String 16) added
+- [x] ai-worker LangGraph pipeline: polls pending jobs → Claude → writes `{ archetype, top3_values, one_liner }`
+- [x] Level 1 Persona Card on submission detail (polls every 2s until done)
+- [x] Public persona page `/persona/:id` — hero, MBTI bars, radar, SDG, timeline, strengths
+- [x] `/persona/demo` — Hupository data, no backend needed
+- [x] Capture routes auth-gated (nav hidden + route redirect on 401)
+- [x] Dev environment: `.env` files created, model set to `claude-haiku-4-5` for cost
+- [ ] `GET /persona/:id` real backend endpoint ← **next**
+- [ ] `POST /persona/:id/ask` Q&A panel backend endpoint
+- [ ] DB volume reset required (new columns: `result`, `persona_id`)
+
+---
+
+## Phase 2 — Enriched Analysis `planned`
+
+Goal: Level 2+ persona depth, multi-modal input
+
+- [ ] `GET /persona/:id` real endpoint + backend persona storage
+- [ ] `POST /persona/:id/ask` — Q&A panel AI answer
+- [ ] LangGraph Phase 2 nodes: `extract_speaking`, `generate_card`
+- [ ] Whisper voice analysis node
+- [ ] Image analysis node
+- [ ] Level 2 output: language patterns + decision-making tendencies + career direction
+- [ ] Multi-LLM backend support (GPT, Gemini swap via LangGraph)
+
+---
+
+## Phase 3 — Operations `planned`
+
+Goal: production-ready
+
+- [ ] Alembic migration introduction
+- [ ] Playwright e2e tests
+- [ ] Admin capture submission list / detail view
+- [ ] Logging and monitoring
+- [ ] Infrastructure automation (Terraform)
+- [ ] Level N: life timeline · goal hierarchy · value evolution · SDG alignment
+
+---
+
+## Next Recommended Work
+
+1. `GET /persona/:id` — real backend endpoint so `/persona/demo` can be replaced with real user profiles
+2. `POST /persona/:id/ask` — Q&A panel AI answer
+3. DB volume reset on next local deploy (run `docker compose down -v && docker compose up`)
