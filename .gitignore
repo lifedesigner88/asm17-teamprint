@@ -28,4 +28,5 @@ venv/
 !compose.env
 !apps/backend/.env.example
 !apps/frontend/.env.example
+!apps/ai-worker/.env.example
 

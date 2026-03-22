@@ -17,6 +17,10 @@
       "path": "apps/backend"
     },
     {
+      "name": "docs",
+      "path": "docs"
+    },
+    {
       "name": "root",
       "path": "."
     },

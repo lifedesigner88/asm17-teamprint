@@ -71,7 +71,7 @@ RESEND_API_KEY=...      # resend.com (optional — for email OTP)
 pnpm dev
 ```
 
-**Option B — full Docker** (all services as containers)
+**Option B — full Docker via pnpm** (Nx-managed, builds images per service)
 ```bash
 pnpm docker        # builds images + starts backend, frontend, ai-worker
 pnpm docker:down   # stop all app containers
@@ -80,6 +80,18 @@ pnpm infra:down    # stop DB and Redis
 
 > `pnpm docker` requires DB + Redis already running (`pnpm infra:up` is called automatically).
 > On first run, Docker builds can take a few minutes. Subsequent runs reuse cached layers.
+
+**Option C — full Docker via Compose** (all services in one command)
+```bash
+docker compose up          # start everything (frontend, backend, ai-worker, db, redis)
+docker compose up -d       # same, detached (background)
+docker compose down        # stop and remove containers
+docker compose down -v     # also wipe DB volume (full reset)
+```
+
+> On first run, `pip install uv` + `uv sync` run inside each Python container — takes ~1 min.
+> Subsequent runs reuse existing containers and start instantly (no reinstall).
+> To force a full reinstall: `docker compose down && docker compose up`
 
 ---
 

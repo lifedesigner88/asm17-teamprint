@@ -18,10 +18,11 @@ services:
     working_dir: /workspace
     command: sh -c "pip install uv && uv run --project apps/backend uvicorn main:app --reload --host 0.0.0.0 --port 8000 --app-dir apps/backend"
     env_file:
-      - compose.env
+      - apps/backend/.env
     environment:
       UV_PROJECT_ENVIRONMENT: /tmp/persona-backend-venv
       UV_LINK_MODE: copy
+      DATABASE_URL: postgresql+psycopg://persona:persona@db:5432/persona_mirror
     volumes:
       - ./:/workspace
     ports:
@@ -35,14 +36,20 @@ services:
   ai-worker:
     image: python:3.11.15-slim
     working_dir: /workspace
-    command: sh -c "pip install uv && echo 'ai-worker scaffold pending (Phase 1, uv ready)' && tail -f /dev/null"
+    command: sh -c "pip install uv && cd apps/ai-worker && uv run python -u -m worker.main"
+    env_file:
+      - apps/ai-worker/.env
     environment:
       UV_PROJECT_ENVIRONMENT: /tmp/persona-ai-worker-venv
       UV_LINK_MODE: copy
+      DATABASE_URL: postgresql+psycopg://persona:persona@db:5432/persona_mirror
     volumes:
       - ./:/workspace
     depends_on:
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
   db:
     image: postgres:16.13-alpine
