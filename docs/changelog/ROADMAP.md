@@ -50,9 +50,10 @@ Goal: full AI pipeline → shareable Level 1 persona card
 - [x] `GET /persona/:id` real backend endpoint (personas table + router)
 - [ ] `POST /persona/:id/ask` Q&A panel backend endpoint
 - [ ] DB volume reset required (new columns: `result`, `persona_id`)
-- [ ] Production Docker images: frontend nginx build, backend
-- [ ] GHCR CI: build + push `persona-mirror-frontend` and `persona-mirror-backend`
-- [ ] Deploy to `asm17.huposit.kr` via 260312-demo-infra (Caddy + compose) `2026-03-22`
+- [x] Production Docker images: frontend nginx build + nginx.conf SPA routing
+- [x] GHCR CI: build + push `persona-mirror-frontend`, `persona-mirror-backend`, `persona-mirror-ai-worker`
+- [x] Supabase as managed DB — removed local Postgres/Redis from compose
+- [ ] Deploy to `asm17.huposit.kr` via 260312-demo-infra (Caddy + compose)
 
 ---
 
@@ -85,7 +86,6 @@ Goal: production-ready
 
 ## Next Recommended Work
 
-1. Production Docker images + GHCR CI for frontend and backend
-2. Deploy to `asm17.huposit.kr` via 260312-demo-infra (Caddy routing + compose)
+1. Deploy to `asm17.huposit.kr` via 260312-demo-infra (Caddy routing + compose)
 3. `POST /persona/:id/ask` — Q&A panel AI answer
 4. DB volume reset on next local deploy (run `docker compose down -v && docker compose up`)

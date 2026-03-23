@@ -4,8 +4,6 @@
   "remote.forwardOnOpen": true,
   "ports": [
     { "number": 3000, "label": "Frontend", "protocol": "http" },
-    { "number": 8000, "label": "Backend API", "protocol": "http" },
-    { "number": 5432, "label": "PostgreSQL" },
-    { "number": 6379, "label": "Redis" }
+    { "number": 8000, "label": "Backend API", "protocol": "http" }
   ]
 }
