@@ -10,9 +10,6 @@
         "envFile": "apps/backend/.env",
         "commands": [
           {
-            "command": "node scripts/wait-for-port.mjs 5432 127.0.0.1 60000"
-          },
-          {
             "command": "uv run --project apps/backend uvicorn main:app --reload --host 0.0.0.0 --port ${BACKEND_PORT:-8000} --app-dir apps/backend --env-file apps/backend/.env"
           }
         ],
@@ -23,9 +20,6 @@
       "executor": "nx:run-commands",
       "options": {
         "commands": [
-          {
-            "command": "node scripts/wait-for-port.mjs 5432 127.0.0.1 60000"
-          },
           {
             "command": "node scripts/docker-build.mjs apps/backend/Dockerfile persona-mirror-backend:dev"
           },

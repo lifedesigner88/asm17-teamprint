@@ -19,7 +19,6 @@
       "options": {
         "envFile": "apps/ai-worker/.env",
         "commands": [
-          "node scripts/wait-for-port.mjs 5432 127.0.0.1 60000",
           "cd apps/ai-worker && uv run python -u -m worker.main"
         ],
         "parallel": false

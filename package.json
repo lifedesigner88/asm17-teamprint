@@ -5,8 +5,8 @@
   "packageManager": "pnpm@10.31.0",
   "scripts": {
     "setup": "node scripts/setup-dev.mjs",
-    "dev": "node scripts/ensure-dev-env.mjs && pnpm infra:up && nx run-many -t dev -p frontend,backend,ai-worker",
-    "infra:up": "docker compose up -d db redis",
+    "dev": "node scripts/ensure-dev-env.mjs && nx run-many -t dev -p frontend,backend,ai-worker",
+    "infra:up": "echo 'DB is Supabase (no local infra needed)'",
     "infra:down": "node scripts/infra-down.mjs",
     "docker": "node scripts/ensure-dev-env.mjs && pnpm infra:up && nx run-many -t docker -p backend,frontend,ai-worker --output-style=stream",
     "docker:down": "node scripts/docker-down.mjs",
