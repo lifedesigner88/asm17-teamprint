@@ -6,7 +6,7 @@ import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Textarea } fro
 import type { RootLoaderData } from "@/features/auth";
 
 import { requestPersonaAsk } from "../utils/api";
-import type { MbtiProfile, PersonaProfile, PersonaQAMessage } from "../utils/types";
+import type { MbtiProfile, PersonaProfile, PersonaQAMessage, TechStackItem } from "../utils/types";
 
 // ─── Markdown export ─────────────────────────────────────────────────────────
 
@@ -87,7 +87,13 @@ function buildProfileMarkdown(p: import("../utils/types").PersonaProfile): strin
 // ─── Loader ──────────────────────────────────────────────────────────────────
 
 export type PersonaLoaderData = {
-  profile: PersonaProfile;
+  personaId: string;
+  title: string;
+  dataEng: PersonaProfile;
+  dataKor: PersonaProfile | null;
+  email: string | null;
+  githubAddress: string | null;
+  notionUrl: string | null;
 };
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -251,7 +257,7 @@ function MbtiBarChart({ mbti }: { mbti: MbtiProfile }) {
         return (
           <div key={key} className="flex items-center gap-3">
             {/* Left pole */}
-            <div className="w-28 flex items-center justify-end gap-1.5 shrink-0">
+            <div className="w-8 sm:w-28 flex items-center justify-end gap-1.5 shrink-0">
               <div className="hidden sm:flex flex-col items-end">
                 <a href={leftUrl} target="_blank" rel="noopener noreferrer" className="text-xs font-medium hover:underline underline-offset-2" style={{ color: leftColor }}>{leftLabel}</a>
                 <span className="text-xs font-bold tabular-nums" style={{ color: leftColor }}>{score}%</span>
@@ -276,7 +282,7 @@ function MbtiBarChart({ mbti }: { mbti: MbtiProfile }) {
             </div>
 
             {/* Right pole */}
-            <div className="w-28 flex items-center gap-1.5 shrink-0">
+            <div className="w-8 sm:w-28 flex items-center gap-1.5 shrink-0">
               <span
                 className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white transition-opacity"
                 style={{ background: rightColor, opacity: !dominant ? 1 : 0.25 }}
@@ -319,9 +325,42 @@ function SdgBadge({ sdg, label, resonance }: { sdg: number; label: string; reson
   );
 }
 
+// ─── Tech Stack card ─────────────────────────────────────────────────────────
+
+function TechStackCard({ items }: { items: TechStackItem[] }) {
+  const { t } = useTranslation("persona");
+  return (
+    <Card className="border-slate-200 bg-[linear-gradient(135deg,rgba(248,250,252,0.98),rgba(241,245,249,0.94))]">
+      <CardContent className="px-5 py-5">
+        <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 mb-4">
+          {t("techStack.title")}
+        </div>
+        <div className="flex flex-wrap gap-3">
+          {items.map((item) => (
+            <div
+              key={item.name}
+              className="flex flex-col items-center gap-1.5 rounded-2xl border border-slate-200/80 bg-white/90 px-3.5 py-3 shadow-sm hover:shadow-md hover:border-slate-300 transition-all"
+              title={`${item.name} · ${item.category}`}
+            >
+              <img
+                src={item.icon_url}
+                alt={item.name}
+                className="h-9 w-9 object-contain"
+                onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+              />
+              <span className="text-[11px] font-medium text-slate-600 capitalize">{item.name}</span>
+              <span className="text-[10px] text-slate-400">{item.category}</span>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 // ─── Q&A panel (auth-gated) ───────────────────────────────────────────────────
 
-function PersonaQAPanel({ personId }: { personId: string }) {
+function PersonaQAPanel({ personId, lang }: { personId: string; lang: string }) {
   const { t } = useTranslation("persona");
   const [messages, setMessages] = useState<PersonaQAMessage[]>([]);
   const [input, setInput] = useState("");
@@ -335,7 +374,7 @@ function PersonaQAPanel({ personId }: { personId: string }) {
     setMessages((prev) => [...prev, { role: "user", content: question }]);
     setLoading(true);
     try {
-      const response = await requestPersonaAsk(personId, question);
+      const response = await requestPersonaAsk(personId, question, lang);
       if (response.ok) {
         const data = (await response.json()) as { answer: string };
         setMessages((prev) => [...prev, { role: "persona", content: data.answer }]);
@@ -413,10 +452,16 @@ function PersonaQAPanel({ personId }: { personId: string }) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export function PersonaPage() {
-  const { t } = useTranslation("persona");
-  const { profile } = useLoaderData() as PersonaLoaderData;
+  const { t, i18n } = useTranslation("persona");
+  const { personaId, title, dataEng, dataKor, email, githubAddress, notionUrl } = useLoaderData() as PersonaLoaderData;
   const rootData = useRouteLoaderData("root") as RootLoaderData;
   const sessionUser = rootData?.sessionUser ?? null;
+
+  // Per-page language state — defaults to global i18n language
+  const [lang, setLang] = useState<"en" | "ko">(() =>
+    i18n.language.startsWith("ko") ? "ko" : "en"
+  );
+  const profile = (lang === "ko" && dataKor) ? dataKor : dataEng;
 
   // Very-light tinted backgrounds derived from dominant MBTI colors
   const mbtiColors = profile.mbti ? getMbtiDominantColors(profile.mbti) : [];
@@ -426,6 +471,14 @@ export function PersonaPage() {
     if (!a || !b) return "rgba(255,255,255,0.94)";
     return `linear-gradient(${deg}deg, ${a}0f, ${b}0a, rgba(255,255,255,0.94))`;
   }
+
+  const [emailCopied, setEmailCopied] = useState(false);
+  const handleEmailCopy = useCallback(async () => {
+    if (!email) return;
+    await navigator.clipboard.writeText(email);
+    setEmailCopied(true);
+    setTimeout(() => setEmailCopied(false), 2000);
+  }, [email]);
 
   const [copied, setCopied] = useState(false);
   const handleCopy = useCallback(async () => {
@@ -439,41 +492,79 @@ export function PersonaPage() {
       {/* Hero card */}
       <Card className="border-teal-200 bg-[linear-gradient(160deg,rgba(240,253,250,0.98),rgba(236,254,255,0.92))]">
         <CardHeader className="gap-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="outline">{t("hero.badge")}</Badge>
-            <Badge variant="success">{profile.person_id}</Badge>
-            {profile.title && (
-              <span className="text-xs font-medium text-muted-foreground">{profile.title}</span>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="outline">{t("hero.badge")}</Badge>
+              <Badge variant="success">{personaId}</Badge>
+              <span className="text-xs font-medium text-muted-foreground">{title}</span>
+            </div>
+            {dataKor && (
+              <div className="flex rounded-xl border border-border overflow-hidden text-xs font-semibold">
+                <button
+                  type="button"
+                  onClick={() => setLang("en")}
+                  className={`px-3 py-1.5 transition-colors ${lang === "en" ? "bg-blue-600 text-white" : "text-foreground/50 hover:bg-black/5"}`}
+                >
+                  EN
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLang("ko")}
+                  className={`px-3 py-1.5 transition-colors ${lang === "ko" ? "bg-red-600 text-white" : "text-foreground/50 hover:bg-black/5"}`}
+                >
+                  KO
+                </button>
+              </div>
             )}
           </div>
           <CardTitle className="text-3xl tracking-[-0.04em]">{profile.archetype}</CardTitle>
           <p className="max-w-2xl text-sm leading-7 text-muted-foreground">{profile.one_liner}</p>
           <p className="text-xs text-muted-foreground/70">{profile.headline}</p>
-          {(profile.email || profile.github_address) && (
+          {(email || githubAddress || notionUrl) && (
             <div className="flex flex-wrap items-center gap-3 pt-1">
-              {profile.email && (
-                <a
-                  href={`mailto:${profile.email}`}
-                  className="flex items-center gap-1.5 rounded-full border border-teal-200 bg-teal-50/70 px-3 py-1 text-xs font-medium text-teal-700 hover:bg-teal-100 transition-colors"
+              {email && (
+                <button
+                  type="button"
+                  onClick={handleEmailCopy}
+                  className="flex items-center gap-1.5 rounded-full border border-zinc-900/20 bg-zinc-900 px-3 py-1 text-xs font-medium text-white hover:bg-zinc-700 transition-colors"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5">
-                    <path d="M3 4a2 2 0 0 0-2 2v1.161l8.441 4.221a1.25 1.25 0 0 0 1.118 0L19 7.162V6a2 2 0 0 0-2-2H3Z" />
-                    <path d="m19 8.839-7.77 3.885a2.75 2.75 0 0 1-2.46 0L1 8.839V14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.839Z" />
-                  </svg>
-                  {profile.email}
-                </a>
+                  {emailCopied ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5">
+                      <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clipRule="evenodd" />
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5">
+                      <path d="M3 4a2 2 0 0 0-2 2v1.161l8.441 4.221a1.25 1.25 0 0 0 1.118 0L19 7.162V6a2 2 0 0 0-2-2H3Z" />
+                      <path d="m19 8.839-7.77 3.885a2.75 2.75 0 0 1-2.46 0L1 8.839V14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.839Z" />
+                    </svg>
+                  )}
+                  {emailCopied ? "Copied!" : email}
+                </button>
               )}
-              {profile.github_address && (
+              {githubAddress && (
                 <a
-                  href={profile.github_address}
+                  href={githubAddress}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50/70 px-3 py-1 text-xs font-medium text-zinc-700 hover:bg-zinc-100 transition-colors"
+                  className="flex items-center gap-1.5 rounded-full border border-zinc-900/20 bg-zinc-900 px-3 py-1 text-xs font-medium text-white hover:bg-zinc-700 transition-colors"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5">
                     <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2Z" clipRule="evenodd" />
                   </svg>
-                  {profile.github_address.replace("https://github.com/", "@")}
+                  {githubAddress.replace("https://github.com/", "@")}
+                </a>
+              )}
+              {notionUrl && (
+                <a
+                  href={notionUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 rounded-full border border-zinc-900/20 bg-zinc-900 px-3 py-1 text-xs font-medium text-white hover:bg-zinc-700 transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5">
+                    <path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 1.968c-.42-.326-.981-.7-2.055-.607L3.01 2.295c-.466.046-.56.28-.374.466zm.793 3.08v13.904c0 .747.373 1.027 1.214.98l14.523-.84c.841-.046.935-.56.935-1.167V6.354c0-.606-.233-.933-.748-.887l-15.177.887c-.56.047-.747.327-.747.933zm14.337.745c.093.42 0 .84-.42.888l-.7.14v10.264c-.608.327-1.168.514-1.635.514-.748 0-.935-.234-1.495-.933l-4.577-7.186v6.952L12.21 19s0 .84-1.168.84l-3.222.186c-.093-.186 0-.653.327-.746l.84-.233V9.854L7.822 9.76c-.094-.42.14-1.026.793-1.073l3.456-.233 4.764 7.279v-6.44l-1.215-.14c-.093-.514.28-.887.747-.933zM1.936 1.035l13.31-.98c1.634-.14 2.055-.047 3.082.7l4.249 2.986c.7.513.934.653.934 1.213v16.378c0 1.026-.373 1.634-1.68 1.726l-15.458.934c-.98.047-1.448-.093-1.962-.747l-3.129-4.06c-.56-.747-.793-1.306-.793-1.96V2.667c0-.839.374-1.54 1.447-1.632z"/>
+                  </svg>
+                  Notion
                 </a>
               )}
             </div>
@@ -517,6 +608,11 @@ export function PersonaPage() {
           </button>
         </CardContent>
       </Card>
+
+      {/* Tech Stack */}
+      {profile.tech_stack && profile.tech_stack.length > 0 && (
+        <TechStackCard items={profile.tech_stack} />
+      )}
 
       {/* MBTI */}
       {profile.mbti ? (
@@ -720,7 +816,7 @@ export function PersonaPage() {
 
       {/* Q&A — auth-gated */}
       {sessionUser ? (
-        <PersonaQAPanel personId={profile.person_id} />
+        <PersonaQAPanel personId={personaId} lang={lang} />
       ) : (
         <Card className="bg-white/88">
           <CardContent className="px-6 py-5">

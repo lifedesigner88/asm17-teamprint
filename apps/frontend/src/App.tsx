@@ -39,7 +39,7 @@ export function App() {
     ...(!sessionUser ? [{ to: "/auth/signup", label: t("nav.signup") }, { to: "/auth/login", label: t("nav.login") }] : []),
     ...(sessionUser?.is_admin ? [{ to: "/admin/users", label: t("nav.adminUsers") }] : []),
     ...(sessionUser ? [{ to: "/capture", label: t("nav.capture") }, { to: "/capture/submissions", label: t("nav.mySubmissions") }] : []),
-    { to: "/persona/demo", label: t("nav.demoPersona") },
+    { to: "/persona/sejong", label: t("nav.sejongPersona") },
   ];
 
   return (

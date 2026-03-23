@@ -1,4 +1,4 @@
-import type { PersonaProfile } from "./types";
+import type { PersonaBilingualResponse } from "./types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
@@ -8,15 +8,15 @@ export async function requestPersonaProfile(personId: string): Promise<Response>
   });
 }
 
-export async function readPersonaProfileResponse(response: Response): Promise<PersonaProfile> {
-  return (await response.json()) as PersonaProfile;
+export async function readPersonaBilingualResponse(response: Response): Promise<PersonaBilingualResponse> {
+  return (await response.json()) as PersonaBilingualResponse;
 }
 
-export async function requestPersonaAsk(personId: string, question: string): Promise<Response> {
+export async function requestPersonaAsk(personId: string, question: string, lang = "en"): Promise<Response> {
   return fetch(`${API_BASE_URL}/persona/${personId}/ask`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ question }),
+    body: JSON.stringify({ question, lang }),
     credentials: "include",
   });
 }

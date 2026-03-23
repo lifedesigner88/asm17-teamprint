@@ -1,4 +1,7 @@
 {
+  "techStack": {
+    "title": "기술 스택"
+  },
   "hero": {
     "badge": "공개 페르소나",
     "topValues": "핵심 가치",

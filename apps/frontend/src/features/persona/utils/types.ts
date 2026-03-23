@@ -39,6 +39,12 @@ export type MbtiProfile = {
   };
 };
 
+export type TechStackItem = {
+  name: string;
+  category: string;
+  icon_url: string;
+};
+
 export type PersonaProfile = {
   person_id: string;
   title?: string;
@@ -53,11 +59,20 @@ export type PersonaProfile = {
   fit_vectors: FitVectors;
   sdg_alignment: SdgAlignment[];
   identity_shifts: IdentityShift[];
-  email?: string;
-  github_address?: string;
+  tech_stack?: TechStackItem[];
 };
 
 export type PersonaQAMessage = {
   role: "user" | "persona";
   content: string;
+};
+
+export type PersonaBilingualResponse = {
+  persona_id: string;
+  title: string;
+  data_eng: PersonaProfile;
+  data_kor: PersonaProfile | null;
+  email: string | null;
+  github_address: string | null;
+  notion_url: string | null;
 };

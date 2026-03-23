@@ -6,7 +6,8 @@
     "adminUsers": "관리자 목록",
     "capture": "캡처",
     "mySubmissions": "내 제출 목록",
-    "demoPersona": "데모 페르소나"
+    "demoPersona": "데모 페르소나",
+    "sejongPersona": "세종 페르소나"
   },
   "sidebar": {
     "phase": "Phase 1 스타터",
