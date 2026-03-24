@@ -18,7 +18,6 @@
   "sidebar": {
     "phase": "AI SW Maestro",
     "tagline": "Find your 450 fellow 17th-cohort members across Seoul and Busan, and get ready for team building.",
-    "openChat": "Open chat",
     "directInquiry": "1:1 inquiry",
     "currentBaseline": "Current baseline",
     "sessionTitle": "Session",
@@ -52,7 +51,9 @@
       "People interviewed together",
       "GitHub",
       "Notion intro",
-      "Same-slot browsing",
+      "AI chatbot",
+      "17th-cohort chat room",
+      "Offline meetup",
       "Pre-team-building discovery"
     ],
     "flowLabel": "Current core flow",
@@ -95,13 +96,14 @@
       "GitHub link",
       "Notion intro link",
       "People interviewed together",
+      "Talk with AI Sejong",
       "Creator PR",
       "Admin approval",
       "Korean / English UI"
     ],
     "futureLabel": "Future direction",
-    "futureTitle": "Start narrow, then expand when enough context exists.",
-    "futureSummary": "The current focus is pre-team-building discovery. Later, I want to extend this toward better direction-based recommendations.",
+    "futureTitle": "Features under consideration if enough members join",
+    "futureSummary": "The current focus is pre-team-building discovery. If enough members sign up later, I want to consider expanding into direction-based recommendations and related tools.",
     "futureItems": [
       "Similar-vision recommendations",
       "AI-assisted matching",

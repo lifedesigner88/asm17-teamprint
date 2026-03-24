@@ -11,12 +11,15 @@ export type DashboardGrid = {
   cells: SlotCell[];
   total_slots: number;
   filled_slots: number;
+  approved_member_count: number;
 };
 
 export type MemberCard = {
   seat: number;
   user_id: number | null;
   name: string | null;
+  birth_year: number | null;
+  residence: string | null;
   gender: string | null;
   email: string | null;
   github_address: string | null;

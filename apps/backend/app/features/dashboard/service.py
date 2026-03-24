@@ -18,7 +18,7 @@ INTERVIEW_DATES = [
 ROOMS = [1, 2, 3, 4, 5]
 MAX_TIME_SLOTS = 5
 OFFICIAL_SEATS_PER_ROOM = 5
-DISPLAY_SEATS_PER_ROOM = 7
+DISPLAY_SEATS_PER_ROOM = OFFICIAL_SEATS_PER_ROOM
 
 
 def _color(user: User | None) -> str:
@@ -65,7 +65,12 @@ def get_dashboard(db: Session) -> DashboardGrid:
 
     filled = sum(1 for c in cells if c.color != "gray")
     total_slots = len(INTERVIEW_DATES) * MAX_TIME_SLOTS * len(ROOMS) * OFFICIAL_SEATS_PER_ROOM
-    return DashboardGrid(cells=cells, total_slots=total_slots, filled_slots=filled)
+    return DashboardGrid(
+        cells=cells,
+        total_slots=total_slots,
+        filled_slots=filled,
+        approved_member_count=len(approved_users),
+    )
 
 
 def get_slot_members(
@@ -101,6 +106,8 @@ def get_slot_members(
                 seat=seat,
                 user_id=user.user_id if user else None,
                 name=user.name if user else None,
+                birth_year=user.birth_date.year if user and user.birth_date else None,
+                residence=user.residence if user else None,
                 gender=user.gender if user else None,
                 email=user.email if user else None,
                 github_address=user.github_address if user else None,

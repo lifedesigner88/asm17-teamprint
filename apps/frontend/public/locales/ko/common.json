@@ -18,8 +18,7 @@
   "sidebar": {
     "phase": "AI SW Maestro",
     "tagline": "서울 + 부산 450명의 17기 동료를 찾고, 팀빌딩을 준비하세요",
-    "openChat": "오픈채팅방 바로가기",
-    "directInquiry": "1:1 문의하기",
+    "directInquiry": "1:1 문의",
     "currentBaseline": "현재 기준선",
     "sessionTitle": "세션",
     "signedInAs": "{{userId}} 로그인 중",
@@ -52,7 +51,9 @@
       "같이 면접 본 사람들",
       "GitHub",
       "Notion 소개",
-      "같은 슬롯 탐색",
+      "AI 챗봇",
+      "17기 톡방",
+      "오프모임",
       "팀빌딩 전 파악"
     ],
     "flowLabel": "현재 핵심 흐름",
@@ -95,13 +96,14 @@
       "GitHub 링크",
       "Notion 소개 링크",
       "같이 면접 본 사람들 보기",
+      "AI 세종과 대화",
       "Creator PR",
       "관리자 승인",
       "한/영 UI"
     ],
     "futureLabel": "앞으로의 방향",
-    "futureTitle": "충분한 맥락이 쌓이면 그 다음을 확장합니다.",
-    "futureSummary": "지금은 팀빌딩 전 탐색이 핵심이고, 이후에 비슷한 방향성 추천까지 확장하고 싶습니다.",
+    "futureTitle": "가입 인원이 충분히 모이면 개발을 고려 중인 기능",
+    "futureSummary": "지금은 팀빌딩 전 탐색이 핵심이고, 이후 가입 인원이 충분히 모이면 비슷한 방향성 추천 같은 기능도 확장하고 싶습니다.",
     "futureItems": ["비슷한 비전 추천", "AI 보조 매칭", "팀빌딩 shortlist", "참가자 프로필 확장"]
   },
   "button": {

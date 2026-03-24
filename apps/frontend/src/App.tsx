@@ -46,6 +46,29 @@ function nowMs(): number {
   return typeof performance !== "undefined" ? performance.now() : Date.now();
 }
 
+function getNavigationItemClasses(item: NavigationItem, isActive: boolean): string {
+  if (item.to === "/seoul/dashboard") {
+    return cn(
+      "rounded-2xl border border-sky-200/80 bg-[linear-gradient(135deg,rgba(180,226,255,0.96),rgba(122,197,255,0.92))] px-4 py-3 text-sm font-semibold text-sky-950 shadow-sm transition hover:brightness-[0.98]",
+      isActive && "shadow-md ring-1 ring-sky-200/90"
+    );
+  }
+
+  if (item.to === "/persona/sejong") {
+    return cn(
+      "rounded-2xl border border-rose-200/80 bg-[linear-gradient(135deg,rgba(255,246,246,0.95),rgba(255,233,236,0.92))] px-4 py-3 text-sm font-medium text-rose-900 transition hover:bg-rose-100/90 hover:text-rose-950",
+      isActive && "shadow-sm ring-1 ring-rose-200/80"
+    );
+  }
+
+  return cn(
+    "rounded-2xl px-4 py-3 text-sm font-medium transition",
+    isActive
+      ? "bg-foreground text-background shadow-sm"
+      : "text-foreground/75 hover:bg-black/5 hover:text-foreground"
+  );
+}
+
 export function App() {
   const { t, i18n } = useTranslation("common");
   const { sessionUser } = useLoaderData() as RootLoaderData;
@@ -125,7 +148,7 @@ export function App() {
                     key={item.to}
                     aria-disabled="true"
                     title={item.hoverTitle}
-                    className="cursor-not-allowed rounded-2xl border border-dashed border-border/70 px-4 py-3 text-sm font-medium text-foreground/40 transition hover:border-foreground/25 hover:bg-black/5"
+                    className="cursor-not-allowed rounded-2xl border border-dashed border-slate-200/90 bg-slate-100/85 px-4 py-3 text-sm font-medium text-slate-400 shadow-inner transition"
                   >
                     {item.label}
                   </span>
@@ -133,14 +156,7 @@ export function App() {
                   <NavLink
                     key={item.to}
                     to={item.to}
-                    className={({ isActive }) =>
-                      cn(
-                        "rounded-2xl px-4 py-3 text-sm font-medium transition",
-                        isActive
-                          ? "bg-foreground text-background shadow-sm"
-                          : "text-foreground/75 hover:bg-black/5 hover:text-foreground"
-                      )
-                    }
+                    className={({ isActive }) => getNavigationItemClasses(item, isActive)}
                     end={item.to === "/"}
                   >
                     {item.label}
@@ -152,14 +168,6 @@ export function App() {
               {sessionUser ? (
                 <LogoutButton className="w-full rounded-2xl border border-stone-200 bg-white/88 px-4 py-3 text-sm font-semibold text-stone-700 shadow-sm transition hover:bg-white" />
               ) : null}
-              <a
-                href={KAKAO_OPEN_CHAT_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block rounded-xl px-1 text-sm text-muted-foreground transition hover:text-foreground"
-              >
-                {t("sidebar.openChat")}
-              </a>
               <a
                 href={KAKAO_OPEN_CHAT_URL}
                 target="_blank"
@@ -248,6 +256,10 @@ export function HomePage() {
     "border-violet-200 bg-violet-50 text-violet-900",
     "border-slate-200 bg-slate-50 text-slate-800"
   ];
+  const getKeywordClass = (keyword: string, index: number) =>
+    keyword.toLowerCase().includes("notion")
+      ? "border-slate-200 bg-white text-slate-900 shadow-sm"
+      : keywordClasses[index % keywordClasses.length];
 
   return (
     <div className="space-y-6">
@@ -282,16 +294,16 @@ export function HomePage() {
               <p className="max-w-3xl text-[13px] leading-6 text-muted-foreground sm:text-sm">
                 {t("home.description")}
               </p>
-              <p className="inline-flex max-w-full rounded-full border border-emerald-200/80 bg-emerald-50/85 px-3 py-1.5 text-[11px] font-semibold text-emerald-900">
+              <p className="inline-flex max-w-full rounded-full border border-rose-200/80 bg-rose-50/90 px-3 py-1.5 text-[11px] font-semibold text-rose-900">
                 {t("home.visibilityNote")}
               </p>
-              <div className="flex flex-wrap gap-2">
+              <div className="grid grid-cols-[repeat(auto-fit,minmax(132px,1fr))] gap-2">
                 {keywords.map((keyword, index) => (
                   <span
                     key={keyword}
                     className={cn(
-                      "rounded-full border px-3 py-1 text-[11px] font-semibold tracking-[0.02em]",
-                      keywordClasses[index % keywordClasses.length]
+                      "flex min-h-[34px] w-full items-center justify-center rounded-[18px] border px-3 py-1.5 text-center text-[11px] font-semibold leading-4 tracking-[0.02em]",
+                      getKeywordClass(keyword, index)
                     )}
                   >
                     {keyword}
@@ -302,7 +314,7 @@ export function HomePage() {
           </div>
 
           <div className="lg:flex lg:justify-end">
-            <div className="w-full max-w-[250px] rounded-[20px] border border-dashed border-slate-300/80 bg-white/82 p-3.5 shadow-sm">
+            <div className="w-full rounded-[20px] border border-dashed border-slate-300/80 bg-white/82 p-3.5 shadow-sm lg:w-[260px] xl:w-[300px]">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
@@ -333,7 +345,7 @@ export function HomePage() {
                     disabled={loading}
                     size="sm"
                     variant="outline"
-                    className="w-full rounded-full"
+                    className="w-full rounded-full border-emerald-300 bg-emerald-50 text-emerald-900 hover:bg-emerald-100 hover:text-emerald-950"
                   >
                     {loading ? t("home.runtimeButtonLoading") : t("home.runtimeButton")}
                   </Button>
@@ -389,11 +401,11 @@ export function HomePage() {
             {t("home.featuresTitle")}
           </h3>
           <p className="mt-2 text-[13px] leading-6 text-muted-foreground">{featuresSummary}</p>
-          <div className="mt-4 flex flex-wrap gap-2.5">
+          <div className="mt-4 grid grid-cols-[repeat(auto-fit,minmax(132px,1fr))] gap-2.5">
             {featureItems.map((item) => (
               <span
                 key={item}
-                className="rounded-full border border-slate-200/80 bg-white/84 px-3 py-1.5 text-[11px] font-semibold text-slate-800 shadow-sm"
+                className="flex min-h-[38px] w-full items-center justify-center rounded-[18px] border border-slate-200/80 bg-white/84 px-3 py-2 text-center text-[11px] font-semibold leading-4 text-slate-800 shadow-sm"
               >
                 {item}
               </span>
@@ -409,11 +421,11 @@ export function HomePage() {
             {t("home.futureTitle")}
           </h3>
           <p className="mt-2 text-[13px] leading-6 text-muted-foreground">{futureSummary}</p>
-          <div className="mt-4 flex flex-wrap gap-2.5">
+          <div className="mt-4 grid grid-cols-[repeat(auto-fit,minmax(132px,1fr))] gap-2.5">
             {futureItems.map((item) => (
               <span
                 key={item}
-                className="rounded-full border border-sky-200/80 bg-white/84 px-3 py-1.5 text-[11px] font-semibold text-slate-800 shadow-sm"
+                className="flex min-h-[38px] w-full items-center justify-center rounded-[18px] border border-sky-200/80 bg-white/84 px-3 py-2 text-center text-[11px] font-semibold leading-4 text-slate-800 shadow-sm"
               >
                 {item}
               </span>
