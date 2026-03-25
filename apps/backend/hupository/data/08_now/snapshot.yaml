@@ -1,0 +1,170 @@
+# 현재 상태 스냅샷 — data/08_now/snapshot.yaml
+# 이벤트 발생 시 갱신하고, 월간 리뷰 때 한 번 더 정리합니다.
+# 과거 스냅샷은 history/{YYYY-MM}.yaml 로 보관합니다.
+
+as_of: "2026-03-25"
+
+# ─────────────────────────────────────────
+# 진행 중인 트랙
+# ─────────────────────────────────────────
+active_tracks:
+
+  sejongclass:
+    status: active           # planned | running | paused | done
+    description: "수학·물리·코딩·라이프디자인 강의 플랫폼 (단독 풀스택 운영)"
+    url: https://sejongclass.kr
+    registered_users: 48    # 가입 유저 (지원서 기준 2026-03-14)
+    paying_students: 0
+    monthly_revenue_krw: 0
+    next_milestone: "첫 유료 수강생 확보"
+    blockers:
+      - "홍보/마케팅 채널 없음"
+      - "강의 콘텐츠 제작 속도"
+    new_series:
+      category: "인생"
+      title: "2026"
+      format: "매주 일요일 저녁 — 편집 없는 주간 리뷰 (한 주 실천 + 다음 주 계획 + 장기 계획)"
+      total: "52강 (52주)"
+      structure: "4계절 × 3개월 × 월 4~5강 (ISO 주차 기준, 총 ~52강)"
+      started: "2026-03-22"
+    notes: "사업자 미등록 데모 운영. 인생 카테고리 2026 주간 리뷰 시리즈를 시작했고, 초기 업로드 리듬을 안정화하는 단계."
+
+  sw_maestro_17:
+    status: pending               # not_applied | applied | coding_test_passed | interview_scheduled | pending | accepted | rejected
+    coding_test_ended: "2026-03-07"
+    coding_test_result: "passed"  # 3/11 합격 통보
+    coding_test_passed_on: "2026-03-11"
+    interview_datetime: "2026-03-20T09:30:00+09:00"
+    interview_completed: "2026-03-20"
+    result: null                  # 결과 발표 3/25 오후 2시
+    notes: "면접 완료(3/20). 결과 발표 3/25 오후 2시 전 대기 중."
+
+  algorithm_study:
+    status: paused           # 목표 달성 후 일시 중단
+    platform: baekjoon
+    current_tier: "platinum_5"    # 3/7 기준 플래티넘 5 달성
+    sessions_completed: 30        # 30일 300문제 완성
+    target_sessions: 30
+    last_active: "2026-03-07"
+    notes: >
+      소마 코딩테스트용 30일 300문제 완성 후 중단.
+      유튜브 40분 풀이 영상 업로드 → 소마 지원자 유입.
+      클래스101 강의 제작 제안으로 이어짐.
+
+  weekly_blog:
+    status: active
+    platform: "네이버 블로그"
+    url: "https://blog.naver.com/lifedesigner88"
+    category: "매주쓰는글"
+    total_posts: 179          # 2026-03-22 기준
+    frequency: "매주 (주 1회)"
+    started: "2025-08"        # 25년 34주차 SejongClass 개발 시작 무렵
+    format: "주간 리뷰 — 한 주 활동 + 다음 주 계획"
+    workflow: "블로그 작성 → 영상 촬영 (블로그 보면서) → 유튜브 업로드 → 블로그에 영상 링크 추가"
+    notes: >
+      세종클래스 유튜브 주간 시리즈(2026 인생 강의)의 소재 베이스.
+      블로그 글 = 유튜브 스크립트. 같은 내용을 영상으로 추가 발행 예정.
+
+  eunpyeong_youth_network:
+    status: active
+    description: "은평청년네트워크 10기 정식 위원 — 일자리창업분과 (2026.01~12)"
+    organization: "은평구청 청장년희망과"
+    last_event: "2026-03-24T19:00:00+09:00 일자리창업분과 모임 참석 완료"
+    next_event: "2026-04-16 정책교육 (정기회의 일정표 기준, 19:00~21:00 / 장소·시간 변동 가능)"
+    notes: >
+      세종클래스·AI 창업 경험을 정책 제안에 연결 가능. 지역 네트워크 확장 기회.
+      2026 정기회의 일정표 확보: 5/21 정책 회의, 6월 워크숍(미정), 7/16 정책 회의,
+      8/20 정책 회의, 9/19 청년축제, 10/15 정책발표회, 11월 네트워크 교류, 12월 사회기여활동 및 성과공유회.
+
+  seoul_citizen_budget:
+    status: applied          # considering | applied | accepted | rejected
+    description: "서울시 시민참여예산위원 지원"
+    applied_on: "2026-03-20"
+    notes: "온라인 지원 완료(3/20). 결과 대기 중."
+
+  class101_opportunity:
+    status: scheduled
+    description: "클래스101 — 소마 코딩테스트 준비 알고리즘 강의 제작 제안"
+    interview_datetime: "2026-03-27T15:00:00+09:00"
+    trigger: "유튜브 알고리즘 풀이 영상 → 소마 지원자 유입 → 클래스101 발견"
+    strategy:
+      goal: "수익 극대화보다 팬 확보 우선 — 소마 이후 마케팅 채널로 활용"
+      production: "PD 제작 지원 수령 검토 (아웃바운드 케이스라 가능성 있음) — 3/27 미팅에서 확인"
+      launch_target: "2026년 5월 말 — 소마 본과정(6월) 시작 전 출시 완료"
+      launch_plan: "소마 합격/불합격 관계없이 4~5월에 기획·제작·출시 집중"
+      revenue_note: >
+        소마 본 연수과정(6~11월) 중 수동적 수익 발생은 그레이존.
+        문제 시 정산 시점을 12월 이후로 조율하는 방향으로 클래스101과 협의 가능.
+      long_term: "소마 팀 제품 홍보 채널 + 세종클래스 외 수익 채널"
+    notes: "3/27 미팅 핵심 확인 포인트: PD 지원 여부, 수익 배분 구조, 개별판매 vs 구독형, 소마 병행 시 정산/출시 조건."
+
+  ai_agent_dev:
+    status: active           # exploring | active | paused | done
+    current_project: "PersonaMirror first public use case — ASM 17 Community / Creator PR context"
+    mvp_deadline: "2026-03-25"
+    stack: "React 19 / FastAPI / LangGraph / OpenAI API (GPT-5.4 family) / PostgreSQL / Redis"
+    progress:
+      completed:
+        - "LangGraph ai-worker 파이프라인 (pending → GPT persona synthesis → persona JSON)"
+        - "Creator PR 페이지 /persona/sejong (최신 Hupository 데이터 기반)"
+        - "Seoul Dashboard 운영 보드 (verification-aware access / preview mode / reviewed-member tracking)"
+        - "AI Sejong login-only multi-turn chat (DB history / grounding / session control / rate limit)"
+      in_progress:
+        - "공개 entry flow와 공유 링크 품질 정리"
+        - "합격 직후 공유용 카피/링크 패키지 정리"
+      not_started:
+        - "실제 유입 반응 반영 및 팀 매칭/운영 확장"
+    notes: >
+      Hupository 기반 PersonaMirror의 첫 공개 유즈케이스다.
+      단기 목적은 ASM 17 Community / Creator PR 맥락에서 팀빌딩 자기소개와 실행력 증명을 동시에 보여주는 front door를 만드는 것이다.
+      장기 목적은 라이프디자인/퍼스널 AI 서비스의 공개 진입점으로 확장하는 것이다.
+
+# ─────────────────────────────────────────
+# 현재 제약 조건
+# ─────────────────────────────────────────
+constraints:
+  financial_runway_months: null   # 업데이트 필요
+  primary_constraint: "수익 창출 시급 (세종클래스 첫 매출)"
+  simultaneous_focus_capacity: 2  # 지금 동시에 진지하게 집중 가능한 트랙 수
+  energy_level: null              # low | medium | high — 업데이트 필요
+  location: "Seoul"
+  work_mode: "solo"
+
+# ─────────────────────────────────────────
+# 현재 집중 우선순위 (1 = 가장 중요)
+# ─────────────────────────────────────────
+focus_priority:
+  1: "sw_maestro_17 — 결과 발표 대기 (3/25 오후 2시)"
+  2: "ai_agent_dev — 공개 entry flow와 공유 링크 정리"
+  3: "class101_opportunity — 미팅 준비 (3/27)"
+  4: "sejongclass — 첫 유료 수강생 확보"
+
+# ─────────────────────────────────────────
+# 대기 중인 외부 이벤트 (결과에 따라 전략 분기)
+# ─────────────────────────────────────────
+pending_decisions:
+  - trigger: "SW마에스트로 17기 합격 발표 (3/25 오후 2시)"
+    if_accepted: >
+      내부 합격자 노션에 PR 링크를 가장 먼저 공유.
+      4~5월 예비과정 + 클래스101 강의 기획·제작 병행.
+      6월 본과정 시작 전 강의 출시 완료 목표.
+      소마 팀빌딩에서 알고리즘 강의 채널 보유 강점으로 활용.
+      세종클래스는 소마 종료(11월) 이후 재개.
+    if_rejected: >
+      4~5월 클래스101 강의 제작 + PersonaMirror 독립 서비스 전환 병행.
+      PR/AI 데모 링크는 개인 프로젝트 홍보 자산으로 재사용.
+      세종클래스 재개 및 수익화 집중.
+
+  - trigger: "클래스101 미팅 결과 (3/27)"
+    if_accepted: >
+      4~5월 강의 기획·제작 착수. PD 지원 여부 확정.
+      합격/불합격 관계없이 5월 말 출시 목표.
+    if_rejected: "유튜브 자체 채널로 콘텐츠 전환 검토."
+
+  - trigger: "세종클래스 첫 유료 수강생 발생"
+    if_yes: "마케팅 채널 확장, 콘텐츠 증설"
+    if_no: "홍보 전략 재검토 (90일 내 미발생 시)"
+
+  - trigger: "서울시 시민참여예산위원 결과"
+    if_accepted: "지역 커뮤니티 활동 확장 — 소마와 병행 가능한 수준 유지"
+    if_rejected: "은평청년네트워크 집중 유지"

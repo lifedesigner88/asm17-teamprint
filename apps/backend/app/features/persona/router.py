@@ -8,7 +8,7 @@ from app.features.auth.service import get_current_user
 
 from .models import Persona
 from .schemas import AskRequest, AskResponse, PersonaChatHistoryResponse, PersonaChatResetResponse
-from .service import ask_persona, list_chat_messages, reset_chat_session
+from .service import ask_persona, get_hourly_question_quota, list_chat_messages, reset_chat_session
 
 router = APIRouter(prefix="/persona", tags=["persona"])
 
@@ -40,14 +40,14 @@ def ask(
     persona = db.scalar(select(Persona).where(Persona.persona_id == persona_id))
     if persona is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Persona not found")
-    answer = ask_persona(
+    answer, quota = ask_persona(
         db,
         persona=persona,
         viewer_user_id=current_user.user_id,
         question=body.question,
         lang=body.lang,
     )
-    return AskResponse(answer=answer)
+    return AskResponse(answer=answer, quota=quota)
 
 
 @router.get("/{persona_id}/chat", response_model=PersonaChatHistoryResponse)
@@ -66,7 +66,8 @@ def get_chat_history(
         viewer_user_id=current_user.user_id,
         lang="ko" if lang.startswith("ko") else "en",
     )
-    return PersonaChatHistoryResponse(messages=messages)
+    quota = get_hourly_question_quota(db, viewer_user_id=current_user.user_id)
+    return PersonaChatHistoryResponse(messages=messages, quota=quota)
 
 
 @router.post("/{persona_id}/chat/reset", response_model=PersonaChatResetResponse)
@@ -85,4 +86,5 @@ def reset_chat(
         viewer_user_id=current_user.user_id,
         lang="ko" if lang.startswith("ko") else "en",
     )
-    return PersonaChatResetResponse(session_id=session_id)
+    quota = get_hourly_question_quota(db, viewer_user_id=current_user.user_id)
+    return PersonaChatResetResponse(session_id=session_id, quota=quota)

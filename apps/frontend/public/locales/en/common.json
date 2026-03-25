@@ -1,9 +1,10 @@
 {
   "nav": {
+    "frontDoor": "Park Sejong | PR",
     "overview": "Overview",
-    "dashboardSeoul": "Dashboard - Seoul",
-    "dashboardBusan": "Dashboard - Busan",
-    "comingSoon": "Coming soon",
+    "dashboardSeoul": "Seoul dashboard",
+    "dashboardBusan": "Busan dashboard",
+    "comingSoon": "Planned",
     "signup": "Sign up",
     "login": "Login",
     "cohortVerification": "Cohort verification",
@@ -12,12 +13,17 @@
     "adminVerifications": "Verification admin",
     "capture": "Persona shell",
     "mySubmissions": "Dummy submissions",
-    "demoPersona": "Creator PR",
-    "sejongPersona": "Creator PR"
+    "demoPersona": "Park Sejong PR",
+    "sejongPersona": "Park Sejong PR",
+    "sejongAiChat": "AI Sejong Chat"
   },
   "sidebar": {
-    "phase": "AI SW Maestro",
-    "tagline": "Find your 450 fellow 17th-cohort members across Seoul and Busan, and get ready for team building.",
+    "phase": "ASM17",
+    "brandTitle": "Park Sejong | PR",
+    "brandSubtitle": "for AI SW Maestro 17 team building",
+    "projectGithubLabel": "PR Project",
+    "blogLabel": "Blog",
+    "blogAddress": "blog.naver.com/lifedesigner88",
     "directInquiry": "1:1 inquiry",
     "currentBaseline": "Current baseline",
     "sessionTitle": "Session",
@@ -97,7 +103,7 @@
       "Notion intro link",
       "People interviewed together",
       "Talk with AI Sejong",
-      "Creator PR",
+      "Park Sejong PR",
       "Admin approval",
       "Korean / English UI"
     ],
@@ -159,6 +165,14 @@
     "logoAlt": "ASM 17 logo",
     "logoTitle": "asm 17",
     "logoSubtitle": "AI Software Maestro 17"
+  },
+  "dashboardBusanPage": {
+    "pill": "ASM17 Busan",
+    "title": "The Busan dashboard is not ready yet.",
+    "description": "Right now, the product priority is to make the Seoul interview dashboard and verification flow solid first.",
+    "subtext": "The Busan dashboard route is in place early, but it will stay inactive until the real data structure and ops flow are ready.",
+    "primaryAction": "Open Seoul dashboard",
+    "secondaryAction": "Back to Park Sejong PR"
   },
   "button": {
     "logout": "Logout",

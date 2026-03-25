@@ -29,10 +29,10 @@ DEMO_USER_GITHUB = "https://github.com/lifedesigner88"
 DEMO_USER_NOTION = "https://leq88.notion.site/17-ee16712aabe583dda7d60117e4c87ad1"
 
 _DATA_ENG: dict = {
-    "archetype": "Founder-PM for Education, Community, and AI",
+    "archetype": "From helping students find jobs to creating jobs myself",
     "headline": (
-        "Founder-PM who turns domain understanding, user empathy, community sense, "
-        "and documentation into clear product direction"
+        "An educator-turned-developer building AI products that help people grow "
+        "and help teams get started"
     ),
     "mbti": {
         "type": "INFJ",
@@ -46,10 +46,8 @@ _DATA_ENG: dict = {
         },
     },
     "one_liner": (
-        "I want to lead the Founder-PM side: clarifying the problem, understanding users, "
-        "setting direction, and keeping a small team aligned through writing. Right now, "
-        "I am looking for one Backend-AI-Infra partner and one Frontend-UX-Product partner "
-        "to test one product together."
+        "I'm Park Sejong, an educator-turned-developer. I want to directly build AI services "
+        "and products that help people grow and help teams get started."
     ),
     "top3_values": ["User Understanding", "Community", "Education x Technology"],
     "strengths": [
@@ -273,10 +271,8 @@ _DATA_ENG: dict = {
 }
 
 _DATA_KOR: dict = {
-    "archetype": "교육·커뮤니티·AI를 잇는 Founder-PM",
-    "headline": (
-        "도메인 이해, 사용자 이해, 커뮤니티 감각, 문서화를 바탕으로 제품 방향을 잡는 Founder-PM"
-    ),
+    "archetype": "학생들의 취업을 돕다가, 이제는 직접 일자리를 만드는 사람",
+    "headline": "교육자에서 개발자로 전환해, 사람의 성장과 팀의 시작을 돕는 AI 제품을 만들고 있습니다.",
     "mbti": {
         "type": "INFJ",
         "identity": "T",
@@ -289,9 +285,8 @@ _DATA_KOR: dict = {
         },
     },
     "one_liner": (
-        "제가 맡고 싶은 역할은 Founder-PM입니다. 문제를 좁히고, 사용자를 이해하고, 방향을 정리하고, "
-        "문서로 팀을 맞추는 쪽에 강합니다. 지금은 Backend-AI-Infra 1명, "
-        "Frontend-UX-Product 1명과 함께 한 제품을 작게 검증해보고 싶습니다."
+        "교육자에서 개발자로 전환한 박세종입니다. 사람의 성장과 팀의 시작을 돕는 AI 서비스와 제품을 "
+        "직접 만들고 싶습니다."
     ),
     "top3_values": ["사용자 이해", "커뮤니티", "교육 x 기술"],
     "strengths": [
@@ -370,7 +365,7 @@ _DATA_KOR: dict = {
             },
             {
                 "label": "지금 찾는 2명",
-                "value": "Backend-AI-Infra 1명 · Frontend-UX-Product 1명",
+                "value": "백엔드 · AI · 인프라 1명 · 프론트엔드 · UX · 프로덕트 1명",
             },
             {
                 "label": "팀 분위기",
@@ -379,7 +374,7 @@ _DATA_KOR: dict = {
         ],
         "teammate_roles": [
             {
-                "title": "Backend-AI-Infra 오너",
+                "title": "백엔드 · AI · 인프라",
                 "summary": (
                     "백엔드·AI·인프라를 주도적으로 맡아 함께 키워갈 사람을 찾습니다."
                 ),
@@ -389,12 +384,12 @@ _DATA_KOR: dict = {
                 ],
             },
             {
-                "title": "Frontend-UX-Product 오너",
+                "title": "프론트엔드 · UX · 프로덕트",
                 "summary": (
                     "제품 화면과 사용자 흐름을 직접 만들고 개선해갈 사람을 찾습니다."
                 ),
                 "bullets": [
-                    "자기소개 흐름, 카드 UI, 정보 구조를 설계하고 구현할 사람",
+                    "React Router v7 기반 흐름을 선호하는 사람",
                     "비주얼뿐 아니라 신뢰감과 모바일 가독성을 중요하게 볼 사람",
                 ],
             },
@@ -412,31 +407,33 @@ _DATA_KOR: dict = {
             ],
         },
         "why_now": {
-            "title": "빠른 소통의 필요성",
+            "title": (
+                "멘토님의 가치를 아시는 분"
+            ),
             "summary": (
-                "오프라인 팀빌딩 시간은 짧습니다. 미리 맥락을 공유하고 대화를 시작할수록 팀 판단이 쉬워집니다."
+                "내 생각보다는 멘토님과 엑스퍼트분들께 배우려는 자세인 팀원 제일 선호."
             ),
             "bullets": [
-                "누구와 먼저 이야기할지 미리 정할 수 있습니다.",
-                "역할, GitHub, 자기소개 링크를 먼저 공유할 수 있습니다.",
-                "짧은 현장 시간을 더 의미 있게 쓸 수 있습니다.",
+                "04월 03일 팀빌딩 완료",
+                "2026년 창업 학습 기간",
+                "2027년 본격 실전 창업",
             ],
         },
         "why_me": {
-            "title": "제가 맡을 수 있는 역할",
+            "title": "서포트형 리더십",
             "summary": (
-                "저는 문제를 좁히고, 사용자 이야기를 듣고, 팀이 같은 방향으로 움직이게 만드는 역할에 강합니다."
+                "최종 목표는 출근하고 싶은 일자리를 만드는 것입니다."
             ),
             "bullets": [
-                "교육과 커뮤니티 경험 덕분에 사용자와 도메인을 읽는 감각이 좋습니다.",
-                "의사결정과 다음 액션이 보이게 문서를 정리하는 편입니다.",
-                "좋은 발표보다 실제 제품 가능성과 실행을 더 중요하게 봅니다.",
+                "팀원들이 원하는 역할을 우선 배정합니다.",
+                "문제를 푸는 데 필요한 역할은 제가 학습해서 서포트합니다.",
+                "국제캠프 PM, 대입 컨설팅 등 실무 감각을 갖고 있습니다.",
             ],
         },
         "cta": {
-            "title": "두 역할 중 하나에 가깝다면, 팀빌딩 전에 편하게 이야기해보고 싶습니다.",
+            "title": "저와 함께 팀을 하고 싶다는 생각이 드셨다면,\n빠르게 이메일로 연락주세요.",
             "body": (
-                "이미 완성된 사람이 아니어도 괜찮습니다. 한 영역을 책임지고 같이 배우며 한 제품을 끝까지 밀어보고 싶다면 메일 주세요."
+                "실무에서는 이메일 소통을 주로 쓰기 때문에, 편하게 이메일로 먼저 이야기해봐요."
             ),
         },
     },

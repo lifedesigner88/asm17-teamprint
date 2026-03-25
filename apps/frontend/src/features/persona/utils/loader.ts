@@ -3,8 +3,7 @@ import type { LoaderFunctionArgs } from "react-router-dom";
 import { requestPersonaProfile, readPersonaBilingualResponse } from "./api";
 import type { PersonaLoaderData } from "../pages/persona-page";
 
-export async function personaLoader({ params }: LoaderFunctionArgs): Promise<PersonaLoaderData> {
-  const personId = params.personId ?? "";
+async function loadPersonaData(personId: string): Promise<PersonaLoaderData> {
   const response = await requestPersonaProfile(personId);
   if (!response.ok) {
     throw new Response("Persona not found", { status: 404 });
@@ -19,4 +18,12 @@ export async function personaLoader({ params }: LoaderFunctionArgs): Promise<Per
     githubAddress: data.github_address,
     notionUrl: data.notion_url
   };
+}
+
+export async function personaLoader({ params }: LoaderFunctionArgs): Promise<PersonaLoaderData> {
+  return loadPersonaData(params.personId ?? "");
+}
+
+export async function sejongPersonaLoader(): Promise<PersonaLoaderData> {
+  return loadPersonaData("sejong");
 }

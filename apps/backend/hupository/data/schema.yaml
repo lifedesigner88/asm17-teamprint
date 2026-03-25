@@ -1,0 +1,184 @@
+# Hupository Schema v1.2
+# 이 파일은 hupository 서비스의 데이터 구조 표준을 정의합니다.
+
+service:
+  name: hupository
+  version: "1.2"
+  tagline: "human + repository — 사람을 위한 저장소"
+
+person_namespace:
+  owner: parksejong
+  note: "이 저장소 자체가 한 사람의 네임스페이스. 공개 데이터 루트(hupository/)가 곧 사람 단위."
+  required_files:
+    - index.yaml
+
+layers:
+  01_identity:
+    purpose: "핵심 신원 및 정체성 사실"
+    format: yaml
+    visibility_default: public
+    files:
+      - core.yaml        # 이름, 생년, 연락처, 링크
+      - persona.yaml     # 자기인식, 별칭, 반복 역할
+      - values.yaml      # 가치관, 세계관
+
+  02_experience:
+    purpose: "학습/커리어/프로젝트 이력"
+    format: yaml
+    visibility_default: public
+    files:
+      - education.yaml
+      - career.yaml
+      - projects/{slug}.yaml
+
+  03_skills:
+    purpose: "역량 데이터 (매칭 + 이력서 생성에 사용)"
+    format: yaml
+    visibility_default: public
+    files:
+      - technical.yaml
+      - soft.yaml
+
+  04_story:
+    purpose: "서사 컨텍스트 — LLM이 사람을 깊이 이해하기 위한 레이어"
+    format: markdown
+    visibility_default: network
+    files:
+      - arc.yaml               # 삶의 버전 히스토리 요약
+      - chapters/*.md          # 시대별 서사
+
+  05_interests:
+    purpose: "관심사 — 매칭 신호"
+    format: yaml
+    visibility_default: public
+
+  06_goals:
+    purpose: "목표 및 현재 탐색 중인 것"
+    format: yaml
+    visibility_default: public
+    files:
+      - lifetime.yaml   # 평생 사명 + 10년 단위 목표 (최상위)
+      - tree.yaml       # 현재 10년의 장기→중간→단기 목표 계층 (lifetime 아래)
+      - goals.yaml      # 레거시 목표 목록 (read-only archive)
+      - progress.yaml   # tree.yaml 기준 진척도 (how far)
+    hierarchy: "lifetime.yaml → tree.yaml → progress.yaml"
+
+  07_matching:
+    purpose: "SNS 매칭 레이어 — 사람 추천 엔진에서 소비"
+    format: yaml
+    visibility_default: public
+    files:
+      - signals.yaml     # 찾는 것, 열려있는 것, 잘 맞는 사람
+      - vectors.yaml     # 수치화된 매칭 벡터
+      - privacy.yaml     # 필드별 공개 정책
+
+  08_now:
+    purpose: "현재 상태 레이어 — AI 다음 스텝 추론의 핵심 입력"
+    format: yaml
+    visibility_default: public
+    update_cadence: "event_driven + monthly_review"
+    files:
+      - snapshot.yaml    # 각 트랙의 현재 상태, 제약조건, 보류 중인 분기점
+      - decisions.yaml   # 주요 의사결정 로그 (why 포함, 장기효력 있는 결정만)
+    history_path: "08_now/history/{YYYY-MM}.yaml"
+    operating_rule: >
+      08_now 는 "그래서 지금 상태가 무엇인가?"에 답하는 정본이다.
+      daily/session 에서 나온 내용 중 다음 주에도 유효한 사실, 제약, 분기점만 압축해 승격한다.
+      이벤트가 생기면 바로 갱신하고, 월 1회 정리한다.
+    notes: >
+      snapshot.yaml 은 이벤트 발생 시 갱신하고 월 1회 정리한다.
+      긴 서사, 감정, 판단 과정과 전술 메모는 09_journal 에 두고 여기에는 durable state 만 남긴다.
+      업데이트 전 이전 버전을 history/ 에 복사하여 스냅샷 이력 보존.
+
+  09_journal:
+    purpose: "일일 리플렉션 + 주간 코칭 레이어 — 장기목표 정렬과 다음 행동 점검"
+    format: mixed
+    visibility_default: private
+    files:
+      - "{decade}/{year}/{month}/{week}/YYYY-MM-DD.md"
+      - "{decade}/{year}/{month}/{week}/session_draft.md"
+      - "{decade}/{year}/{month}/{week}/session.md"
+    prompts:
+      - ai/prompts/daily_reflection.md
+      - ai/prompts/weekly_coaching.md
+      - ai/prompts/monthly_review.md
+    operating_rule: >
+      09_journal 은 "왜 이렇게 보고 있는가?"를 담는 레이어다.
+      daily 는 하루 단위 사실/감정/배움, session_draft 는 진행 중인 해석과 질문,
+      session.md 는 주간 코칭의 확정 결론을 담는다.
+    flow: >
+      [매일]   GPT 대화 → {decade}/{year}/{month}/{week}/YYYY-MM-DD.md 저장.
+      [세션 진행 중] 판단/질문/미확정 해석은 session_draft.md 에 누적.
+      [주 1회] recent daily + 직전 session + lifetime/tree/snapshot →
+               session_draft.md 작성/보강 후 session.md 확정.
+      [월 1회] recent session + lifetime/tree/progress/snapshot →
+               ai/outputs/monthly_review/YYYY-MM.md 생성.
+
+  ai_layer:
+    purpose: "GPT 코칭 및 파생 문서 레이어"
+    format: mixed
+    visibility_default: public
+    files:
+      - context/weekly_coaching.yaml
+      - context/next_step.yaml
+      - prompts/daily_reflection.md
+      - prompts/weekly_coaching.md
+      - prompts/monthly_review.md
+      - prompts/resume_prompt.md
+      - prompts/intro_prompt.md
+      - prompts/matching_prompt.md
+      - outputs/monthly_review/
+      - outputs/next_step/
+      - outputs/resume_ko.md
+      - outputs/self_intro_30sec.md
+      - outputs/self_intro_full.md
+      - outputs/profile_tags.yaml
+
+# ─────────────────────────────────────────
+# 데이터 표기 규칙 (Conventions)
+# ─────────────────────────────────────────
+conventions:
+
+  age:
+    standard: "만나이 (대한민국 법정 기준)"
+    rule: >
+      이 저장소의 모든 나이 표기는 만나이를 사용한다.
+      만나이 = 생일이 지난 경우 (현재 연도 - 출생 연도),
+               생일이 지나지 않은 경우 (현재 연도 - 출생 연도 - 1).
+    example: "1988년 9월생 → 2026년 3월 기준 만 37세"
+    applied_to:
+      - "lifetime.yaml 의 age_range"
+      - "index.yaml 의 current_age"
+      - "모든 파일의 나이 관련 필드"
+    note: "한국식 세는나이(+1), 연나이 사용 금지."
+
+  date:
+    standard: "ISO 8601"
+    rule: "날짜는 YYYY-MM-DD, 주는 YYYY-WXX (ISO 8601 월요일 시작)"
+
+  week:
+    standard: "ISO 8601"
+    rule: "한 주는 월요일 00:00 ~ 일요일 23:59"
+    saturday: "주간 회고 메모 정리"
+    sunday: "주간 코칭 세션"
+
+confidence_scale:
+  high: "직접 확인된 사실 (본인 제공, 공식 문서)"
+  medium: "여러 근거를 합쳐 추정 가능"
+  low: "단일 근거 또는 약한 추정"
+
+visibility_levels:
+  public: "누구나 볼 수 있음"
+  network: "연결된 사람만"
+  private: "본인만"
+  secret: "암호화 또는 저장 안 함"
+
+matching_vector_dimensions:
+  - learning_drive       # 학습 욕구
+  - teaching_drive       # 가르치려는 욕구
+  - community_drive      # 커뮤니티 지향
+  - builder_drive        # 만드는 것을 좋아함
+  - scientific_curiosity # 과학적 호기심
+  - entrepreneurship     # 창업/독립 지향
+  - reflection_depth     # 회고/기록 깊이
+  # 0~5 척도

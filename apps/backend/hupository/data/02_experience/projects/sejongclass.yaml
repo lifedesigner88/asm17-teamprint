@@ -1,0 +1,116 @@
+id: project_sejongclass
+name: 세종클래스
+type: solo_product
+category: edtech
+status: live
+
+period:
+  start: "2025-08-01"
+  v1_launch: "2026-01-01"   # 포트폴리오 제출 기준 버전
+  end: ongoing
+
+summary: >
+  수학, 물리, 코딩을 통해 사람의 생각과 행동을 구조적으로 이해하도록 돕는 학습 플랫폼.
+  정답을 빨리 맞히는 서비스가 아니라, 왜 그런 선택과 행동이 나오는지 설명할 수 있는
+  사고의 지도를 만드는 서비스.
+role: "전 과정 기획/개발/배포/운영 (1인)"
+metrics:
+  registered_users: 48    # 2026-03-14 포트폴리오 제출 기준
+learning_perspective:
+  - "수학: 생각을 구조와 비교의 언어로 바라봄"
+  - "물리: 변화를 시간 속의 과정으로 바라봄"
+  - "코딩: 생각을 규칙으로 바꾸고 검증함"
+  - "인생: 이론이 실제 삶을 설명하는지 다시 질문함"
+key_features:
+  - "Theme → Subject → Textbook → Major → Middle → Unit 계층 구조의 학습 콘텐츠"
+  - "무료/유료 수강 등록 및 진도율 관리"
+  - "유닛 기반 영상 학습 + 리치 텍스트 콘텐츠"
+  - "댓글·대댓글·좋아요·알림"
+  - "관리자용 콘텐츠 수정 및 댓글 모더레이션"
+  - "배치 작업: 교재 통계 재계산, 오래된 알림 정리"
+  - "사용자 권한: users.role 기반 user/admin (프론트·서버 이중 검증)"
+
+links:
+  website: https://sejongclass.kr/
+  github: https://github.com/lifedesigner88/250818_SejongClass
+  youtube: https://www.youtube.com/@sejongclass
+
+tech_stack:
+  frontend:
+    - React 19
+    - React Router 7 (SSR)
+    - Vite
+    - Tailwind CSS 4
+    - Radix UI
+  backend:
+    - TypeScript
+    - Node.js 22
+    - React Router loaders/actions
+  db_auth:
+    - PostgreSQL
+    - Drizzle ORM
+    - Supabase SSR
+    - Supabase Auth (OAuth: Kakao, GitHub, Google)
+  payment_email:
+    - TossPayments
+    - Resend
+    - React Email
+  learning_ux:
+    - Tiptap
+    - KaTeX
+    - React Markdown
+    - react-youtube
+  infra:
+    - Vercel
+    - CloudFlare
+
+key_implementations:
+  - "TossPayments 결제 시스템 연동"
+  - "Supabase OAuth 로그인 (Kakao, GitHub, Google)"
+  - "커스텀 도메인 구성 (Vercel + CloudFlare)"
+  - "Shadcn UI 기반 반응형 인터페이스"
+
+significance: >
+  교육자 커리어와 개발자 커리어가 처음으로 하나의 제품 안에서 만난 프로젝트.
+  부트캠프 수료 후 약 1년 만에 실제 서비스 론칭.
+
+course_hierarchy:
+  as_of: "2026-03-22"
+  structure: "Theme > Subject > Textbook > Major > Middle > Unit"
+  tree:
+    A1_수학:
+      B1_초등:
+        - C1 초등 1~2학년  # 촬영·업로드 완료
+        - C2 초등 3~4학년  # 촬영·업로드 완료
+        - C3 초등 5~6학년
+      B2_중등:
+        - C1 중등 1학년
+        - C2 중등 2학년
+        - C3 중등 3학년
+      B3_고등:
+        - C1 고등 1-1 공통수학1
+        - C1 고등 1-2 공통수학2
+        - C1 고등 2-1 대수
+        - C1 고등 2-2 미적분1
+        - C1 고등 3-1 확률과 통계
+        - C1 고등 3-2 기하
+        - C1 고등 3-3 미적분2
+    A3_코딩:
+      B1_파이썬:
+        AI_SW_마에스트로:
+          status: "촬영·업로드 완료 — 소마 최종 발표 후 마무리 영상 1편 예정"
+          content:
+            - D1 모의고사 01-10
+            - D2 모의고사 11-20
+            - D3 모의고사 21-25
+    A4_인생:
+      note: "연도별 시작 시점 상이 — 2026: 3월 시작 / 2027~: 1월 시작"
+      B1_2026-2030:
+        C1_2026:
+          started: "2026-03"
+          D1_봄(Spring):
+            - 03월: w00_title (진행 중)
+        C2_2027:
+          started: "2027-01"  # 1월부터 시작
+
+confidence: high

@@ -16,7 +16,6 @@ export function LoginPage() {
       <div className="space-y-2">
         <StatusPill label={t("login.pill")} />
         <h2 className="text-2xl font-semibold tracking-[-0.03em]">{t("login.title")}</h2>
-        <p className="text-sm leading-6 text-muted-foreground">{t("login.description")}</p>
       </div>
       <Form className="mt-6 space-y-4" method="post">
         <Field label={t("login.emailLabel")}>
@@ -50,6 +49,17 @@ export function LoginPage() {
           <Button type="submit">{t("login.submit")}</Button>
         </div>
       </Form>
+      <div className="mt-4 rounded-2xl border border-slate-200/80 bg-white/70 px-4 py-4">
+        <Link className="block" to="/auth/signup">
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full border-sky-200 bg-sky-50/80 text-sky-700 hover:border-sky-300 hover:bg-sky-100 hover:text-sky-800"
+          >
+            {t("login.signupBtn")}
+          </Button>
+        </Link>
+      </div>
       {actionData?.error ? (
         <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {actionData.error}

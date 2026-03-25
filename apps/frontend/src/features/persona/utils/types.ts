@@ -115,16 +115,24 @@ export type PersonaQAMessage = {
   created_at?: string;
 };
 
+export type PersonaChatQuota = {
+  remaining_questions: number;
+  reset_at: string | null;
+};
+
 export type PersonaChatHistoryResponse = {
   messages: PersonaQAMessage[];
+  quota: PersonaChatQuota;
 };
 
 export type PersonaAskResponse = {
   answer: string;
+  quota: PersonaChatQuota;
 };
 
 export type PersonaChatResetResponse = {
   session_id: number;
+  quota: PersonaChatQuota;
 };
 
 export type PersonaBilingualResponse = {

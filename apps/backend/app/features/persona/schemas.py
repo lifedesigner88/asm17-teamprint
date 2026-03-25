@@ -9,8 +9,14 @@ class AskRequest(BaseModel):
     lang: str = "en"
 
 
+class PersonaChatQuotaResponse(BaseModel):
+    remaining_questions: int
+    reset_at: datetime | None = None
+
+
 class AskResponse(BaseModel):
     answer: str
+    quota: PersonaChatQuotaResponse
 
 
 class PersonaChatMessageResponse(BaseModel):
@@ -23,7 +29,9 @@ class PersonaChatMessageResponse(BaseModel):
 
 class PersonaChatHistoryResponse(BaseModel):
     messages: list[PersonaChatMessageResponse]
+    quota: PersonaChatQuotaResponse
 
 
 class PersonaChatResetResponse(BaseModel):
     session_id: int
+    quota: PersonaChatQuotaResponse

@@ -1,0 +1,148 @@
+# 커뮤니티·시민 활동 — data/02_experience/community.yaml
+# 직장 경력 외 커뮤니티·자원봉사·정책참여 활동 기록
+
+activities:
+
+  - id: eunpyeong_youth_network
+    organization: "은평청년네트워크 (은평구청 청장년희망과 운영)"
+    role: "10기 정식 위원 — 일자리창업분과"
+    cohort: 10
+    start: "2026-01"
+    end: "2026-12"
+    duration: "1년 (임기)"
+    type: civic
+    visibility: public
+    summary: >
+      서울시 은평구 청년 정책 참여기구. 지역 청년이 직접 청년 정책을 제안하고
+      실현하는 구조. 일자리창업분과 소속으로 창업·취업 분야 정책 제안 활동.
+    organization_info:
+      founded: 2017
+      cohort_size: "40명 이내"
+      eligibility: "만 19~39세, 은평구 거주·직장·학업 청년"
+      supervising_dept: "은평구청 청장년희망과 (02-351-6885)"
+    key_activities:
+      - "매월 정기회의 및 분과회의 참여"
+      - "청년 정책 제안 및 형성 과정 참여"
+      - "일자리·창업 관련 청년 정책 제안"
+    upcoming:
+      - date: "2026-04-16"
+        event: "정책교육"
+        time: "19:00~21:00"
+        location: "서울청년센터 은평"
+        note: "정기회의 일정표 기준. 회의 내용에 따라 장소 및 시간 변경 가능"
+      - date: "2026-05-21"
+        event: "정책 회의"
+        time: "19:00~21:00"
+        location: "서울청년센터 은평"
+        note: "정기회의 일정표 기준. 회의 내용에 따라 장소 및 시간 변경 가능"
+    regular_schedule_2026:
+      source: "사용자 제공 이미지 '2026년 은평 청년네트워크 정기회의 일정표' (2026-03-24 파싱)"
+      standard_location: "서울청년센터 은평"
+      standard_time: "19:00~21:00"
+      caveat: "회의 내용에 따라 장소 및 시간 변경 가능"
+      items:
+        - month: "2026-03"
+          date: "2026-03-19"
+          topic: "참여예산 교육"
+        - month: "2026-04"
+          date: "2026-04-16"
+          topic: "정책교육"
+        - month: "2026-05"
+          date: "2026-05-21"
+          topic: "정책 회의"
+        - month: "2026-06"
+          date: null
+          topic: "워크숍"
+        - month: "2026-07"
+          date: "2026-07-16"
+          topic: "정책 회의"
+        - month: "2026-08"
+          date: "2026-08-20"
+          topic: "정책 회의"
+        - month: "2026-09"
+          date: "2026-09-19"
+          topic: "청년축제"
+        - month: "2026-10"
+          date: "2026-10-15"
+          topic: "정책발표회"
+        - month: "2026-11"
+          date: null
+          topic: "네트워크 교류"
+        - month: "2026-12"
+          date: null
+          topic: "사회기여활동 및 성과공유회"
+    notes: >
+      9기 주요 성과 중 '청년 구직·창업 교육 프로그램'이 2026년 정책으로 확대 시행.
+      세종클래스·AI 빌더 경험을 정책 제안에 활용 가능성 있음.
+    confidence: high
+
+  - id: seoul_participatory_budget
+    organization: "서울시 시민참여예산위원회 (서울특별시)"
+    role: "시민참여예산위원"
+    cohort: "2026년"
+    start: null      # 결과 대기 중
+    end: null
+    type: civic
+    status: applied  # applied | active | done | rejected
+    applied_on: "2026-03-20"
+    result: null     # 결과 나오면 업데이트
+    visibility: public
+    summary: >
+      서울시민이 직접 예산 편성 과정에 참여하는 제도. 위원은 시민제안사업 심의·조정·의결 및
+      서울시 주요 재정분야 의견 제출 담당.
+    organization_info:
+      website: "https://yesan.seoul.go.kr"
+      recruitment_period: "2026-03-05 ~ 2026-03-20"
+      headcount: 172
+      eligibility: "서울시민 및 서울 소재 직장인·학생"
+    confidence: high
+
+  - id: eunpyeong_youth_festival_2026
+    organization: "2026 은평청년축제 기획단 (은평구)"
+    role: "기획단원"
+    cohort: "2026 제4회"
+    start: "2026-04"   # 활동 시작 예정
+    end: "2026-09"
+    type: civic
+    status: applied
+    applied_on: "2026-03-20"
+    result: null       # 결과 나오면 업데이트 (마감 3/27)
+    visibility: public
+    summary: >
+      은평구 주관 청년 축제 기획·운영 참여. 주제·콘셉트 선정부터 당일 운영까지 전 과정 직접 참여.
+      9월 개최 목표.
+    organization_info:
+      recruitment_deadline: "2026-03-27"
+      headcount: "10여 명"
+      eligibility: "은평구 거주 또는 활동 중인 만 19~39세 청년"
+      activity_period: "2026-04 ~ 2026-09 (월 1~2회 정기회의)"
+    confidence: high
+
+  - id: parkmooho_science
+    organization: "박문호의 자연과학 세상"
+    role: "정회원 / 이사 (서류상)"
+    start: "2021-01"
+    end: null
+    type: study_community
+    status: paused   # 정회원·이사 자격 유지, 활동 일시 중단
+    paused_since: "2024-05"
+    director_registered: "2025-05"
+    upcoming:
+      - date: "2026-03-29"
+        event: "방문 예정"
+        note: "이사진 재등록 요청 관련 맥락 확인"
+    visibility: public
+    summary: "신경과학·물리학·우주론 중심 과학 스터디 커뮤니티. 2020년 팬데믹 이후 200권+ 독서와 연결."
+    notes: "2024-05부터 활동 일시 중단. 정회원 자격 유지. 2025-05 이사 서류 등록. 2026-03-24 이사진 재등록 요청 도착."
+    confidence: high
+
+  - id: nulga_ji
+    organization: "대학문화기획동아리 너울가지"
+    role: "회장"
+    start: "2010-09"
+    end: "2014-08"
+    duration: "4년"
+    type: student_club
+    visibility: public
+    summary: "대학 문화 기획 동아리. 회장으로 커뮤니티 운영 및 행사 기획 경험."
+    confidence: high

@@ -12,7 +12,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from .models import Persona, PersonaChatMessage
-from .schemas import PersonaChatMessageResponse
+from .schemas import PersonaChatMessageResponse, PersonaChatQuotaResponse
 
 CHAT_HISTORY_CONTEXT_LIMIT = 12
 QUESTION_LIMIT_PER_HOUR = 10
@@ -20,11 +20,12 @@ CHAT_RESPONSE_LIMITS = {
     "ko": {"max_chars": 1200, "max_lines": 20, "max_tokens": 900},
     "en": {"max_chars": 1200, "max_lines": 20, "max_tokens": 900},
 }
-BASE_CONTEXT_KEYS = ("profile", "persona", "snapshot")
+BASE_CONTEXT_KEYS = ("profile", "persona", "snapshot", "decisions", "journal_session")
 HUPOSITORY_FILE_LIMITS = {
     "profile": ("data/profile.yaml", 1600),
     "persona": ("data/01_identity/persona.yaml", 2400),
     "snapshot": ("data/08_now/snapshot.yaml", 2200),
+    "decisions": ("data/08_now/decisions.yaml", 4200),
     "technical": ("data/03_skills/technical.yaml", 1800),
     "goals": ("data/06_goals/lifetime.yaml", 1800),
     "matching": ("data/07_matching/signals.yaml", 1400),
@@ -46,6 +47,33 @@ KEYWORD_CONTEXT_RULES: tuple[tuple[tuple[str, ...], tuple[str, ...]], ...] = (
     (
         ("휴포지토리", "hupository", "repo", "repository", "data", "데이터"),
         ("readme",),
+    ),
+    (
+        (
+            "오늘",
+            "요즘",
+            "최근",
+            "근황",
+            "생각",
+            "고민",
+            "회고",
+            "저널",
+            "일지",
+            "일기",
+            "today",
+            "recent",
+            "lately",
+            "journal",
+            "diary",
+            "daily",
+            "log",
+            "reflection",
+            "thought",
+            "thoughts",
+            "worry",
+            "worries",
+        ),
+        ("journal_daily",),
     ),
 )
 
@@ -131,6 +159,7 @@ def _resolve_hupository_root() -> Path | None:
     env_root = os.getenv("HUPOSITORY_ROOT")
     candidates = [
         Path(env_root) if env_root else None,
+        _repo_root() / "apps" / "backend" / "hupository",
         _repo_root() / "hupository",
         _repo_root().parent / "hupository" / "hupository",
     ]
@@ -140,12 +169,55 @@ def _resolve_hupository_root() -> Path | None:
     return None
 
 
+@lru_cache(maxsize=4)
+def _find_latest_weekly_session_relative_path(root_str: str) -> str | None:
+    root = Path(root_str)
+    candidates = sorted(path.relative_to(root).as_posix() for path in root.rglob("session.md"))
+    return candidates[-1] if candidates else None
+
+
+@lru_cache(maxsize=8)
+def _find_latest_daily_journal_relative_path(root_str: str) -> str | None:
+    root = Path(root_str)
+    dated_paths: list[tuple[datetime, str]] = []
+    for path in root.rglob("*.md"):
+        try:
+            day = datetime.strptime(path.stem, "%Y-%m-%d")
+        except ValueError:
+            continue
+        dated_paths.append((day, path.relative_to(root).as_posix()))
+
+    if not dated_paths:
+        return None
+
+    dated_paths.sort(key=lambda item: (item[0], item[1]))
+    return dated_paths[-1][1]
+
+
+def _resolve_hupository_context_path(context_key: str, root: Path) -> tuple[str, int] | None:
+    if context_key in HUPOSITORY_FILE_LIMITS:
+        return HUPOSITORY_FILE_LIMITS[context_key]
+
+    if context_key == "journal_session":
+        relative_path = _find_latest_weekly_session_relative_path(str(root))
+        return (relative_path, 1800) if relative_path else None
+
+    if context_key == "journal_daily":
+        relative_path = _find_latest_daily_journal_relative_path(str(root))
+        return (relative_path, 1600) if relative_path else None
+
+    return None
+
+
 @lru_cache(maxsize=16)
 def _read_hupository_snippet(context_key: str) -> str:
     root = _resolve_hupository_root()
     if root is None:
         return ""
-    relative_path, char_limit = HUPOSITORY_FILE_LIMITS[context_key]
+    resolved = _resolve_hupository_context_path(context_key, root)
+    if resolved is None:
+        return ""
+    relative_path, char_limit = resolved
     path = root / relative_path
     if not path.exists():
         return ""
@@ -421,21 +493,38 @@ def _fallback_answer(lang: Literal["ko", "en"]) -> str:
 
 
 def _enforce_hourly_question_limit(db: Session, *, viewer_user_id: int) -> None:
-    window_start = datetime.now(timezone.utc) - timedelta(hours=1)
-    question_count = db.scalar(
-        select(func.count())
-        .select_from(PersonaChatMessage)
-        .where(
-            PersonaChatMessage.viewer_user_id == viewer_user_id,
-            PersonaChatMessage.role == "user",
-            PersonaChatMessage.created_at >= window_start,
-        )
-    )
-    if (question_count or 0) >= QUESTION_LIMIT_PER_HOUR:
+    quota = get_hourly_question_quota(db, viewer_user_id=viewer_user_id)
+    if quota.remaining_questions <= 0:
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail=f"You can ask up to {QUESTION_LIMIT_PER_HOUR} questions per hour.",
         )
+
+
+def get_hourly_question_quota(
+    db: Session, *, viewer_user_id: int
+) -> PersonaChatQuotaResponse:
+    window_start = datetime.now(timezone.utc) - timedelta(hours=1)
+    question_filters = (
+        PersonaChatMessage.viewer_user_id == viewer_user_id,
+        PersonaChatMessage.role == "user",
+        PersonaChatMessage.created_at >= window_start,
+    )
+    question_count = db.scalar(
+        select(func.count())
+        .select_from(PersonaChatMessage)
+        .where(*question_filters)
+    )
+    next_reset_source = db.scalar(
+        select(PersonaChatMessage.created_at)
+        .where(*question_filters)
+        .order_by(PersonaChatMessage.created_at.asc())
+        .limit(1)
+    )
+    return PersonaChatQuotaResponse(
+        remaining_questions=max(0, QUESTION_LIMIT_PER_HOUR - int(question_count or 0)),
+        reset_at=(next_reset_source + timedelta(hours=1)) if next_reset_source else None,
+    )
 
 
 def _request_model_answer(
@@ -466,7 +555,7 @@ def ask_persona(
     viewer_user_id: int,
     question: str,
     lang: str,
-) -> str:
+) -> tuple[str, PersonaChatQuotaResponse]:
     normalized_lang = _normalize_lang(lang)
     _enforce_hourly_question_limit(db, viewer_user_id=viewer_user_id)
     persona_data = persona.data_kor if (normalized_lang == "ko" and persona.data_kor) else persona.data_eng
@@ -516,4 +605,4 @@ def ask_persona(
         )
     )
     db.commit()
-    return answer
+    return answer, get_hourly_question_quota(db, viewer_user_id=viewer_user_id)

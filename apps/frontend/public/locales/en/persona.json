@@ -5,6 +5,11 @@
   "hero": {
     "badge": "Public persona",
     "topValues": "Top values",
+    "portfolioButton": "Final Interview Portfolio",
+    "healthButton": "Health Check",
+    "healthLoading": "Checking...",
+    "healthError": "Failed",
+    "healthResult": "{{ms}}ms",
     "copyHeading": "Want to use this profile somewhere?",
     "copySubtext": "Copy the full profile as Markdown — ready to paste into any doc or AI prompt.",
     "copiedHeading": "✓ Copied to clipboard!",
@@ -15,7 +20,7 @@
   "creatorIntro": {
     "badge": "Real team-building PR",
     "title": "A short view of my role and team fit.",
-    "description": "A concise Creator PR page to quickly see whether we may be a good team for AI SW Maestro 17.",
+    "description": "A concise Park Sejong PR page to quickly see whether we may be a good team for AI SW Maestro 17.",
     "contact": "I am looking for teammates who want to build and grow together, not only fully polished experts.",
     "aiBadge": "AI Note",
     "aiTitle": "AI-generated page",
@@ -31,7 +36,7 @@
     "teamSectionTitle": "I would love to build a team with these two kinds of partners.",
     "avoidMatches": "Probably not a fit",
     "projectSectionLabel": "What to build",
-    "whyNow": "Why now",
+    "whyNow": "Preferred teammate type",
     "whyMe": "What I can own",
     "ctaSectionLabel": "Contact",
     "contactButton": "Copy email"
@@ -41,7 +46,7 @@
     "turbulent": "· Turbulent",
     "assertive": "· Assertive",
     "viewOn16p": "View on 16personalities →",
-    "aiNote": "AI prediction — this result is inferred from values, behaviors, and identity data, not a self-reported test. The more input data PersonaMirror has, the more precise this prediction becomes."
+    "aiNote": "AI-inferred from Hupository data."
   },
   "mbtiDimensions": {
     "introverted": "Introverted",
@@ -151,7 +156,12 @@
   },
   "sdg": {
     "sectionLabel": "SDGs of interest",
-    "aiNote": "AI prediction — interest is inferred from values, career history, and community activity, not a self-reported assessment. The more input data PersonaMirror has, the more precise this interest estimate becomes."
+    "description": "SDGs are the UN's 17 Sustainable Development Goals, a shared framework for improving social, environmental, and economic outcomes together.",
+    "allGoalsLinkTitle": "View all 17 goals",
+    "allGoalsLinkCaption": "Official UN page",
+    "allGoalsLinkLabel": "View all 17 SDGs on the official UN page",
+    "allGoalsIconAlt": "Circular icon for the 17 SDGs",
+    "aiNote": "AI-inferred from Hupository data."
   },
   "timeline": {
     "sectionLabel": "Identity timeline"
@@ -163,12 +173,16 @@
     "sectionLabel": "Weaknesses"
   },
   "qa": {
-    "badge": "Ask this persona",
-    "compactBadge": "AI Sejong",
-    "title": "Talk with Sejong Persona",
-    "compactTitle": "Have a short chat with AI Sejong",
-    "description": "Ask anything — Sejong Persona answers based on his values, experiences, and worldview.",
-    "compactDescription": "Ask a short question to get a quick sense of how he thinks before team building.",
+    "badge": "Sejong AI",
+    "compactBadge": "Sejong AI",
+    "title": "Hupository-based Sejong AI",
+    "compactTitle": "Hupository-based Sejong AI",
+    "chatPageBadge": "AI Sejong Chat",
+    "chatPageTitle": "AI Sejong Chat",
+    "chatPageDescription": "This is the dedicated chat page separated from Park Sejong PR. Ask whatever you are curious about.",
+    "chatPagePrButton": "Open Park Sejong PR",
+    "description": "",
+    "compactDescription": "",
     "disclaimer": "This is an AI-generated response, so it may differ from Sejong's actual opinion or wording.",
     "loggingNotice": "Questions and answers are being logged to discourage careless or excessive use.",
     "thinking": "Thinking…",
@@ -177,24 +191,26 @@
     "resetSessionButton": "Reset session",
     "resetSessionFailed": "Couldn't reset the current session.",
     "sessionResetNotice": "A new chat session started. Older records are still stored in the DB, but they will not be loaded again here.",
-    "placeholder": "Ask a question… (Enter to send)",
+    "placeholder": "Ask a question… (Enter to send · Shift+Enter for new line)\n\nLogged-in users can ask up to 10 questions per hour.",
     "ask": "Ask",
-    "hint": "Press Enter to send · Shift+Enter for new line",
-    "rateLimitHint": "Logged-in users can ask up to 10 questions per hour.",
+    "quotaStatus": "{{count}} questions left",
+    "quotaStatusWithReset": "{{count}} questions left · resets {{time}}",
     "rateLimitError": "You can ask up to 10 questions per hour. Please try again a little later.",
     "errorMessage": "Sorry, I couldn't answer that right now.",
     "howItWorksButton": "How it works",
     "howItWorksBadge": "Developer note",
     "howItWorksTitle": "How the AI Sejong chat works",
-    "howItWorksDescription": "It feels lightweight on the page, but underneath it runs as a logged multi-turn chat flow.",
+    "howItWorksDescription": "For now, the server reads about 400 KB of bundled Hupository data and attaches selected snippets to the prompt.",
     "howItWorksAccessLabel": "Access",
-    "howItWorksAccessBody": "Only logged-in users can use this chat, and each user can ask up to 10 questions per hour. That keeps the feature more intentional and reduces low-signal misuse.",
+    "howItWorksAccessBody": "Only logged-in users can use this chat, and each user can ask up to 10 questions in a rolling one-hour window. Slots open back up one by one as the oldest questions age out.",
     "howItWorksContextLabel": "Grounding data",
-    "howItWorksContextBody": "Answers are grounded in Sejong's persona data, Creator PR content, and selected core documents from his Hupository.",
+    "howItWorksContextBody": "For now, it reads about 400 KB of Hupository data bundled in the backend and attaches selected context to the answer. The likely next upgrade is direct GitHub fetches or pgvector-based retrieval.",
+    "howItWorksModelLabel": "Model",
+    "howItWorksModelBody": "Anthropic Claude Haiku 4.5 · claude-haiku-4-5-20251001",
     "howItWorksMemoryLabel": "Multi-turn memory",
-    "howItWorksMemoryBody": "The full conversation is stored in the DB, while only a recent slice of turns is sent back into the model for efficiency.",
+    "howItWorksMemoryBody": "The full conversation is stored in the DB, while only the latest 12 messages from the current session are sent back into the model. If you reset the session, the chat continues as a new thread while older records remain.",
     "howItWorksLoggingLabel": "Logging",
-    "howItWorksLoggingBody": "Every question and answer is saved in the DB. That makes it possible to review common question patterns later.",
+    "howItWorksLoggingBody": "Every question and answer is saved in the DB to review common question patterns and team-building interest. Deletion is not supported.",
     "howItWorksClose": "Close"
   },
   "loginPrompt": {

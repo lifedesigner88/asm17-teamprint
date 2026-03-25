@@ -119,6 +119,8 @@ def test_ask_persona_persists_chat_history(client, user_session):
 
     assert response.status_code == 200
     assert response.json()["answer"] == "I value honesty above all."
+    assert response.json()["quota"]["remaining_questions"] == 9
+    assert response.json()["quota"]["reset_at"] is not None
 
     with SessionLocal() as db:
         messages = list(
@@ -182,6 +184,36 @@ def test_ask_persona_shapes_long_answer_for_chat_ui(client, user_session):
     assert len(answer) <= CHAT_RESPONSE_LIMITS["en"]["max_chars"]
     assert len([line for line in answer.splitlines() if line.strip()]) <= CHAT_RESPONSE_LIMITS["en"]["max_lines"]
     assert answer.endswith("…")
+
+
+def test_get_chat_history_includes_quota_status(client, login_user):
+    _seed_persona()
+    viewer_user_id = _create_user("viewer@example.com")
+    recent_time = datetime.now(timezone.utc) - timedelta(minutes=15)
+
+    with SessionLocal() as db:
+        db.add_all(
+            [
+                PersonaChatMessage(
+                    persona_id=PERSONA_ID,
+                    viewer_user_id=viewer_user_id,
+                    role="user",
+                    session_id=1,
+                    lang="en",
+                    content=f"Question {index + 1}",
+                    created_at=recent_time,
+                )
+                for index in range(3)
+            ]
+        )
+        db.commit()
+
+    login_user("viewer@example.com")
+    response = client.get(f"/persona/{PERSONA_ID}/chat", params={"lang": "en"})
+
+    assert response.status_code == 200
+    assert response.json()["quota"]["remaining_questions"] == 7
+    assert response.json()["quota"]["reset_at"] is not None
 
 
 def test_get_chat_history_returns_viewer_and_lang_scoped_messages(client, login_user):

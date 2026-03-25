@@ -1,0 +1,107 @@
+# 주요 의사결정 로그 — data/08_now/decisions.yaml
+# AI가 "왜 이 방향인가"를 이해하기 위한 맥락 데이터.
+# 결정을 내릴 때마다 추가. 결과가 나오면 outcome 업데이트.
+
+decisions:
+
+  - id: "D001"
+    date: "2025-07"
+    decision: "엔코아(PlayData) 퇴사 → 세종클래스 1인 창업 전념"
+    rationale: >
+      교육×기술 통합이 장기 방향이고, 지금 만들지 않으면 언제 만드나.
+      취업은 창업 실패 후에도 할 수 있는 옵션.
+    alternatives_rejected:
+      - option: "취업 먼저 (백엔드/풀스택 개발자)"
+        why_rejected: "창업 시도 없이 취업하면 나중에 후회할 것 같았음"
+      - option: "부업으로 병행"
+        why_rejected: "에너지 분산으로 어중간한 결과가 날 것"
+    outcome: "pending"  # pending | success | failure | pivot
+    outcome_note: null
+
+  - id: "D002"
+    date: "2025-10"
+    decision: "세종클래스 스택 선택 — Supabase + React Router + Vercel"
+    rationale: >
+      1인 운영이므로 관리 포인트 최소화. BaaS로 인프라 부담 줄이고
+      TypeScript + React 스킬을 그대로 활용.
+    alternatives_rejected:
+      - option: "Spring Boot + 자체 DB 서버"
+        why_rejected: "1인 운영에 오버엔지니어링. 데브옵스 비용 과다."
+    outcome: "success"
+    outcome_note: "플랫폼 기술적으로 완성. 운영 중."
+
+  - id: "D003"
+    date: "2026-03"
+    decision: "SW마에스트로 17기 도전"
+    rationale: >
+      AI 역량 고도화와 네트워크 확보를 위한 최선의 기회.
+      합격 시 세종클래스 최소 유지 모드로 전환.
+    alternatives_rejected: []
+    outcome: "pending"
+    outcome_note: null
+
+  - id: "D004"
+    date: "2026-02"
+    decision: "소마 코딩테스트 대비 — 30일 300문제 자체 제작 후 유튜브 공개"
+    rationale: >
+      AI(Gemini, GPT 기반 도구들)로 모의고사를 직접 출제하면
+      학습 효과와 콘텐츠 자산을 동시에 얻을 수 있다는 판단.
+      공개하면 소마 지원자 네트워크도 생긴다.
+    alternatives_rejected:
+      - option: "기존 문제집/강의로 준비"
+        why_rejected: "수동적 학습. 콘텐츠 자산이 남지 않음."
+    outcome: "success"
+    outcome_note: >
+      플래티넘 5 달성, 코딩테스트 합격(3/11).
+      유튜브 영상이 소마 지원자 유입 → 클래스101 강의 제작 제안(3/27 미팅)으로 이어짐.
+
+  - id: "D005"
+    date: "2026-03"
+    decision: "클래스101 소마 코딩테스트 강의 제작 제안 — 미팅 수락"
+    rationale: >
+      세종클래스 외 독립적인 수익 채널. 이미 만든 300문제 콘텐츠를 활용 가능.
+      클래스101 플랫폼 유입으로 세종클래스 인지도 상승 가능성.
+    alternatives_rejected: []
+    outcome: "pending"   # 3/27 미팅 후 수락/거절 결정
+    outcome_note: null
+
+  - id: "D006"
+    date: "2026-03-23"
+    decision: "PersonaMirror를 소마·클래스101과 별개로 지속할 핵심 과업으로 유지"
+    rationale: >
+      Hupository 데이터를 실제 유즈케이스로 보여주는 첫 번째 제품이며,
+      소마 합격 여부와 관계없이 장기 사명(G-LIFE)을 구현하는 가장 직접적인 실험체이기 때문.
+      외부 기회는 가속 수단일 뿐, PersonaMirror 자체는 계속 밀어야 할 축으로 판단.
+    alternatives_rejected:
+      - option: "소마 합격 시에만 팀 매칭 도구로 한정"
+        why_rejected: "외부 결과에 종속되면 장기 방향성이 약해짐"
+      - option: "소마 불합격 시 프로젝트 중단"
+        why_rejected: "이미 확보한 데모와 방향성을 버리기엔 장기 가치가 큼"
+    outcome: "pending"
+    outcome_note: "3/25 결과 발표 후 합격/탈락 시나리오에 따라 운영 방식만 분기"
+
+  - id: "D007"
+    date: "2026-03-25"
+    decision: "소마 합격 직후 공유되는 첫 링크의 front door는 ASM 17 Community보다 박세종 Creator PR을 우선"
+    rationale: >
+      300명 규모의 합격자 자기소개 노션에서는 긴 기능 설명보다
+      박세종이 어떤 사람이고 왜 같이 팀하면 좋은지, 그리고 실제로 바로 만들 수 있는 사람인지가
+      몇 초 안에 보여야 한다는 판단.
+      내부 정보공유 노션이 이미 강하게 열릴 가능성이 높아 공용 정보공유 시스템 자체보다
+      유튜브·AI 데모·서비스 링크를 통한 PR/실행력 증명이 더 중요한 차별점이 된다.
+    alternatives_rejected:
+      - option: "ASM 17 Community 브랜딩과 대시보드 흐름을 루트 front door로 계속 유지"
+        why_rejected: "커뮤니티 도구는 보이지만 박세종이라는 사람과 팀 핏이 먼저 기억되기 어렵다"
+      - option: "장기 비전 설명을 길게 앞세우기"
+        why_rejected: "300명 노션 환경에서는 추상 비전보다 짧은 카피와 이미 만든 증거가 더 잘 읽힌다"
+    outcome: "pending"
+    outcome_note: "3/25 결과 발표 전 리팩토링과 실제 공유 반응으로 검증 예정"
+
+  # ─ 새 결정은 아래에 추가 ─
+  # - id: "D006"
+  #   date: "YYYY-MM"
+  #   decision: ""
+  #   rationale: ""
+  #   alternatives_rejected: []
+  #   outcome: "pending"
+  #   outcome_note: null

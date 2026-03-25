@@ -26,6 +26,7 @@ import {
 import type {
   CreatorPrProfile,
   MbtiProfile,
+  PersonaChatQuota,
   PersonaProfile,
   PersonaQAMessage,
   TechStackItem
@@ -180,7 +181,30 @@ export type PersonaLoaderData = {
   notionUrl: string | null;
 };
 
+export type PersonaPageMode = "pr" | "chat";
+
 const HUPOSITORY_URL = "https://github.com/lifedesigner88/lifedesigner88/tree/main/hupository";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
+const SDG_ALL_GOALS_URL = "https://sdgs.un.org/goals";
+const SDG_WHEEL_COLORS = [
+  "#E5243B",
+  "#DDA63A",
+  "#4C9F38",
+  "#C5192D",
+  "#FF3A21",
+  "#26BDE2",
+  "#FCC30B",
+  "#A21942",
+  "#FD6925",
+  "#DD1367",
+  "#FD9D24",
+  "#BF8B2E",
+  "#3F7E44",
+  "#0A97D9",
+  "#56C02B",
+  "#00689D",
+  "#19486A"
+];
 
 const SECTION_CARD_BASE =
   "overflow-hidden rounded-[28px] border border-slate-200/80 bg-white/95 shadow-[0_12px_36px_rgba(15,23,42,0.06)] backdrop-blur-sm";
@@ -572,16 +596,98 @@ function SdgBadge({ sdg, label, resonance }: { sdg: number; label: string; reson
   const nn = String(sdg).padStart(2, "0");
   const iconUrl = `https://sdgs.un.org/sites/default/files/goals/E_SDG_Icons-${nn}.jpg`;
   const goalUrl = `https://sdgs.un.org/goals/goal${sdg}`;
-  const ring = resonance === "high" ? "ring-2 ring-sky-200" : "ring-1 ring-slate-200";
+  const emphasisClass =
+    resonance === "high"
+      ? "border-sky-200/90 bg-[linear-gradient(145deg,rgba(255,255,255,0.96),rgba(240,249,255,0.92))] shadow-[0_16px_32px_rgba(56,189,248,0.12)]"
+      : "border-slate-200/90 bg-[linear-gradient(145deg,rgba(255,255,255,0.94),rgba(248,250,252,0.9))] shadow-[0_12px_26px_rgba(15,23,42,0.06)]";
   return (
     <a
       href={goalUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className={`flex flex-col items-center gap-2.5 rounded-2xl border border-slate-200/80 bg-white/86 px-3.5 py-4 text-xs shadow-sm transition hover:bg-white ${ring}`}
+      className={cn(
+        "group flex h-full items-center gap-4 rounded-[24px] px-4 py-4 text-left transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white",
+        emphasisClass
+      )}
     >
-      <img src={iconUrl} alt={`SDG ${sdg}`} width={80} height={80} className="rounded-xl" />
-      <div className="text-center text-[11px] leading-5 text-slate-600">{label}</div>
+      <div className="overflow-hidden rounded-2xl border border-white/80 bg-white shadow-sm">
+        <img
+          src={iconUrl}
+          alt={`SDG ${sdg}`}
+          width={76}
+          height={76}
+          className="h-[76px] w-[76px] object-cover"
+        />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="inline-flex rounded-full border border-slate-200 bg-white/82 px-2.5 py-1 text-[10px] font-semibold tracking-[0.14em] text-slate-500">
+          SDG {sdg}
+        </div>
+        <p className="mt-2 text-sm font-semibold leading-6 text-slate-900">{label}</p>
+      </div>
+    </a>
+  );
+}
+
+function SdgOverviewLink() {
+  const { t } = useTranslation("persona");
+  const fallbackGradient = `conic-gradient(${SDG_WHEEL_COLORS.map((color, index) => {
+    const start = (index / SDG_WHEEL_COLORS.length) * 360;
+    const end = ((index + 1) / SDG_WHEEL_COLORS.length) * 360;
+    return `${color} ${start}deg ${end}deg`;
+  }).join(", ")})`;
+
+  return (
+    <a
+      href={SDG_ALL_GOALS_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={t("sdg.allGoalsLinkLabel")}
+      title={t("sdg.allGoalsLinkLabel")}
+      className="group inline-flex items-center gap-3 self-start rounded-[20px] border border-slate-200/90 bg-white/88 px-4 py-3 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
+    >
+      <span className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-white shadow-sm transition group-hover:scale-[1.03]">
+        <span className="absolute inset-0 rounded-full" style={{ background: fallbackGradient }} />
+        <span className="absolute inset-[24%] rounded-full bg-white shadow-inner" />
+        <span className="relative text-[10px] font-bold tracking-[0.16em] text-slate-700">17</span>
+      </span>
+      <span className="min-w-0">
+        <span className="block text-sm font-semibold text-slate-900">
+          {t("sdg.allGoalsLinkTitle")}
+        </span>
+        <span className="block text-xs leading-5 text-slate-500">{t("sdg.allGoalsLinkCaption")}</span>
+      </span>
+      <span className="sr-only">{t("sdg.allGoalsLinkLabel")}</span>
+    </a>
+  );
+}
+
+function HupositoryButton({ className }: { className?: string }) {
+  const { t } = useTranslation("persona");
+
+  return (
+    <a
+      href={HUPOSITORY_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={cn(
+        "inline-flex items-center gap-2 rounded-full border border-sky-200 bg-white/88 px-4 py-2 text-sm font-medium text-sky-700 shadow-sm transition hover:border-cyan-300 hover:bg-cyan-50 hover:text-cyan-700",
+        className
+      )}
+    >
+      <span aria-hidden="true">✅</span>
+      {t("creatorIntro.repoButton")}
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        className="h-4 w-4"
+      >
+        <path d="M7 17 17 7" />
+        <path d="M9 7h8v8" />
+      </svg>
     </a>
   );
 }
@@ -775,49 +881,16 @@ function CreatorPrRolesCard({ data }: { data: CreatorPrProfile }) {
   );
 }
 
-function CreatorPrProjectCard({ data }: { data: CreatorPrProfile }) {
-  const { t } = useTranslation("persona");
-
-  return (
-    <Card
-      className={cn(
-        SECTION_CARD_BASE,
-        "border-slate-200 bg-[linear-gradient(160deg,rgba(252,249,242,0.98),rgba(250,246,235,0.94))]"
-      )}
-    >
-      <CardHeader className={SECTION_HEADER_BASE}>
-        <SectionEyebrow className="text-amber-600">
-          {t("creatorPr.projectSectionLabel")}
-        </SectionEyebrow>
-        <CardTitle className={cn(SECTION_TITLE_BASE, "max-w-4xl text-amber-950")}>
-          {data.project.title}
-        </CardTitle>
-        <p className="text-sm leading-7 text-amber-900/85">{data.project.summary}</p>
-      </CardHeader>
-      <CardContent className={SECTION_CONTENT_BASE}>
-        <ul className="grid gap-3 lg:grid-cols-2">
-          {data.project.bullets.map((bullet) => (
-            <li
-              key={bullet}
-              className="rounded-2xl border border-white/85 bg-white/78 px-4 py-4 text-sm leading-6 text-amber-950/85 shadow-sm"
-            >
-              {bullet}
-            </li>
-          ))}
-        </ul>
-      </CardContent>
-    </Card>
-  );
-}
-
 function CreatorPrWhyCard({
   label,
   section,
-  accent
+  accent,
+  bulletInset = false
 }: {
   label: string;
   section: CreatorPrProfile["why_now"];
   accent: "sky" | "emerald";
+  bulletInset?: boolean;
 }) {
   const accentClasses =
     accent === "sky"
@@ -844,7 +917,7 @@ function CreatorPrWhyCard({
         <p className={cn("text-sm leading-7", accentClasses.summary)}>{section.summary}</p>
       </CardHeader>
       <CardContent className={SECTION_CONTENT_BASE}>
-        <ul className="space-y-1.5">
+        <ul className={cn("space-y-1.5", bulletInset ? "pl-3" : null)}>
           {section.bullets.map((bullet) => (
             <li key={bullet} className="flex gap-2 text-sm leading-6 text-slate-700">
               <span className={cn("mt-2 h-1.5 w-1.5 shrink-0 rounded-full", accentClasses.dot)} />
@@ -877,29 +950,40 @@ function CreatorPrCtaCard({
         "border-slate-200 bg-[linear-gradient(155deg,rgba(240,249,245,0.98),rgba(245,250,248,0.95))]"
       )}
     >
-      <CardHeader className={SECTION_HEADER_BASE}>
-        <SectionEyebrow className="text-emerald-700/80">
-          {t("creatorPr.ctaSectionLabel")}
-        </SectionEyebrow>
-        <CardTitle className={cn(SECTION_TITLE_BASE, "max-w-4xl text-emerald-950")}>
-          {data.cta.title}
-        </CardTitle>
-        <p className="text-sm leading-7 text-emerald-900/80">{data.cta.body}</p>
+      <CardHeader className={cn(SECTION_HEADER_BASE, "pb-0")}>
+        <SectionEyebrow className="text-emerald-700/80">{t("creatorPr.ctaSectionLabel")}</SectionEyebrow>
       </CardHeader>
-      <CardContent className={cn(SECTION_CONTENT_BASE, "pt-0")}>
-        <div className="flex flex-wrap items-center gap-3">
+      <CardContent className={cn(SECTION_CONTENT_BASE, "pt-4")}>
+        <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_320px] md:items-stretch">
+          <div className="rounded-[24px] border border-white/80 bg-white/72 px-5 py-5 shadow-sm">
+            <CardTitle className={cn(SECTION_TITLE_BASE, "max-w-4xl whitespace-pre-line text-emerald-950")}>
+              {data.cta.title}
+            </CardTitle>
+            <p className="mt-3 text-sm leading-7 text-emerald-900/80">{data.cta.body}</p>
+          </div>
+
           {email ? (
             <button
               type="button"
               onClick={() => {
                 void onEmailCopy();
               }}
-              className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
+              className="group flex h-full min-h-[148px] flex-col justify-between rounded-[24px] border border-emerald-200/90 bg-white px-5 py-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-300 hover:bg-emerald-50/70"
             >
-              <span>{email}</span>
-              <span className="text-slate-500">
-                {emailCopied ? t("creatorIntro.emailCopied") : t("creatorPr.contactButton")}
-              </span>
+              <div className="space-y-2">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-600">
+                  {t("creatorPr.contactButton")}
+                </div>
+                <div className="break-all text-sm leading-6 font-medium text-slate-800">{email}</div>
+              </div>
+              <div className="flex items-center justify-between gap-3 pt-4">
+                <span className="text-xs font-semibold text-slate-500">
+                  {emailCopied ? t("creatorIntro.emailCopied") : t("creatorPr.contactButton")}
+                </span>
+                <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-emerald-700 transition group-hover:border-emerald-300 group-hover:bg-white">
+                  {emailCopied ? t("creatorIntro.emailCopied") : t("creatorIntro.emailCopy")}
+                </span>
+              </div>
             </button>
           ) : null}
         </div>
@@ -910,11 +994,7 @@ function CreatorPrCtaCard({
 
 // ─── Q&A panel (auth-gated) ───────────────────────────────────────────────────
 
-function PersonaChatHowItWorksButton({
-  compact = false
-}: {
-  compact?: boolean;
-}) {
+function PersonaChatHowItWorksButton({ compact = false }: { compact?: boolean }) {
   const { t } = useTranslation("persona");
   const [open, setOpen] = useState(false);
 
@@ -952,7 +1032,9 @@ function PersonaChatHowItWorksButton({
                 <CardHeader className="gap-3 px-5 pt-5 pb-0 sm:px-6 sm:pt-6">
                   <div className="flex items-start justify-between gap-4">
                     <div className="space-y-2">
-                      <SectionEyebrow className="text-sky-600">{t("qa.howItWorksBadge")}</SectionEyebrow>
+                      <SectionEyebrow className="text-sky-600">
+                        {t("qa.howItWorksBadge")}
+                      </SectionEyebrow>
                       <CardTitle
                         id="persona-chat-how-title"
                         className="text-xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-[1.45rem]"
@@ -1004,9 +1086,16 @@ function PersonaChatHowItWorksButton({
                     </SectionPanel>
                   </div>
 
+                  <p className="px-1 text-[11px] leading-5 text-slate-400 sm:text-right">
+                    <span className="font-semibold text-slate-500">
+                      {t("qa.howItWorksModelLabel")}
+                    </span>
+                    {` · ${t("qa.howItWorksModelBody")}`}
+                  </p>
+
                   <SectionNote
-                    className="border-amber-200/90 bg-amber-50/90"
-                    iconClassName="text-amber-500"
+                    className="border-rose-200/90 bg-rose-50/90"
+                    iconClassName="text-rose-500"
                   >
                     {t("qa.loggingNotice")}
                   </SectionNote>
@@ -1037,6 +1126,21 @@ function PersonaChatHowItWorksButton({
   );
 }
 
+function PersonaLoginActions({ showHowItWorks = false }: { showHowItWorks?: boolean }) {
+  const { t } = useTranslation("persona");
+
+  return (
+    <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto">
+      {showHowItWorks ? <PersonaChatHowItWorksButton compact /> : null}
+      <a href="/auth/login" className="w-full sm:w-auto">
+        <Button size="sm" className="w-full sm:w-auto">
+          {t("loginPrompt.loginBtn")}
+        </Button>
+      </a>
+    </div>
+  );
+}
+
 function renderChatMessageContent(content: string): ReactNode {
   const lines = content.split("\n");
 
@@ -1063,10 +1167,7 @@ function renderChatMessageContent(content: string): ReactNode {
           return (
             <div
               key={`line-${lineIndex}`}
-              className={cn(
-                "flex items-center gap-1.5 pt-1 pb-0.5",
-                lineIndex > 0 ? "mt-2" : ""
-              )}
+              className={cn("flex items-center gap-1.5 pt-1 pb-0.5", lineIndex > 0 ? "mt-2" : "")}
             >
               <span aria-hidden="true" className="shrink-0 opacity-80">
                 {headingEmoji}
@@ -1114,14 +1215,17 @@ function renderChatMessageContent(content: string): ReactNode {
 function PersonaQAPanel({
   personId,
   lang,
-  compact = false
+  compact = false,
+  showRepoAction = false
 }: {
   personId: string;
   lang: string;
   compact?: boolean;
+  showRepoAction?: boolean;
 }) {
   const { t } = useTranslation("persona");
   const [messages, setMessages] = useState<PersonaQAMessage[]>([]);
+  const [quota, setQuota] = useState<PersonaChatQuota | null>(null);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [historyLoading, setHistoryLoading] = useState(true);
@@ -1129,6 +1233,7 @@ function PersonaQAPanel({
   const [resettingSession, setResettingSession] = useState(false);
   const [sessionResetNoticeVisible, setSessionResetNoticeVisible] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const panelDescription = compact ? t("qa.compactDescription") : t("qa.description");
 
   useEffect(() => {
     let cancelled = false;
@@ -1146,10 +1251,12 @@ function PersonaQAPanel({
         const data = await readPersonaChatHistoryResponse(response);
         if (!cancelled) {
           setMessages(data.messages);
+          setQuota(data.quota);
         }
       } catch {
         if (!cancelled) {
           setMessages([]);
+          setQuota(null);
           setHistoryError(t("qa.historyLoadFailed"));
         }
       } finally {
@@ -1174,8 +1281,9 @@ function PersonaQAPanel({
       if (!response.ok) {
         throw new Error("reset-session-failed");
       }
-      await readPersonaChatResetResponse(response);
+      const data = await readPersonaChatResetResponse(response);
       setMessages([]);
+      setQuota(data.quota);
       setInput("");
       setSessionResetNoticeVisible(true);
     } catch {
@@ -1197,11 +1305,18 @@ function PersonaQAPanel({
       const response = await requestPersonaAsk(personId, question, lang);
       if (response.ok) {
         const data = await readPersonaAskResponse(response);
+        setQuota(data.quota);
         setMessages((prev) => [...prev, { role: "assistant", content: data.answer, lang }]);
       } else if (response.status === 429) {
-        setMessages((prev) => [...prev, { role: "assistant", content: t("qa.rateLimitError"), lang }]);
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: t("qa.rateLimitError"), lang }
+        ]);
       } else {
-        setMessages((prev) => [...prev, { role: "assistant", content: t("qa.errorMessage"), lang }]);
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: t("qa.errorMessage"), lang }
+        ]);
       }
     } catch {
       setMessages((prev) => [...prev, { role: "assistant", content: t("qa.errorMessage"), lang }]);
@@ -1217,6 +1332,29 @@ function PersonaQAPanel({
       handleAsk();
     }
   }
+
+  function buildQuotaLabel() {
+    if (!quota) {
+      return "";
+    }
+
+    if (!quota.reset_at) {
+      return t("qa.quotaStatus", { count: quota.remaining_questions });
+    }
+
+    const resetTime = new Intl.DateTimeFormat(lang.startsWith("ko") ? "ko-KR" : "en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).format(new Date(quota.reset_at));
+
+    return t("qa.quotaStatusWithReset", {
+      count: quota.remaining_questions,
+      time: resetTime,
+    });
+  }
+
+  const quotaLabel = buildQuotaLabel();
 
   return (
     <Card className={cn(SECTION_CARD_BASE, "overflow-visible bg-white/94")}>
@@ -1235,25 +1373,26 @@ function PersonaQAPanel({
             >
               {compact ? t("qa.compactTitle") : t("qa.title")}
             </CardTitle>
-            <p className={SECTION_TEXT_BASE}>
-              {compact ? t("qa.compactDescription") : t("qa.description")}
-            </p>
+            {panelDescription ? <p className={SECTION_TEXT_BASE}>{panelDescription}</p> : null}
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            {compact ? (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleSessionReset}
-                disabled={historyLoading || resettingSession || messages.length === 0}
-                className="border-emerald-300 bg-emerald-50/90 text-emerald-700 hover:border-emerald-400 hover:bg-emerald-100 hover:text-emerald-800"
-              >
-                {t("qa.resetSessionButton")}
-              </Button>
-            ) : null}
-            {compact ? <PersonaChatHowItWorksButton compact /> : null}
-          </div>
+          {showRepoAction || compact ? (
+            <div className="flex flex-wrap items-center gap-2">
+              {showRepoAction ? <HupositoryButton /> : null}
+              {showRepoAction || compact ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSessionReset}
+                  disabled={historyLoading || resettingSession || messages.length === 0}
+                  className="border-emerald-300 bg-emerald-50/90 text-emerald-700 hover:border-emerald-400 hover:bg-emerald-100 hover:text-emerald-800"
+                >
+                  {t("qa.resetSessionButton")}
+                </Button>
+              ) : null}
+              {showRepoAction || compact ? <PersonaChatHowItWorksButton compact /> : null}
+            </div>
+          ) : null}
         </div>
       </CardHeader>
       <CardContent className={SECTION_CONTENT_BASE}>
@@ -1261,7 +1400,10 @@ function PersonaQAPanel({
         {historyError ? <p className="text-xs leading-5 text-rose-600">{historyError}</p> : null}
 
         {sessionResetNoticeVisible && !historyLoading ? (
-          <SectionNote className="border-emerald-200 bg-emerald-50/80" iconClassName="text-emerald-500">
+          <SectionNote
+            className="border-emerald-200 bg-emerald-50/80"
+            iconClassName="text-emerald-500"
+          >
             {t("qa.sessionResetNotice")}
           </SectionNote>
         ) : null}
@@ -1280,7 +1422,9 @@ function PersonaQAPanel({
                       : "border border-sky-200/80 bg-sky-50/90 text-slate-800"
                   }`}
                 >
-                  <div className="break-words overflow-visible">{renderChatMessageContent(msg.content)}</div>
+                  <div className="break-words overflow-visible">
+                    {renderChatMessageContent(msg.content)}
+                  </div>
                 </div>
               </div>
             ))}
@@ -1296,26 +1440,27 @@ function PersonaQAPanel({
 
         <div className="flex gap-3">
           <Textarea
+            autoGrow
+            minRows={3}
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={t("qa.placeholder")}
-            className="min-h-[72px] resize-none"
+            className="resize-none"
             disabled={loading}
           />
           <Button onClick={handleAsk} disabled={loading || !input.trim()} className="self-end">
             {t("qa.ask")}
           </Button>
         </div>
-        <SectionNote className="border-slate-200 bg-slate-50/80" iconClassName="text-slate-400">
-          {t("qa.disclaimer")}
-        </SectionNote>
-        <SectionNote className="border-amber-200 bg-amber-50/80" iconClassName="text-amber-500">
-          {t("qa.loggingNotice")}
-        </SectionNote>
-        <p className={SECTION_SUBTEXT_BASE}>{t("qa.rateLimitHint")}</p>
-        <p className={SECTION_SUBTEXT_BASE}>{t("qa.hint")}</p>
+        <div className="flex flex-col gap-1.5 pt-1 sm:flex-row sm:items-start sm:justify-between">
+          <p className="text-xs leading-5 text-slate-500">{t("qa.disclaimer")}</p>
+          {quotaLabel ? (
+            <p className="text-right text-[11px] leading-5 text-slate-400">{quotaLabel}</p>
+          ) : null}
+        </div>
+        <p className="text-xs leading-5 text-rose-600">{t("qa.loggingNotice")}</p>
       </CardContent>
     </Card>
   );
@@ -1323,9 +1468,9 @@ function PersonaQAPanel({
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export function PersonaPage() {
+export function PersonaPage({ pageMode = "pr" }: { pageMode?: PersonaPageMode }) {
   const { t, i18n } = useTranslation("persona");
-  const { personaId, title, dataEng, dataKor, email, githubAddress, notionUrl } =
+  const { personaId, title, dataEng, dataKor, email, notionUrl } =
     useLoaderData() as PersonaLoaderData;
   const rootData = useRouteLoaderData("root") as RootLoaderData;
   const sessionUser = rootData?.sessionUser ?? null;
@@ -1335,6 +1480,12 @@ export function PersonaPage() {
   const isCreatorProfile = personaId === "sejong";
   const showExtendedPersonaSections = !isCreatorProfile;
   const creatorPr = isCreatorProfile ? (profile.creator_pr ?? null) : null;
+  const creatorPrPage = isCreatorProfile && pageMode === "pr";
+  const creatorChatPage = isCreatorProfile && pageMode === "chat";
+  const showFullProfile = !isCreatorProfile || creatorPrPage;
+  const showChatSection = !isCreatorProfile || creatorChatPage;
+  const compactChat = !isCreatorProfile ? false : !creatorChatPage;
+  const qaDescription = t("qa.description");
 
   // Very-light tinted backgrounds derived from dominant MBTI colors
   const mbtiColors = profile.mbti ? getMbtiDominantColors(profile.mbti) : [];
@@ -1359,23 +1510,71 @@ export function PersonaPage() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }, [profile]);
+  const [heroHealthStatus, setHeroHealthStatus] = useState<"idle" | "loading" | "success" | "error">(
+    "idle"
+  );
+  const [heroHealthLatencyMs, setHeroHealthLatencyMs] = useState<number | null>(null);
+  const handleHeroHealthCheck = useCallback(async () => {
+    setHeroHealthStatus("loading");
+    setHeroHealthLatencyMs(null);
+    const startedAt = performance.now();
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/health`, {
+        credentials: "include",
+        cache: "no-store"
+      });
+      if (!response.ok) throw new Error("Health check failed");
+
+      setHeroHealthStatus("success");
+      setHeroHealthLatencyMs(Math.round(performance.now() - startedAt));
+    } catch {
+      setHeroHealthStatus("error");
+    }
+  }, []);
+  const heroHealthLabel =
+    heroHealthStatus === "loading"
+      ? t("hero.healthLoading")
+      : heroHealthStatus === "success"
+        ? t("hero.healthResult", { ms: heroHealthLatencyMs ?? 0 })
+        : heroHealthStatus === "error"
+          ? t("hero.healthError")
+          : t("hero.healthButton");
+  const heroHealthTone =
+    heroHealthStatus === "success"
+      ? "border-emerald-300 bg-emerald-50 text-emerald-700"
+      : heroHealthStatus === "error"
+        ? "border-rose-300 bg-rose-50 text-rose-700"
+        : heroHealthStatus === "loading"
+          ? "border-amber-300 bg-amber-50 text-amber-700"
+          : "border-slate-200 bg-white/88 text-slate-600";
 
   const sdgSection =
     profile.sdg_alignment.length > 0 ? (
       <Card
-        className={cn(SECTION_CARD_BASE, "bg-white/94")}
-        style={{ background: mbtiCardBg(2, 3) }}
+        className={cn(
+          SECTION_CARD_BASE,
+          "border-slate-200 bg-[linear-gradient(145deg,rgba(255,255,255,0.95),rgba(248,250,252,0.94),rgba(255,247,237,0.9))]"
+        )}
       >
         <CardHeader className={SECTION_HEADER_BASE}>
-          <SectionEyebrow className="text-slate-500">{t("sdg.sectionLabel")}</SectionEyebrow>
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+            <div className="flex-1 space-y-3">
+              <SectionEyebrow className="text-slate-500">{t("sdg.sectionLabel")}</SectionEyebrow>
+              <div className="max-w-4xl text-sm leading-7 text-slate-600">
+                {t("sdg.description")}
+              </div>
+            </div>
+            <SdgOverviewLink />
+          </div>
         </CardHeader>
         <CardContent className={SECTION_CONTENT_BASE}>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {profile.sdg_alignment.map((s) => (
               <SdgBadge key={s.sdg} {...s} />
             ))}
           </div>
-          <SectionNote className="border-slate-200 bg-slate-50/80" iconClassName="text-slate-400">
+          <SectionNote className="border-slate-200/90 bg-white/70" iconClassName="text-slate-400">
             {t("sdg.aiNote")}
           </SectionNote>
         </CardContent>
@@ -1392,7 +1591,9 @@ export function PersonaPage() {
               style={{ background: mbtiCardBg(0, 4, 160) }}
             >
               <CardHeader className={SECTION_HEADER_BASE}>
-                <SectionEyebrow className="text-slate-500">{t("timeline.sectionLabel")}</SectionEyebrow>
+                <SectionEyebrow className="text-slate-500">
+                  {t("timeline.sectionLabel")}
+                </SectionEyebrow>
               </CardHeader>
               <CardContent className={SECTION_CONTENT_BASE}>
                 <div className="space-y-0">
@@ -1435,199 +1636,160 @@ export function PersonaPage() {
         })()
       : null;
 
-  return (
-    <div className="space-y-5">
-      {isCreatorProfile ? (
-        <Card
-          className={cn(
-            SECTION_CARD_BASE,
-            "border-slate-200 bg-[linear-gradient(155deg,rgba(244,249,252,0.98),rgba(247,250,252,0.95))]"
-          )}
-        >
-          <CardHeader className={cn(SECTION_HEADER_BASE, "pb-5 sm:pb-6")}>
-            <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_290px] lg:items-start">
-              <div className="space-y-4">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant="outline">{t("creatorIntro.badge")}</Badge>
-                  {creatorPr ? <Badge variant="success">{creatorPr.event_badge}</Badge> : null}
-                </div>
-                <CardTitle className={cn(SECTION_TITLE_BASE, "max-w-3xl")}>
-                  {t("creatorIntro.title")}
-                </CardTitle>
-                <p className={cn(SECTION_TEXT_BASE, "max-w-3xl")}>
-                  {t("creatorIntro.description")}
-                </p>
-                <div className="flex flex-wrap items-center gap-3">
-                  <a
-                    href={HUPOSITORY_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-4 py-2 text-sm font-medium text-sky-700 shadow-sm transition hover:border-cyan-300 hover:bg-cyan-50 hover:text-cyan-700"
-                  >
-                    <span aria-hidden="true">✅</span>
-                    {t("creatorIntro.repoButton")}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      className="h-4 w-4"
-                    >
-                      <path d="M7 17 17 7" />
-                      <path d="M9 7h8v8" />
-                    </svg>
-                  </a>
-                  <p className="text-xs leading-5 text-slate-500">{t("creatorIntro.contact")}</p>
-                </div>
-              </div>
-
-              <div className="flex h-full min-h-[168px] flex-col rounded-[24px] border border-sky-200/80 bg-[linear-gradient(145deg,rgba(236,253,255,0.96),rgba(255,251,235,0.94))] p-4 shadow-[0_14px_34px_rgba(14,165,233,0.12)] backdrop-blur-sm">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge
-                    variant="outline"
-                    className="border-sky-200 bg-sky-100/90 text-sky-700"
-                  >
-                    {t("creatorIntro.aiBadge")}
-                  </Badge>
-                </div>
-                <p className="mt-3 text-base font-semibold leading-6 text-slate-900">
-                  {t("creatorIntro.aiTitle")}
-                </p>
-                <p className="mt-2 text-sm leading-6 text-slate-700">{t("creatorIntro.aiNote")}</p>
-                <div className="mt-auto pt-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-600">
-                  {t("creatorIntro.aiSignature")}
-                </div>
-              </div>
-            </div>
-          </CardHeader>
-        </Card>
-      ) : null}
-
-      {/* Tech Stack */}
-      {isCreatorProfile && profile.tech_stack && profile.tech_stack.length > 0 ? (
-        <TechStackCard items={profile.tech_stack} />
-      ) : null}
-
-      {/* Hero card */}
-      <Card
-        className={cn(
-          SECTION_CARD_BASE,
-          "border-slate-200 bg-[linear-gradient(160deg,rgba(243,250,248,0.98),rgba(242,249,251,0.94))]"
-        )}
-      >
-        <CardHeader className={SECTION_HEADER_BASE}>
-          <div className="flex flex-wrap items-center justify-between gap-2">
+  const heroCard = showFullProfile ? (
+    <Card
+      className={cn(
+        SECTION_CARD_BASE,
+        "border-slate-200 bg-[linear-gradient(160deg,rgba(243,250,248,0.98),rgba(242,249,251,0.94))]"
+      )}
+    >
+      <CardHeader className={cn(SECTION_HEADER_BASE, isCreatorProfile ? "pb-5 sm:pb-6" : "")}>
+        <div className="space-y-4">
+          <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant="outline">{t("hero.badge")}</Badge>
               <Badge variant="success">{creatorPr ? creatorPr.event_badge : personaId}</Badge>
               <span className={SECTION_SUBTEXT_BASE}>{title}</span>
             </div>
+            {isCreatorProfile ? (
+              <button
+                type="button"
+                onClick={handleHeroHealthCheck}
+                disabled={heroHealthStatus === "loading"}
+                className={cn(
+                  "inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-semibold shadow-sm transition hover:-translate-y-0.5 disabled:translate-y-0 disabled:cursor-default",
+                  heroHealthTone
+                )}
+              >
+                <span
+                  className={cn(
+                    "h-2 w-2 rounded-full",
+                    heroHealthStatus === "success"
+                      ? "bg-emerald-500"
+                      : heroHealthStatus === "error"
+                        ? "bg-rose-500"
+                        : heroHealthStatus === "loading"
+                          ? "bg-amber-500"
+                          : "bg-slate-400"
+                  )}
+                />
+                {heroHealthLabel}
+              </button>
+            ) : null}
           </div>
-          <CardTitle className="text-3xl tracking-[-0.04em] text-slate-950 sm:text-[2.2rem]">
-            {profile.archetype}
-          </CardTitle>
-          <p className={cn(SECTION_TEXT_BASE, "max-w-3xl")}>{profile.one_liner}</p>
-          <p className={SECTION_SUBTEXT_BASE}>{profile.headline}</p>
-          {(githubAddress || notionUrl) && (
-            <div className="flex flex-wrap items-center gap-3 pt-1">
-              {githubAddress && (
-                <a
-                  href={githubAddress}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 rounded-full border border-zinc-900/20 bg-zinc-900 px-3 py-1 text-xs font-medium text-white hover:bg-zinc-700 transition-colors"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    className="h-3.5 w-3.5"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2Z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  {githubAddress.replace("https://github.com/", "@")}
-                </a>
-              )}
-              {notionUrl && (
-                <a
-                  href={notionUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 rounded-full border border-zinc-900/20 bg-zinc-900 px-3 py-1 text-xs font-medium text-white hover:bg-zinc-700 transition-colors"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    className="h-3.5 w-3.5"
-                  >
-                    <path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 1.968c-.42-.326-.981-.7-2.055-.607L3.01 2.295c-.466.046-.56.28-.374.466zm.793 3.08v13.904c0 .747.373 1.027 1.214.98l14.523-.84c.841-.046.935-.56.935-1.167V6.354c0-.606-.233-.933-.748-.887l-15.177.887c-.56.047-.747.327-.747.933zm14.337.745c.093.42 0 .84-.42.888l-.7.14v10.264c-.608.327-1.168.514-1.635.514-.748 0-.935-.234-1.495-.933l-4.577-7.186v6.952L12.21 19s0 .84-1.168.84l-3.222.186c-.093-.186 0-.653.327-.746l.84-.233V9.854L7.822 9.76c-.094-.42.14-1.026.793-1.073l3.456-.233 4.764 7.279v-6.44l-1.215-.14c-.093-.514.28-.887.747-.933zM1.936 1.035l13.31-.98c1.634-.14 2.055-.047 3.082.7l4.249 2.986c.7.513.934.653.934 1.213v16.378c0 1.026-.373 1.634-1.68 1.726l-15.458.934c-.98.047-1.448-.093-1.962-.747l-3.129-4.06c-.56-.747-.793-1.306-.793-1.96V2.667c0-.839.374-1.54 1.447-1.632z" />
-                  </svg>
-                  Notion
-                </a>
-              )}
-            </div>
-          )}
-        </CardHeader>
+          <div className="space-y-3">
+            <CardTitle className="text-3xl tracking-[-0.04em] text-slate-950 sm:text-[2.2rem]">
+              {profile.archetype}
+            </CardTitle>
+            <p className={cn(SECTION_TEXT_BASE, "max-w-3xl")}>{profile.one_liner}</p>
+          </div>
+        </div>
+      </CardHeader>
+      {!isCreatorProfile ? (
         <CardContent className={SECTION_CONTENT_BASE}>
-          {creatorPr ? (
-            <SectionPanel label={t("hero.topValues")} labelClassName="text-slate-500">
-              <div className="flex flex-wrap gap-2">
-                {profile.top3_values.map((value) => (
-                  <span
-                    key={value}
-                    className="rounded-full border border-sky-200/80 bg-sky-50/80 px-3 py-1 text-sm font-medium text-slate-700"
-                  >
-                    {value}
-                  </span>
-                ))}
-              </div>
-            </SectionPanel>
-          ) : (
-            <SectionPanel label={t("hero.topValues")} labelClassName="text-slate-500">
-              <div className="flex flex-wrap gap-2">
-                {profile.top3_values.map((v) => (
-                  <span
-                    key={v}
-                    className="rounded-full border border-sky-200/80 bg-sky-50/80 px-3 py-1 text-sm font-medium text-slate-700"
-                  >
-                    {v}
-                  </span>
-                ))}
-              </div>
-            </SectionPanel>
-          )}
-
-          {!isCreatorProfile ? (
-            <button
-              onClick={handleCopy}
-              className="group w-full rounded-2xl border border-sky-200/80 bg-white/72 px-5 py-4 text-left shadow-sm transition hover:bg-sky-50/70 active:scale-[0.99]"
-            >
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <div className="text-sm font-semibold text-slate-800">
-                    {copied ? t("hero.copiedHeading") : t("hero.copyHeading")}
-                  </div>
-                  <div className="mt-1 text-xs leading-5 text-slate-600">
-                    {copied ? t("hero.copiedSubtext") : t("hero.copySubtext")}
-                  </div>
+          <button
+            onClick={handleCopy}
+            className="group w-full rounded-2xl border border-sky-200/80 bg-white/72 px-5 py-4 text-left shadow-sm transition hover:bg-sky-50/70 active:scale-[0.99]"
+          >
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <div className="text-sm font-semibold text-slate-800">
+                  {copied ? t("hero.copiedHeading") : t("hero.copyHeading")}
                 </div>
-                <span className="shrink-0 rounded-xl border border-sky-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm transition group-hover:border-sky-300">
-                  {copied ? t("hero.copiedBtn") : t("hero.copyBtn")}
-                </span>
+                <div className="mt-1 text-xs leading-5 text-slate-600">
+                  {copied ? t("hero.copiedSubtext") : t("hero.copySubtext")}
+                </div>
               </div>
-            </button>
-          ) : null}
+              <span className="shrink-0 rounded-xl border border-sky-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm transition group-hover:border-sky-300">
+                {copied ? t("hero.copiedBtn") : t("hero.copyBtn")}
+              </span>
+            </div>
+          </button>
         </CardContent>
-      </Card>
+      ) : null}
+    </Card>
+  ) : null;
+
+  const creatorHeroSupportCards = creatorPrPage ? (
+    <div className="grid gap-4 lg:grid-cols-2">
+      {notionUrl ? (
+        <a
+          href={notionUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group flex min-h-[168px] items-center justify-center rounded-[24px] border border-slate-200/90 bg-white/92 p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
+        >
+          <div className="flex items-center justify-center gap-4 text-center sm:gap-5">
+            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-slate-300 bg-white text-slate-950 shadow-sm">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="h-7 w-7"
+              >
+                <path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 1.968c-.42-.326-.981-.7-2.055-.607L3.01 2.295c-.466.046-.56.28-.374.466zm.793 3.08v13.904c0 .747.373 1.027 1.214.98l14.523-.84c.841-.046.935-.56.935-1.167V6.354c0-.606-.233-.933-.748-.887l-15.177.887c-.56.047-.747.327-.747.933zm14.337.745c.093.42 0 .84-.42.888l-.7.14v10.264c-.608.327-1.168.514-1.635.514-.748 0-.935-.234-1.495-.933l-4.577-7.186v6.952L12.21 19s0 .84-1.168.84l-3.222.186c-.093-.186 0-.653.327-.746l.84-.233V9.854L7.822 9.76c-.094-.42.14-1.026.793-1.073l3.456-.233 4.764 7.279v-6.44l-1.215-.14c-.093-.514.28-.887.747-.933zM1.936 1.035l13.31-.98c1.634-.14 2.055-.047 3.082.7l4.249 2.986c.7.513.934.653.934 1.213v16.378c0 1.026-.373 1.634-1.68 1.726l-15.458.934c-.98.047-1.448-.093-1.962-.747l-3.129-4.06c-.56-.747-.793-1.306-.793-1.96V2.667c0-.839.374-1.54 1.447-1.632z" />
+              </svg>
+            </span>
+            <div className="min-w-0">
+              <p className="text-lg font-semibold leading-7 text-slate-950 sm:text-[1.2rem]">
+                {t("hero.portfolioButton")}
+              </p>
+            </div>
+          </div>
+        </a>
+      ) : null}
+
+      <div className="flex min-h-[168px] flex-col rounded-[24px] border border-sky-200/80 bg-[linear-gradient(145deg,rgba(236,253,255,0.96),rgba(255,251,235,0.94))] p-5 shadow-[0_14px_34px_rgba(14,165,233,0.12)] backdrop-blur-sm">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="outline" className="border-sky-200 bg-sky-100/90 text-sky-700">
+            {t("creatorIntro.aiBadge")}
+          </Badge>
+        </div>
+        <p className="mt-3 text-base font-semibold leading-6 text-slate-900">
+          {t("creatorIntro.aiTitle")}
+        </p>
+        <p className="mt-2 text-sm leading-6 text-slate-700">{t("creatorIntro.aiNote")}</p>
+        <div className="mt-auto flex flex-wrap items-center gap-3 pt-4">
+          <a
+            href={HUPOSITORY_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-white/88 px-4 py-2 text-sm font-medium text-sky-700 shadow-sm transition hover:border-cyan-300 hover:bg-cyan-50 hover:text-cyan-700"
+          >
+            <span aria-hidden="true">✅</span>
+            {t("creatorIntro.repoButton")}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              className="h-4 w-4"
+            >
+              <path d="M7 17 17 7" />
+              <path d="M9 7h8v8" />
+            </svg>
+          </a>
+          <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-600">
+            {t("creatorIntro.aiSignature")}
+          </div>
+        </div>
+      </div>
+    </div>
+  ) : null;
+
+  return (
+    <div className="space-y-5">
+      {heroCard}
+      {creatorHeroSupportCards}
+
+      {/* Tech Stack */}
+      {creatorPrPage && profile.tech_stack && profile.tech_stack.length > 0 ? (
+        <TechStackCard items={profile.tech_stack} />
+      ) : null}
 
       {/* MBTI */}
-      {profile.mbti ? (
+      {showFullProfile && profile.mbti ? (
         <Card
           className={cn(
             SECTION_CARD_BASE,
@@ -1696,23 +1858,21 @@ export function PersonaPage() {
         </Card>
       ) : null}
 
-      {creatorPr ? <CreatorPrProjectCard data={creatorPr} /> : null}
+      {showFullProfile && isCreatorProfile ? sdgSection : null}
 
-      {isCreatorProfile ? sdgSection : null}
-
-      {isCreatorProfile ? timelineSection : null}
-
-      {creatorPr ? (
+      {showFullProfile && creatorPr ? (
         <div className="grid gap-4 xl:grid-cols-2">
           <CreatorPrWhyCard
             label={t("creatorPr.whyNow")}
             section={creatorPr.why_now}
             accent="sky"
+            bulletInset
           />
           <CreatorPrWhyCard
             label={t("creatorPr.whyMe")}
             section={creatorPr.why_me}
             accent="emerald"
+            bulletInset
           />
         </div>
       ) : null}
@@ -1785,9 +1945,9 @@ export function PersonaPage() {
       {/* Identity shifts timeline */}
       {!isCreatorProfile ? timelineSection : null}
 
-      {creatorPr ? <CreatorPrRolesCard data={creatorPr} /> : null}
+      {showFullProfile && creatorPr ? <CreatorPrRolesCard data={creatorPr} /> : null}
 
-      {creatorPr ? (
+      {showFullProfile && creatorPr ? (
         <CreatorPrCtaCard
           data={creatorPr}
           email={email}
@@ -1844,48 +2004,54 @@ export function PersonaPage() {
       ) : null}
 
       {/* Q&A — auth-gated */}
-      {sessionUser ? (
-        <PersonaQAPanel personId={personaId} lang={lang} compact={isCreatorProfile} />
-      ) : isCreatorProfile ? (
-        <Card className={cn(SECTION_CARD_BASE, "bg-white/88")}>
-          <CardHeader className={SECTION_HEADER_BASE}>
-            <SectionEyebrow className="text-slate-500">{t("qa.compactBadge")}</SectionEyebrow>
-            <CardTitle className="text-lg font-semibold tracking-[-0.03em] text-slate-950 sm:text-[1.35rem]">
-              {t("qa.compactTitle")}
-            </CardTitle>
-            <p className={SECTION_TEXT_BASE}>{t("qa.compactDescription")}</p>
-          </CardHeader>
-          <CardContent className={SECTION_CONTENT_BASE}>
-            <SectionNote className="border-slate-200 bg-slate-50/80" iconClassName="text-slate-400">
-              {t("qa.disclaimer")}
-            </SectionNote>
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className={SECTION_TEXT_BASE}>{t("loginPrompt.message")}</p>
-              <div className="flex flex-wrap items-center gap-2">
-                <PersonaChatHowItWorksButton compact />
-                <a href="/auth/login">
-                  <Button variant="outline" size="sm">
-                    {t("loginPrompt.loginBtn")}
-                  </Button>
-                </a>
+      {showChatSection ? (
+        sessionUser ? (
+          <div id={isCreatorProfile ? "ai-sejong" : undefined}>
+            <PersonaQAPanel
+              personId={personaId}
+              lang={lang}
+              compact={compactChat}
+              showRepoAction={creatorChatPage}
+            />
+          </div>
+        ) : creatorChatPage ? (
+          <div id="ai-sejong">
+            <Card className={cn(SECTION_CARD_BASE, "bg-white/88")}>
+              <CardHeader className={SECTION_HEADER_BASE}>
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="space-y-2">
+                    <SectionEyebrow className="text-slate-500">{t("qa.badge")}</SectionEyebrow>
+                    <CardTitle className={SECTION_TITLE_BASE}>{t("qa.title")}</CardTitle>
+                    {qaDescription ? <p className={SECTION_TEXT_BASE}>{qaDescription}</p> : null}
+                  </div>
+                  <HupositoryButton />
+                </div>
+              </CardHeader>
+              <CardContent className={SECTION_CONTENT_BASE}>
+                <SectionNote
+                  className="border-slate-200 bg-slate-50/80"
+                  iconClassName="text-slate-400"
+                >
+                  {t("qa.disclaimer")}
+                </SectionNote>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p className={SECTION_TEXT_BASE}>{t("loginPrompt.message")}</p>
+                  <PersonaLoginActions showHowItWorks />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        ) : isCreatorProfile ? null : (
+          <Card className={cn(SECTION_CARD_BASE, "bg-white/88")}>
+            <CardContent className={cn(SECTION_CONTENT_BASE, "sm:py-5")}>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className={SECTION_TEXT_BASE}>{t("loginPrompt.message")}</p>
+                <PersonaLoginActions />
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card className={cn(SECTION_CARD_BASE, "bg-white/88")}>
-          <CardContent className={cn(SECTION_CONTENT_BASE, "sm:py-5")}>
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className={SECTION_TEXT_BASE}>{t("loginPrompt.message")}</p>
-              <a href="/auth/login">
-                <Button variant="outline" size="sm">
-                  {t("loginPrompt.loginBtn")}
-                </Button>
-              </a>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+            </CardContent>
+          </Card>
+        )
+      ) : null}
     </div>
   );
 }

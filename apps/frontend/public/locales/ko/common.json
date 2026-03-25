@@ -1,9 +1,10 @@
 {
   "nav": {
+    "frontDoor": "박세종 | PR",
     "overview": "개요",
-    "dashboardSeoul": "대시보드 - 서울",
-    "dashboardBusan": "대시보드 - 부산",
-    "comingSoon": "Coming soon",
+    "dashboardSeoul": "서울 대시보드",
+    "dashboardBusan": "부산 대시보드",
+    "comingSoon": "예정",
     "signup": "회원가입",
     "login": "로그인",
     "cohortVerification": "합격자 인증",
@@ -12,12 +13,17 @@
     "adminVerifications": "인증 관리",
     "capture": "페르소나 구조",
     "mySubmissions": "더미 제출 목록",
-    "demoPersona": "만든 사람 PR",
-    "sejongPersona": "만든 사람 PR"
+    "demoPersona": "박세종 PR",
+    "sejongPersona": "박세종 PR",
+    "sejongAiChat": "세종AI 챗봇"
   },
   "sidebar": {
-    "phase": "AI SW Maestro",
-    "tagline": "서울 + 부산 450명의 17기 동료를 찾고, 팀빌딩을 준비하세요",
+    "phase": "ASM17",
+    "brandTitle": "박세종 | PR",
+    "brandSubtitle": "for AI SW Maestro 17 team building",
+    "projectGithubLabel": "PR 프로젝트",
+    "blogLabel": "블로그",
+    "blogAddress": "blog.naver.com/lifedesigner88",
     "directInquiry": "1:1 문의",
     "currentBaseline": "현재 기준선",
     "sessionTitle": "세션",
@@ -97,7 +103,7 @@
       "Notion 소개 링크",
       "같이 면접 본 사람들 보기",
       "AI 세종과 대화",
-      "Creator PR",
+      "박세종 PR",
       "관리자 승인",
       "한/영 UI"
     ],
@@ -154,6 +160,14 @@
     "logoAlt": "ASM 17 로고",
     "logoTitle": "asm 17",
     "logoSubtitle": "AI Software Maestro 17"
+  },
+  "dashboardBusanPage": {
+    "pill": "ASM17 Busan",
+    "title": "부산 대시보드는 아직 준비 중입니다.",
+    "description": "현재 제품 우선순위는 서울 인터뷰 대시보드와 인증 흐름을 먼저 단단하게 만드는 데 있습니다.",
+    "subtext": "부산 대시보드는 자리만 먼저 열어두었고, 실제 데이터 구조와 운영 흐름이 정리되면 그때 활성화할 예정입니다.",
+    "primaryAction": "서울 대시보드 보기",
+    "secondaryAction": "박세종 PR로 돌아가기"
   },
   "button": {
     "logout": "로그아웃",

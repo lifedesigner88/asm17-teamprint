@@ -5,6 +5,11 @@
   "hero": {
     "badge": "공개 페르소나",
     "topValues": "핵심 가치",
+    "portfolioButton": "최종면접 포트폴리오",
+    "healthButton": "헬스체크",
+    "healthLoading": "체크 중...",
+    "healthError": "실패",
+    "healthResult": "{{ms}}ms",
     "copyHeading": "이 프로필을 어딘가에 사용하고 싶으신가요?",
     "copySubtext": "전체 프로필을 마크다운으로 복사 — 문서나 AI 프롬프트에 바로 붙여넣기 가능합니다.",
     "copiedHeading": "✓ 클립보드에 복사됨!",
@@ -15,7 +20,7 @@
   "creatorIntro": {
     "badge": "실전 팀빌딩 PR",
     "title": "박세종의 역할과 팀 조합만 짧게 보여드리고 싶습니다.",
-    "description": "AI SW Maestro 17 팀빌딩 전에 같이 팀해볼 만한지 빠르게 보는 Creator PR 페이지입니다.",
+    "description": "AI SW Maestro 17 팀빌딩 전에 같이 팀해볼 만한지 빠르게 보는 박세종 PR 페이지입니다.",
     "contact": "완성형보다 같이 만들고 같이 성장할 팀을 찾고 있습니다.",
     "aiBadge": "AI 제작 메모",
     "aiTitle": "AI를 활용해 생성된 페이지",
@@ -31,7 +36,7 @@
     "teamSectionTitle": "이런 역할의 두 분과 함께 팀을 만들어보고 싶습니다.",
     "avoidMatches": "이 조합은 잘 안 맞을 가능성이 큽니다.",
     "projectSectionLabel": "함께 만들 방향",
-    "whyNow": "지금",
+    "whyNow": "선호 팀원 유형",
     "whyMe": "제가 맡을 역할",
     "ctaSectionLabel": "연락",
     "contactButton": "메일 복사"
@@ -41,7 +46,7 @@
     "turbulent": "· 격동형",
     "assertive": "· 자기주장형",
     "viewOn16p": "16personalities에서 보기 →",
-    "aiNote": "AI 예측 — 이 결과는 자기 보고 테스트가 아닌 가치관, 행동 양식, 아이덴티티 데이터에서 추론된 것입니다. PersonaMirror에 입력 데이터가 많을수록 예측이 더 정확해집니다."
+    "aiNote": "휴포지토리를 기반으로 AI가 추론한 결과입니다."
   },
   "mbtiDimensions": {
     "introverted": "내향형",
@@ -151,7 +156,12 @@
   },
   "sdg": {
     "sectionLabel": "관심있는 SDGs",
-    "aiNote": "AI 예측 — 관심은 가치관, 커리어 이력, 커뮤니티 활동에서 추론된 것이며 자기 보고 평가가 아닙니다. PersonaMirror에 입력 데이터가 많을수록 이 관심 추정이 더 정확해집니다."
+    "description": "SDGs는 유엔이 제시한 17개의 지속가능발전목표로, 사회·환경·경제 문제를 함께 더 나아지게 만들기 위한 공통 목표입니다.",
+    "allGoalsLinkTitle": "17개 목표 보기",
+    "allGoalsLinkCaption": "UN 공식 페이지",
+    "allGoalsLinkLabel": "유엔 공식 페이지에서 SDGs 17개 목표 보기",
+    "allGoalsIconAlt": "SDGs 17개 목표 원형 아이콘",
+    "aiNote": "휴포지토리를 기반으로 AI가 추론한 결과입니다."
   },
   "timeline": {
     "sectionLabel": "아이덴티티 타임라인"
@@ -163,12 +173,16 @@
     "sectionLabel": "약점"
   },
   "qa": {
-    "badge": "이 페르소나에게 묻기",
-    "compactBadge": "AI 세종",
-    "title": "세종 페르소나와 대화하기",
-    "compactTitle": "AI 세종과 짧게 대화하기",
-    "description": "무엇이든 물어보세요 — 세종 페르소나가 자신의 가치관, 경험, 세계관을 바탕으로 답변합니다.",
-    "compactDescription": "궁금한 점을 짧게 물어보세요. 팀빌딩 전에 분위기와 생각을 가볍게 확인할 수 있습니다.",
+    "badge": "세종 AI",
+    "compactBadge": "세종 AI",
+    "title": "휴포지토리 기반 세종 AI",
+    "compactTitle": "휴포지토리 기반 세종 AI",
+    "chatPageBadge": "세종AI 챗봇",
+    "chatPageTitle": "세종AI 챗봇",
+    "chatPageDescription": "박세종 PR과 분리된 전용 챗 페이지입니다. 궁금한 점을 바로 물어보세요.",
+    "chatPagePrButton": "박세종 PR 보기",
+    "description": "",
+    "compactDescription": "",
     "disclaimer": "AI가 생성한 답변이라 실제 세종의 생각이나 표현과 다를 수 있습니다.",
     "loggingNotice": "질문과 답변은 무분별한 사용을 막기 위해 기록되고 있습니다.",
     "thinking": "생각 중…",
@@ -177,24 +191,26 @@
     "resetSessionButton": "세션 초기화",
     "resetSessionFailed": "세션을 초기화하지 못했습니다.",
     "sessionResetNotice": "새 채팅 세션을 시작했습니다. 이전 기록은 DB에 남아 있지만 다시 불러오지 않습니다.",
-    "placeholder": "질문을 입력하세요… (Enter로 전송)",
+    "placeholder": "질문을 입력하세요… (Enter로 전송 · Shift+Enter로 줄바꿈)\n\n로그인 사용자 기준 1시간에 최대 10개의 질문만 할 수 있습니다.",
     "ask": "질문",
-    "hint": "Enter로 전송 · Shift+Enter로 줄바꿈",
-    "rateLimitHint": "로그인 사용자 기준 1시간에 최대 10개의 질문만 할 수 있습니다.",
+    "quotaStatus": "남은 질문 {{count}}",
+    "quotaStatusWithReset": "남은 질문 {{count}} · 초기화 {{time}}",
     "rateLimitError": "질문은 1시간에 최대 10개까지만 가능합니다. 잠시 후 다시 시도해 주세요.",
     "errorMessage": "죄송합니다, 지금은 답변하기 어렵습니다.",
     "howItWorksButton": "작동 방식 보기",
     "howItWorksBadge": "개발자 메모",
     "howItWorksTitle": "AI 세종 채팅은 이렇게 작동합니다",
-    "howItWorksDescription": "팀빌딩용 대화이지만, 내부적으로는 기록형 멀티턴 구조로 동작합니다.",
+    "howItWorksDescription": "지금은 서버 안에 함께 둔 휴포지토리 데이터 약 400KB를 읽어 프롬프트에 붙이는 단순한 구조입니다.",
     "howItWorksAccessLabel": "이용 조건",
-    "howItWorksAccessBody": "이 채팅은 로그인한 사용자만 사용할 수 있고, 1시간에 최대 10개의 질문까지만 가능합니다. 이상한 질문이나 무분별한 사용을 줄이기 위한 기본 장치입니다.",
+    "howItWorksAccessBody": "로그인한 사용자만 사용할 수 있고, 질문은 최근 1시간 기준 최대 10개까지 가능합니다. 가장 오래된 질문부터 순차적으로 다시 풀립니다.",
     "howItWorksContextLabel": "참고 데이터",
-    "howItWorksContextBody": "세종의 페르소나 데이터와 Creator PR, 그리고 휴포지토리 핵심 문서를 함께 참고해 답변합니다.",
+    "howItWorksContextBody": "지금은 백엔드에 함께 둔 휴포지토리 데이터 약 400KB를 읽어 답변에 붙입니다. 이후에는 GitHub 원격 조회나 pgvector 검색으로 업그레이드할 계획입니다.",
+    "howItWorksModelLabel": "사용 모델",
+    "howItWorksModelBody": "Anthropic Claude Haiku 4.5 · claude-haiku-4-5-20251001",
     "howItWorksMemoryLabel": "멀티턴 방식",
-    "howItWorksMemoryBody": "전체 대화는 DB에 저장하고, 답변할 때는 최근 대화 일부만 다시 넣어 성능과 비용을 함께 관리합니다.",
+    "howItWorksMemoryBody": "전체 대화는 DB에 저장하고, 답변할 때는 현재 세션의 최근 대화 12개만 다시 넣습니다. 세션을 초기화하면 새 대화로 이어지고, 이전 기록은 남습니다.",
     "howItWorksLoggingLabel": "기록 방식",
-    "howItWorksLoggingBody": "질문과 답변은 모두 DB에 저장됩니다. 나중에 자주 묻는 질문 패턴이나 팀빌딩 관심사를 살펴볼 수 있습니다.",
+    "howItWorksLoggingBody": "질문과 답변은 모두 DB에 저장됩니다. 자주 묻는 질문과 팀빌딩 관심사를 보기 위한 기록이며, 삭제는 지원하지 않습니다.",
     "howItWorksClose": "닫기"
   },
   "loginPrompt": {

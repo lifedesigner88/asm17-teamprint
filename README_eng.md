@@ -1,10 +1,10 @@
-# SoMa Community
+# Park Sejong PR for ASM17
 
-> A small community app built for SW Maestro 17 (ASM17) team building.
+> The root URL now opens directly into `Park Sejong PR`.
 >
 > It started from a simple real-world problem: before meeting in person, applicants should be able to share interview schedule, GitHub, and self-introduction Notion links, then understand the people who interviewed together with them faster.
 >
-> This is still an early product focused on solving that team-building flow first, not a large polished platform.
+> Inside, the dashboard, verification, and ASM17 team-building operations flow still remain active.
 
 For the Korean README, see [README.md](README.md).
 
@@ -18,32 +18,37 @@ This project started from one practical idea:
 
 > Before meeting people in person, it would be useful if applicants could share interview schedule, GitHub, and intro links and understand the people who interviewed together with them.
 
-SoMa Community is my attempt to turn that idea into a small, usable product.
+This repo is my attempt to turn that idea into a small, usable product.
 
-The creator PR page is still part of the product, but it is only one surface inside the team-building flow. The main product is the community app itself.
+As of March 25, 2026, the main entry has been reordered:
+
+- `/` is the `Park Sejong PR` page itself
+- `Park Sejong PR`, `AI Sejong`, YouTube, and shipped surfaces act as the first proof assets
+- the Seoul dashboard, verification, and ops flow now sit one step behind that first impression
 
 ## What Users Can Do Now
 
 - Sign up and log in
+- Open `/` and land directly on the `Park Sejong PR` page
 - Complete email verification and 17th-cohort verification
 - Enter interview date, start time, and related interview information
 - Add a GitHub profile link
 - Add a Notion self-introduction link
 - View people who interviewed in the same slot
 - Use the service before team building to understand possible teammates faster
-- Open the creator PR / introduction page as one part of the overall product flow
+- Open the Park Sejong PR / introduction page as one part of the overall product flow
 - Use the login-only `AI Sejong` multi-turn chat
 
 ## Current Core Flow
 
-1. A user signs up.
-2. The user completes email verification and 17th-cohort verification.
-3. The user enters interview date, start time, and slot-related information.
-4. The user adds profile links such as GitHub and a self-introduction Notion page.
-5. The system places the user into an interview slot.
-6. The user browses other people from the same slot before team building.
-7. If needed, the user opens the Creator PR page or uses `AI Sejong` for extra context.
-8. The user uses that context and those links to decide who may be worth talking to in person.
+1. A user enters `/` and lands on the `Park Sejong PR` page itself.
+2. The user scans the PR page, YouTube, and `AI Sejong` as proof surfaces first.
+3. If interested, the user signs up.
+4. The user completes email verification and 17th-cohort verification.
+5. The user enters interview date, start time, and slot-related information.
+6. The user adds profile links such as GitHub and a self-introduction Notion page.
+7. The system places the user into an interview slot.
+8. The user browses other people from the same slot before team building.
 
 ## Key Features
 
@@ -53,8 +58,8 @@ The creator PR page is still part of the product, but it is only one surface ins
 - GitHub profile link input
 - Notion self-introduction link input
 - Dashboard and slot-based browsing for people who interviewed together
-- Creator PR / introduction page for the builder of the project
-- Login-only `AI Sejong` multi-turn chat
+- Park Sejong PR page for the builder of the project
+- Login-only `AI Sejong` multi-turn chat page
 - Admin approval flow for managing access to member detail views
 - Bilingual UI support for Korean and English
 
@@ -107,7 +112,7 @@ I would especially like to work with people who want to make the AI layer more u
 
 Main directories:
 
-- `apps/frontend` — community UI, dashboard, verification flow, and creator PR page
+- `apps/frontend` — Park Sejong PR, AI Sejong, community UI, dashboard, and verification flow
 - `apps/backend` — auth, verification, dashboard, admin, and persona APIs
 - `apps/ai-worker` — legacy / experimental worker for later AI features
 - `infrastructure/terraform` — infrastructure-related workspace
@@ -159,8 +164,9 @@ pnpm dev
 Main local URLs:
 
 - Frontend: `http://localhost:3000`
-- Main app entry: `http://localhost:3000/seoul/dashboard`
-- Creator PR page: `http://localhost:3000/persona/sejong`
+- Main app entry / Park Sejong PR page: `http://localhost:3000/`
+- Legacy Park Sejong PR link: `http://localhost:3000/persona/sejong` -> `http://localhost:3000/`
+- AI Sejong page: `http://localhost:3000/ai/sejong`
 - Backend API docs: `http://localhost:8000/docs`
 
 ### Run with Docker
@@ -185,6 +191,8 @@ There are no polished screenshots checked into the repository yet.
 
 For now, the easiest way to explore the product is through these routes:
 
+- `http://localhost:3000/` — Park Sejong PR root page and default shared link
+- `http://localhost:3000/persona/sejong` — legacy Park Sejong PR link that now resolves to `/`
+- `http://localhost:3000/ai/sejong` — AI Sejong chat page inside the product
 - `http://localhost:3000/seoul/dashboard` — main community and interview-context flow
-- `http://localhost:3000/persona/sejong` — creator PR page inside the product
 - `http://localhost:8000/docs` — backend API documentation

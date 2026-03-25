@@ -1,0 +1,88 @@
+# 목표 진척도 추적 — data/06_goals/progress.yaml
+# tree.yaml 기준 각 목표의 현재 진척과 근거를 기록합니다.
+# 이벤트 발생 시 갱신하고, 월간 리뷰 때 한 번 더 정리합니다.
+
+as_of: "2026-03-25"
+tracking_basis: "tree.yaml"
+
+goal_progress:
+  - id: "G-SEJONG-01"
+    title: "첫 유료 수강생 확보"
+    status: in_progress     # not_started | in_progress | done | dropped
+    completion_pct: 10
+    metric:
+      label: "유료 수강생 수"
+      current: 0
+      registered_users: 48
+      target: null
+    notes: >
+      플랫폼과 초기 유입 기반은 열렸고, 첫 결제 전환이 다음 분기점이다.
+      2026 주간 리뷰 시리즈는 시작했지만 실제 업로드 리듬은 아직 안정화 중이다.
+
+  - id: "G-SEJONG-03"
+    title: "콘텐츠 채널 확장 (클래스101 등)"
+    status: in_progress
+    next_checkpoint: "2026-03-27T15:00:00+09:00"
+    notes: >
+      클래스101 미팅 예정. 단기 수익보다 팬 확보와 채널 확장 관점에서 판단한다.
+
+  - id: "G-AI-01"
+    title: "AI Agent 개발 역량 확보 (LangGraph · FastAPI)"
+    status: in_progress
+    completion_pct: 30
+    notes: >
+      Hupository와 PersonaMirror를 통해 FastAPI, LangGraph, GPT-5.4 계열 활용 경험을 실전으로 축적 중이다.
+
+  - id: "G-AI-02"
+    title: "Hupository AI Agent 완성 (일상 수집 → 자동 업데이트)"
+    status: in_progress
+    completion_pct: 20
+    notes: >
+      09_journal → 08_now 운영 루프는 작동 중이다.
+      상위 데이터 자동 승격과 추출 자동화는 다음 단계다.
+
+  - id: "G-PM-01"
+    title: "PersonaMirror 공개 유즈케이스 정리 (3/25 목표)"
+    status: in_progress
+    completion_pct: 80
+    milestones:
+      - step: "Creator PR 페이지 /persona/sejong"
+        status: completed
+      - step: "Seoul Dashboard 운영 보드"
+        status: completed
+      - step: "AI Sejong multi-turn chat"
+        status: completed
+      - step: "공유 링크 front door 정리"
+        status: in_progress
+      - step: "합격 직후 공유용 카피/링크 패키지"
+        status: in_progress
+    notes: >
+      PersonaMirror의 첫 공개 유즈케이스를 ASM 17 Community / Creator PR 맥락에서 검증 중이다.
+      핵심 과제는 제품 기능 추가보다 첫 공유 링크의 설득력 정리다.
+
+  - id: "G-AI-03"
+    title: "SW마에스트로 17기 합격 → AI 네트워크·역량 확보"
+    status: in_progress
+    completion_pct: 80
+    milestones:
+      - step: "코딩테스트"
+        status: passed
+        date: "2026-03-07"
+        passed_on: "2026-03-11"
+      - step: "면접"
+        status: completed
+        datetime: "2026-03-20T09:30:00+09:00"
+      - step: "최종 발표"
+        status: pending
+        datetime: "2026-03-25T14:00:00+09:00"
+    notes: >
+      결과에 따라 단기 운영 전략이 갈린다.
+      합격 시 팀빌딩 가속 옵션, 불합격 시 PersonaMirror와 클래스101 쪽으로 무게 이동.
+
+  - id: "G-LS-02"
+    title: "PersonaMirror 독립 서비스 배포 및 운영"
+    status: in_progress
+    completion_pct: 15
+    notes: >
+      현재는 ASM 17 Community / Creator PR 맥락에서 공개 entry flow를 검증 중이며,
+      이후 장기적으로 라이프디자인 서비스의 공개 진입점으로 확장한다.

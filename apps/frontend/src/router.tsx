@@ -1,6 +1,6 @@
 import { Navigate, createBrowserRouter } from "react-router-dom";
 
-import { App, HomePage, RouteErrorBoundary, homeAction, homeLoader } from "./App";
+import { App, RouteErrorBoundary } from "./App";
 import { AdminUsersPage, adminUsersLoader } from "./features/admin";
 import {
   LoginPage,
@@ -28,8 +28,8 @@ import {
   submitCaptureAction,
   voiceAction
 } from "./features/capture";
-import { DashboardPage } from "./features/dashboard";
-import { PersonaPage, personaLoader } from "./features/persona";
+import { BusanDashboardPage, DashboardPage } from "./features/dashboard";
+import { PersonaPage, personaLoader, sejongPersonaLoader } from "./features/persona";
 import { VerificationPage } from "./features/verification";
 import { AdminVerificationsPage } from "./features/admin";
 
@@ -43,13 +43,12 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Navigate to="/seoul/dashboard" replace />
+        element: <PersonaPage pageMode="pr" />,
+        loader: sejongPersonaLoader
       },
       {
         path: "home",
-        element: <HomePage />,
-        loader: homeLoader,
-        action: homeAction
+        element: <Navigate to="/" replace />
       },
       {
         id: "capture",
@@ -133,8 +132,21 @@ export const router = createBrowserRouter([
         element: <DashboardPage />
       },
       {
+        path: "busan/dashboard",
+        element: <BusanDashboardPage />
+      },
+      {
+        path: "persona/sejong",
+        element: <Navigate to="/" replace />
+      },
+      {
         path: "persona/:personId",
-        element: <PersonaPage />,
+        element: <PersonaPage pageMode="pr" />,
+        loader: personaLoader
+      },
+      {
+        path: "ai/:personId",
+        element: <PersonaPage pageMode="chat" />,
         loader: personaLoader
       }
     ]

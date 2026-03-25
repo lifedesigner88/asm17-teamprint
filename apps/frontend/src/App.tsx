@@ -1,63 +1,43 @@
+import { type ReactNode, useEffect, useRef } from "react";
 import {
-  Form,
   NavLink,
   Outlet,
   isRouteErrorResponse,
-  useActionData,
+  useLocation,
   useLoaderData,
-  useNavigation,
-  useRouteLoaderData,
   useRouteError
 } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import { Button, LangToggle, ShellCard, StatusPill } from "@/common/components";
+import { LangToggle, ShellCard, StatusPill } from "@/common/components";
 import { LogoutButton, type RootLoaderData } from "@/features/auth";
-import { KAKAO_OPEN_CHAT_URL } from "@/lib/contact";
+import { KAKAO_OPEN_CHAT_URL, NAVER_BLOG_URL, PROJECT_GITHUB_URL } from "@/lib/contact";
 import { cn } from "@/lib/utils";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
-
-type HealthLoaderData = { initialStatus: string; initialDurationMs: number | null };
-type HealthActionData = { result: string; durationMs: number | null };
 type NavigationItem = {
   to: string;
   label: string;
   disabled?: boolean;
   hoverTitle?: string;
 };
-type HomeStep = {
-  title: string;
-  text: string;
-};
 
-async function requestHealthStatus(): Promise<string> {
-  const response = await fetch(`${API_BASE_URL}/health`, {
-    credentials: "include"
-  });
-  if (!response.ok) {
-    throw new Error(`Backend request failed: ${response.status}`);
-  }
-  const data = (await response.json()) as { status?: string };
-  return data.status ?? "unknown";
-}
-
-function nowMs(): number {
-  return typeof performance !== "undefined" ? performance.now() : Date.now();
-}
+const FEATURED_NAV_BASE =
+  "rounded-2xl border px-4 py-3.5 text-sm leading-5 transition shadow-[0_8px_22px_rgba(15,23,42,0.04)]";
 
 function getNavigationItemClasses(item: NavigationItem, isActive: boolean): string {
-  if (item.to === "/seoul/dashboard") {
+  if (item.to === "/ai/sejong") {
     return cn(
-      "rounded-2xl border border-sky-200/80 bg-[linear-gradient(135deg,rgba(180,226,255,0.96),rgba(122,197,255,0.92))] px-4 py-3 text-sm font-semibold text-sky-950 shadow-sm transition hover:brightness-[0.98]",
-      isActive && "shadow-md ring-1 ring-sky-200/90"
+      FEATURED_NAV_BASE,
+      "border-rose-300/80 bg-[linear-gradient(135deg,rgba(255,241,242,1),rgba(255,247,237,0.98))] font-semibold text-rose-950 hover:border-rose-400/80 hover:bg-[linear-gradient(135deg,rgba(255,241,242,1),rgba(255,251,235,1))] hover:text-rose-950",
+      isActive && "ring-1 ring-rose-300/90 shadow-[0_14px_28px_rgba(244,63,94,0.14)]"
     );
   }
 
-  if (item.to === "/persona/sejong") {
+  if (item.to === "/seoul/dashboard") {
     return cn(
-      "rounded-2xl border border-rose-200/80 bg-[linear-gradient(135deg,rgba(255,246,246,0.95),rgba(255,233,236,0.92))] px-4 py-3 text-sm font-medium text-rose-900 transition hover:bg-rose-100/90 hover:text-rose-950",
-      isActive && "shadow-sm ring-1 ring-rose-200/80"
+      FEATURED_NAV_BASE,
+      "border-sky-200/75 bg-[linear-gradient(135deg,rgba(249,250,251,0.98),rgba(240,249,255,0.9))] font-medium text-sky-900 hover:border-sky-300/75 hover:bg-sky-50/92 hover:text-sky-950",
+      isActive && "ring-1 ring-sky-200/80 shadow-[0_10px_24px_rgba(56,189,248,0.1)]"
     );
   }
 
@@ -69,23 +49,79 @@ function getNavigationItemClasses(item: NavigationItem, isActive: boolean): stri
   );
 }
 
+function NaverBlogIcon() {
+  return <span className="text-[15px] font-black">N</span>;
+}
+
+function GitHubIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="h-4 w-4">
+      <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2Z" />
+    </svg>
+  );
+}
+
+function KakaoTalkIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-4 w-4">
+      <path
+        fill="currentColor"
+        d="M12 4c-4.97 0-9 3.019-9 6.742 0 2.442 1.736 4.58 4.332 5.756L6.25 20l4.012-2.095c.566.084 1.145.126 1.738.126 4.97 0 9-3.02 9-6.743C21 7.02 16.97 4 12 4Z"
+      />
+      <circle cx="8.45" cy="10.75" r="1.05" fill="#FEE500" />
+      <circle cx="12" cy="10.75" r="1.05" fill="#FEE500" />
+      <circle cx="15.55" cy="10.75" r="1.05" fill="#FEE500" />
+    </svg>
+  );
+}
+
+type SidebarActionLinkProps = {
+  href: string;
+  label: string;
+  icon: ReactNode;
+  cardClassName: string;
+  iconClassName: string;
+  labelClassName: string;
+};
+
+function SidebarActionLink({
+  href,
+  label,
+  icon,
+  cardClassName,
+  iconClassName,
+  labelClassName
+}: SidebarActionLinkProps) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={cn(
+        "group flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left transition",
+        cardClassName
+      )}
+    >
+      <span
+        className={cn(
+          "inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border",
+          iconClassName
+        )}
+      >
+        {icon}
+      </span>
+      <span className={cn("text-sm font-semibold transition", labelClassName)}>{label}</span>
+    </a>
+  );
+}
+
 export function App() {
   const { t, i18n } = useTranslation("common");
+  const location = useLocation();
   const { sessionUser } = useLoaderData() as RootLoaderData;
+  const contentRef = useRef<HTMLDivElement | null>(null);
   const navigationItems: NavigationItem[] = [
-    { to: "/seoul/dashboard", label: t("nav.dashboardSeoul") },
-    {
-      to: "/busan/dashboard",
-      label: t("nav.dashboardBusan"),
-      disabled: true,
-      hoverTitle: t("nav.comingSoon")
-    },
-    ...(!sessionUser
-      ? [
-          { to: "/auth/signup", label: t("nav.signup") },
-          { to: "/auth/login", label: t("nav.login") }
-        ]
-      : []),
+    { to: "/ai/sejong", label: t("nav.sejongAiChat") },
     ...(sessionUser
       ? [
           {
@@ -97,16 +133,38 @@ export function App() {
           }
         ]
       : []),
+    ...(!sessionUser
+      ? [
+          { to: "/auth/signup", label: t("nav.signup") },
+          { to: "/auth/login", label: t("nav.login") }
+        ]
+      : []),
     ...(sessionUser?.is_admin
       ? [
           { to: "/admin/users", label: t("nav.adminUsers") },
           { to: "/admin/verifications", label: t("nav.adminVerifications") }
         ]
       : []),
-    // Capture navigation is intentionally hidden for now.
-    // We'll bring this tab back later when persona-based team-building features are prioritized again.
-    { to: "/persona/sejong", label: t("nav.sejongPersona") }
+    { to: "/seoul/dashboard", label: t("nav.dashboardSeoul") },
+    {
+      to: "/busan/dashboard",
+      label: t("nav.dashboardBusan"),
+      disabled: true,
+      hoverTitle: t("nav.comingSoon")
+    }
   ];
+
+  useEffect(() => {
+    if (!location.pathname.startsWith("/auth/")) return;
+    if (typeof window === "undefined") return;
+    if (!window.matchMedia("(max-width: 1023px)").matches) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      contentRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [location.pathname]);
 
   return (
     <main className="mx-auto min-h-screen max-w-[1440px] px-4 py-6 sm:px-6 lg:px-8">
@@ -122,35 +180,41 @@ export function App() {
             }}
           >
             <div className="flex items-center justify-between">
-              <StatusPill label={t("sidebar.phase")} />
+              <StatusPill label={t("sidebar.phase")} tone="warn" />
               <LangToggle />
             </div>
-            <div className="mt-4">
-              <NavLink
-                to="/home"
-                className="group inline-flex w-full items-center gap-3 rounded-3xl"
-                end
-              >
-                <img
-                  src="/asm17_logo.png"
-                  alt="ASM 17 logo"
-                  className="h-14 w-14 shrink-0 object-contain"
-                />
-                <p className="min-w-0 text-sm font-medium leading-5 text-foreground/78 transition group-hover:text-foreground">
-                  {t("sidebar.tagline")}
-                </p>
+            <div className="mt-6 space-y-4 pb-1">
+              <NavLink to="/" className="group block rounded-3xl">
+                <div className="flex items-center gap-3">
+                  <img
+                    src="/asm17_logo.png"
+                    alt="ASM 17 logo"
+                    className="h-14 w-14 shrink-0 object-contain"
+                  />
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold leading-5 text-slate-950 transition group-hover:text-slate-700">
+                      {t("sidebar.brandTitle")}
+                    </p>
+                    <p className="mt-1 text-xs leading-5 text-slate-500">
+                      {t("sidebar.brandSubtitle")}
+                    </p>
+                  </div>
+                </div>
               </NavLink>
             </div>
-            <nav className="mt-8 grid gap-2">
+            <nav className="mt-7 grid gap-2.5">
               {navigationItems.map((item) =>
                 item.disabled ? (
                   <span
                     key={item.to}
                     aria-disabled="true"
                     title={item.hoverTitle}
-                    className="cursor-not-allowed rounded-2xl border border-dashed border-slate-200/90 bg-slate-100/85 px-4 py-3 text-sm font-medium text-slate-400 shadow-inner transition"
+                    className="flex cursor-not-allowed items-center justify-between gap-2 rounded-2xl border border-dashed border-slate-200/90 bg-slate-100/78 px-4 py-3.5 text-sm font-medium text-slate-400 shadow-inner transition"
                   >
-                    {item.label}
+                    <span>{item.label}</span>
+                    <span className="rounded-full border border-slate-200 bg-white/80 px-2 py-0.5 text-[11px] font-semibold tracking-[0.02em] text-slate-400">
+                      {item.hoverTitle}
+                    </span>
                   </span>
                 ) : (
                   <NavLink
@@ -164,276 +228,43 @@ export function App() {
                 )
               )}
             </nav>
-            <div className="mt-8 space-y-3 rounded-2xl border border-black/5 bg-white/70 p-4 text-sm">
+            <div className="mt-7 space-y-2.5 rounded-2xl border border-black/5 bg-white/70 p-4 text-sm">
               {sessionUser ? (
                 <LogoutButton className="w-full rounded-2xl border border-stone-200 bg-white/88 px-4 py-3 text-sm font-semibold text-stone-700 shadow-sm transition hover:bg-white" />
               ) : null}
-              <a
+              <SidebarActionLink
                 href={KAKAO_OPEN_CHAT_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex w-full items-center justify-center rounded-2xl border border-[#E7D486] bg-[#F3E19A] px-4 py-3 text-sm font-semibold text-[#3A3522] shadow-sm transition hover:bg-[#ECD67E]"
-              >
-                {t("sidebar.directInquiry")}
-              </a>
+                label={t("sidebar.directInquiry")}
+                icon={<KakaoTalkIcon />}
+                cardClassName="border-[#E7D486]/75 bg-[#FFF8DE]/88 hover:border-[#D8BF64] hover:bg-[#FFF3C7]"
+                iconClassName="border-[#E8D78F] bg-[#FFF1A6] text-[#3A2E10]"
+                labelClassName="text-[#4A3B18] group-hover:text-[#3C3116]"
+              />
+              <SidebarActionLink
+                href={NAVER_BLOG_URL}
+                label={t("sidebar.blogLabel")}
+                icon={<NaverBlogIcon />}
+                cardClassName="border-emerald-200/80 bg-emerald-50/72 hover:border-emerald-300 hover:bg-emerald-50/90"
+                iconClassName="border-emerald-200/80 bg-white/82 text-[#03C75A]"
+                labelClassName="text-slate-800 group-hover:text-emerald-800"
+              />
+              <SidebarActionLink
+                href={PROJECT_GITHUB_URL}
+                label={t("sidebar.projectGithubLabel")}
+                icon={<GitHubIcon />}
+                cardClassName="border-slate-200/85 bg-slate-50/78 hover:border-slate-300 hover:bg-white"
+                iconClassName="border-slate-200/80 bg-white/82 text-slate-700"
+                labelClassName="text-slate-800 group-hover:text-slate-700"
+              />
             </div>
           </ShellCard>
         </aside>
 
-        <div className="space-y-6">
+        <div ref={contentRef} className="space-y-6">
           <Outlet />
         </div>
       </div>
     </main>
-  );
-}
-
-export function homeLoader(): HealthLoaderData {
-  return { initialStatus: "not checked", initialDurationMs: null };
-}
-
-export async function homeAction(): Promise<HealthActionData> {
-  const startedAt = nowMs();
-  try {
-    const result = await requestHealthStatus();
-    return { result, durationMs: Math.max(0, Math.round(nowMs() - startedAt)) };
-  } catch {
-    return {
-      result: "request failed",
-      durationMs: Math.max(0, Math.round(nowMs() - startedAt))
-    };
-  }
-}
-
-export function HomePage() {
-  const { t } = useTranslation("common");
-  const loaderData = useLoaderData() as HealthLoaderData;
-  const rootData = useRouteLoaderData("root") as RootLoaderData;
-  const actionData = useActionData() as HealthActionData | undefined;
-  const navigation = useNavigation();
-  const loading = navigation.state === "submitting";
-  const result = actionData?.result ?? loaderData.initialStatus;
-  const durationMs = actionData?.durationMs ?? loaderData.initialDurationMs;
-  const tone = result === "ok" ? "success" : result === "request failed" ? "warn" : "default";
-  const statusLabel =
-    result === "ok"
-      ? t("home.runtimeStatusOk")
-      : result === "request failed"
-        ? t("home.runtimeStatusFailed")
-        : t("home.runtimeStatusIdle");
-  const sessionUser = rootData.sessionUser;
-  const keywords = t("home.keywords", {
-    returnObjects: true,
-    defaultValue: []
-  }) as string[];
-  const flowSteps = t("home.flowSteps", {
-    returnObjects: true,
-    defaultValue: []
-  }) as HomeStep[];
-  const featureItems = t("home.featureItems", {
-    returnObjects: true,
-    defaultValue: []
-  }) as string[];
-  const featuresSummary = t("home.featuresSummary");
-  const futureSummary = t("home.futureSummary");
-  const futureItems = t("home.futureItems", {
-    returnObjects: true,
-    defaultValue: []
-  }) as string[];
-  const flowAccentClasses = [
-    "bg-amber-500",
-    "bg-rose-500",
-    "bg-emerald-500",
-    "bg-sky-500",
-    "bg-violet-500",
-    "bg-slate-800"
-  ];
-  const keywordClasses = [
-    "border-amber-200 bg-amber-50 text-amber-900",
-    "border-emerald-200 bg-emerald-50 text-emerald-900",
-    "border-sky-200 bg-sky-50 text-sky-900",
-    "border-rose-200 bg-rose-50 text-rose-900",
-    "border-violet-200 bg-violet-50 text-violet-900",
-    "border-slate-200 bg-slate-50 text-slate-800"
-  ];
-  const getKeywordClass = (keyword: string, index: number) =>
-    keyword.toLowerCase().includes("notion")
-      ? "border-slate-200 bg-white text-slate-900 shadow-sm"
-      : keywordClasses[index % keywordClasses.length];
-
-  return (
-    <div className="space-y-6">
-      <ShellCard className="relative overflow-hidden border-white/70 bg-[linear-gradient(135deg,rgba(255,251,244,0.98),rgba(241,249,245,0.96))] p-0">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute top-[-24px] right-[-18px] h-44 w-44 rounded-full bg-amber-300/45 blur-3xl" />
-          <div className="absolute bottom-[-30px] left-[-12px] h-40 w-40 rounded-full bg-emerald-300/45 blur-3xl" />
-          <div className="absolute top-1/3 left-1/2 h-36 w-36 -translate-x-1/2 rounded-full bg-sky-200/25 blur-3xl" />
-          <div className="absolute inset-x-0 top-0 h-px bg-white/80" />
-        </div>
-        <div className="relative grid gap-6 p-6 lg:grid-cols-[1.24fr_0.76fr] lg:p-8">
-          <div className="space-y-5">
-            <div className="flex flex-wrap gap-2">
-              <StatusPill label={t("home.pill")} />
-              <StatusPill
-                label={
-                  sessionUser
-                    ? t("home.loggedIn", { userId: sessionUser.user_id })
-                    : t("home.guestMode")
-                }
-                tone={sessionUser ? "success" : "default"}
-              />
-              {sessionUser?.is_admin ? (
-                <StatusPill label={t("home.adminAccess")} tone="success" />
-              ) : null}
-            </div>
-
-            <div className="space-y-3.5">
-              <h2 className="max-w-3xl text-[1.55rem] font-semibold tracking-[-0.05em] text-foreground sm:text-[1.75rem] lg:text-[1.95rem]">
-                {t("home.heading")}
-              </h2>
-              <p className="max-w-3xl text-[13px] leading-6 text-muted-foreground sm:text-sm">
-                {t("home.description")}
-              </p>
-              <p className="inline-flex max-w-full rounded-full border border-rose-200/80 bg-rose-50/90 px-3 py-1.5 text-[11px] font-semibold text-rose-900">
-                {t("home.visibilityNote")}
-              </p>
-              <div className="grid grid-cols-[repeat(auto-fit,minmax(132px,1fr))] gap-2">
-                {keywords.map((keyword, index) => (
-                  <span
-                    key={keyword}
-                    className={cn(
-                      "flex min-h-[34px] w-full items-center justify-center rounded-[18px] border px-3 py-1.5 text-center text-[11px] font-semibold leading-4 tracking-[0.02em]",
-                      getKeywordClass(keyword, index)
-                    )}
-                  >
-                    {keyword}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="lg:flex lg:justify-end">
-            <div className="w-full rounded-[20px] border border-dashed border-slate-300/80 bg-white/82 p-3.5 shadow-sm lg:w-[260px] xl:w-[300px]">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                    {t("home.runtimeLabel")}
-                  </div>
-                  <h3 className="mt-1 text-sm font-semibold tracking-[-0.03em] text-slate-950">
-                    {t("home.runtimeTitle")}
-                  </h3>
-                </div>
-                <StatusPill label={statusLabel} tone={tone} />
-              </div>
-
-              <div className="mt-3 rounded-2xl border border-slate-200/70 bg-slate-50/90 px-3 py-2.5">
-                <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                  {t("home.runtimeLatency")}
-                </div>
-                <div className="mt-1 text-[1.15rem] font-semibold tracking-[-0.04em] text-slate-950">
-                  {durationMs == null
-                    ? t("home.runtimeLatencyIdle")
-                    : t("home.runtimeLatencyValue", { ms: durationMs })}
-                </div>
-              </div>
-
-              <div className="mt-3">
-                <Form method="post">
-                  <Button
-                    type="submit"
-                    disabled={loading}
-                    size="sm"
-                    variant="outline"
-                    className="w-full rounded-full border-emerald-300 bg-emerald-50 text-emerald-900 hover:bg-emerald-100 hover:text-emerald-950"
-                  >
-                    {loading ? t("home.runtimeButtonLoading") : t("home.runtimeButton")}
-                  </Button>
-                </Form>
-              </div>
-            </div>
-          </div>
-        </div>
-      </ShellCard>
-
-      <ShellCard className="bg-white/90">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-              {t("home.flowLabel")}
-            </div>
-            <h3 className="mt-2.5 text-[1.35rem] font-semibold tracking-[-0.04em] text-slate-950">
-              {t("home.flowTitle")}
-            </h3>
-          </div>
-        </div>
-        <ol className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {flowSteps.map((step, index) => (
-            <li
-              key={step.title}
-              className="rounded-[22px] border border-slate-200/80 bg-[linear-gradient(160deg,rgba(255,255,255,0.95),rgba(248,250,252,0.96))] px-4 py-4 shadow-sm"
-            >
-              <div className="flex items-center gap-3">
-                <span
-                  className={cn(
-                    "inline-flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold text-white",
-                    flowAccentClasses[index % flowAccentClasses.length]
-                  )}
-                >
-                  {index + 1}
-                </span>
-                <h4 className="text-sm font-semibold tracking-[-0.02em] text-slate-950">
-                  {step.title}
-                </h4>
-              </div>
-              <p className="mt-2.5 text-[13px] leading-5 text-muted-foreground">{step.text}</p>
-            </li>
-          ))}
-        </ol>
-      </ShellCard>
-
-      <div className="grid gap-4 xl:grid-cols-[1.02fr_0.98fr]">
-        <ShellCard className="bg-[linear-gradient(160deg,rgba(248,250,252,0.98),rgba(255,255,255,0.95))]">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-            {t("home.featuresLabel")}
-          </div>
-          <h3 className="mt-2.5 text-[1.35rem] font-semibold tracking-[-0.04em] text-slate-950">
-            {t("home.featuresTitle")}
-          </h3>
-          <p className="mt-2 text-[13px] leading-6 text-muted-foreground">{featuresSummary}</p>
-          <div className="mt-4 grid grid-cols-[repeat(auto-fit,minmax(132px,1fr))] gap-2.5">
-            {featureItems.map((item) => (
-              <span
-                key={item}
-                className="flex min-h-[38px] w-full items-center justify-center rounded-[18px] border border-slate-200/80 bg-white/84 px-3 py-2 text-center text-[11px] font-semibold leading-4 text-slate-800 shadow-sm"
-              >
-                {item}
-              </span>
-            ))}
-          </div>
-        </ShellCard>
-
-        <ShellCard className="bg-[linear-gradient(160deg,rgba(240,246,255,0.98),rgba(255,250,240,0.96))]">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-sky-700/80">
-            {t("home.futureLabel")}
-          </div>
-          <h3 className="mt-2.5 text-[1.35rem] font-semibold tracking-[-0.04em] text-slate-950">
-            {t("home.futureTitle")}
-          </h3>
-          <p className="mt-2 text-[13px] leading-6 text-muted-foreground">{futureSummary}</p>
-          <div className="mt-4 grid grid-cols-[repeat(auto-fit,minmax(132px,1fr))] gap-2.5">
-            {futureItems.map((item) => (
-              <span
-                key={item}
-                className="flex min-h-[38px] w-full items-center justify-center rounded-[18px] border border-sky-200/80 bg-white/84 px-3 py-2 text-center text-[11px] font-semibold leading-4 text-slate-800 shadow-sm"
-              >
-                {item}
-              </span>
-            ))}
-          </div>
-        </ShellCard>
-      </div>
-    </div>
   );
 }
 
