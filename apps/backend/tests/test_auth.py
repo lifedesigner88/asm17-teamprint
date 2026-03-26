@@ -1,7 +1,9 @@
 from datetime import datetime, timedelta, timezone
 
 from sqlalchemy import select
+from sqlalchemy.exc import OperationalError
 
+import app.main as app_main
 from app.common.db import SessionLocal
 from app.common.security import hash_password, verify_password
 from app.features.auth.models import User
@@ -29,6 +31,56 @@ def test_signup_login_me_and_logout_flow(client, signup_user, login_user):
 
     me_after_logout = client.get("/auth/me")
     assert me_after_logout.status_code == 401
+
+
+def test_signup_assigns_non_null_gender(client):
+    signup_response = client.post("/auth/signup", json={"email": "gendered@example.com", "password": "123456"})
+    assert signup_response.status_code == 201
+    assert signup_response.json()["gender"] in {"M", "F"}
+
+    with SessionLocal() as db:
+        user = db.scalar(select(User).where(User.email == "gendered@example.com"))
+        assert user is not None
+        assert user.gender in {"M", "F"}
+
+
+def test_postgres_user_gender_constraints_fail_soft_on_lock_timeout(monkeypatch):
+    class FakeConnection:
+        def __init__(self):
+            self.dialect = type("FakeDialect", (), {"name": "postgresql"})()
+            self.rollback_called = False
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, tb):
+            return False
+
+        def execute(self, statement):
+            sql = str(statement)
+            if "ALTER TABLE users ALTER COLUMN gender SET DEFAULT" in sql:
+                raise OperationalError("ALTER TABLE", {}, Exception("lock timeout"))
+            return None
+
+        def commit(self):
+            raise AssertionError("commit should not be reached after a lock timeout")
+
+        def rollback(self):
+            self.rollback_called = True
+
+    class FakeEngine:
+        def __init__(self, connection):
+            self.connection = connection
+
+        def connect(self):
+            return self.connection
+
+    fake_connection = FakeConnection()
+    monkeypatch.setattr(app_main, "engine", FakeEngine(fake_connection))
+
+    app_main.ensure_postgres_user_gender_constraints()
+
+    assert fake_connection.rollback_called is True
 
 
 def test_sync_admin_seed_keeps_existing_admin_pin():

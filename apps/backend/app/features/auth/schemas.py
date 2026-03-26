@@ -63,7 +63,7 @@ class UserResponse(BaseModel):
     notion_url: str | None = None
     invite_code: str | None = None
     name: str | None = None
-    gender: str | None = None
+    gender: str = "M"
     birth_date: date | None = None
     residence: str | None = None
     phone: str | None = None

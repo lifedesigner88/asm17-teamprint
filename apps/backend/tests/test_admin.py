@@ -14,6 +14,7 @@ def test_admin_users_returns_seeded_admin_and_recent_users(signup_user, admin_se
     response = client.get("/admin/users")
 
     assert response.status_code == 200
-    user_ids = [user["user_id"] for user in response.json()]
-    assert "admin" in user_ids
-    assert "ALI001" in user_ids
+    users = response.json()
+    assert any(user["is_admin"] is True for user in users)
+    assert any(user["email"] == "parksejong88@gmail.com" for user in users)
+    assert any(user["email"] == "alice@example.com" for user in users)

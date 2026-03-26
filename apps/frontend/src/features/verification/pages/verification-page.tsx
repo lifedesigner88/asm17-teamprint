@@ -147,8 +147,7 @@ export function VerificationPage() {
         <StatusPill label={STATUS_LABEL["pending"]} tone="warn" />
         <h2 className="mt-4 text-2xl font-semibold tracking-[-0.03em]">인증 대기 중</h2>
         <p className="mt-2 text-sm leading-6 text-muted-foreground">
-          합격자 인증은 양식을 제출하신 뒤 아래 카카오톡 오픈채팅으로 들어가, 성함, 이메일, 합격자
-          이메일과 본인 이메일이 함께 보이도록 캡쳐해서 보내주세요.
+          24시간 내로 인증코드 확인 후 승인해드리겠습니다.
         </p>
       </ShellCard>
     );
@@ -195,10 +194,7 @@ export function VerificationPage() {
       setSuccessMessage(
         nextMode === "edit"
           ? "제출한 인증정보가 저장되었습니다."
-          : [
-              "합격자 인증은 양식을 제출하신 뒤 아래 카카오톡 오픈채팅으로 들어가,",
-              "성함, 이메일, 합격자 이메일과 본인 이메일이 함께 보이도록 캡쳐해서 보내주세요."
-            ].join(" ")
+          : "24시간 내로 인증코드 확인 후 승인해드리겠습니다."
       );
       revalidator.revalidate();
     }

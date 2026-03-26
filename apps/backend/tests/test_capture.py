@@ -8,10 +8,17 @@ from app.features.capture.models import CaptureJob
 def build_capture_payload():
     return {
         "interview": {
-            "selfSummary": "차분한 디지털 페르소나를 만들고 싶다.",
-            "coreValues": "기록, 일관성, 몰입",
-            "speakingStyle": "짧고 분명한 문장",
-            "keywords": "mirror, archive, calm",
+            "messages": [
+                {
+                    "role": "assistant",
+                    "content": "자기소개를 짧게 해주세요.",
+                },
+                {
+                    "role": "user",
+                    "content": "차분한 디지털 페르소나를 만들고 싶습니다.",
+                },
+            ],
+            "isComplete": False,
         },
         "voice": {
             "inputMode": "later",
@@ -63,7 +70,7 @@ def test_capture_job_is_linked_to_user_by_foreign_key(user_session):
 
         assert user is not None
         assert job is not None
-        assert job.owner_id == user.id
+        assert job.owner_id == user.user_id
         assert job.owner.user_id == user_id
 
 

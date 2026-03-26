@@ -24,7 +24,7 @@ export function InterviewCapturePage() {
     if (messages.length === 0) {
       sendMessage(null);
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });

@@ -1,5 +1,6 @@
 export type SessionUser = {
   user_id: number;
+  email: string;
   is_admin: boolean;
   created_at: string;
   github_address?: string | null;

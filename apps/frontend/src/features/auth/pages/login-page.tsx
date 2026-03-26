@@ -42,24 +42,20 @@ export function LoginPage() {
             </Button>
           </div>
         </Field>
-        <div className="flex items-center justify-between gap-4">
-          <Link className="text-xs text-muted-foreground underline underline-offset-2" to="/auth/reset-pin">
-            {t("login.forgotPin")}
-          </Link>
-          <Button type="submit">{t("login.submit")}</Button>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <Link className="text-xs text-muted-foreground underline underline-offset-2" to="/auth/signup">
+              {t("login.signupBtn")}
+            </Link>
+            <Link className="text-xs text-muted-foreground underline underline-offset-2" to="/auth/reset-pin">
+              {t("login.forgotPin")}
+            </Link>
+          </div>
+          <Button className="w-full" type="submit">
+            {t("login.submit")}
+          </Button>
         </div>
       </Form>
-      <div className="mt-4 rounded-2xl border border-slate-200/80 bg-white/70 px-4 py-4">
-        <Link className="block" to="/auth/signup">
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full border-sky-200 bg-sky-50/80 text-sky-700 hover:border-sky-300 hover:bg-sky-100 hover:text-sky-800"
-          >
-            {t("login.signupBtn")}
-          </Button>
-        </Link>
-      </div>
       {actionData?.error ? (
         <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {actionData.error}

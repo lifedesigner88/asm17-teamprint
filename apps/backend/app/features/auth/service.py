@@ -1,3 +1,4 @@
+import hashlib
 import os
 import re
 import secrets
@@ -47,6 +48,15 @@ ADMIN_SEED_EMAIL = os.getenv("ADMIN_SEED_EMAIL", "parksejong88@gmail.com")
 LEGACY_ADMIN_SEED_EMAILS = ("admin@example.com",)
 
 
+def _default_gender_for_identity(identity: str | int) -> str:
+    digest = hashlib.sha256(str(identity).encode("utf-8")).digest()
+    return "M" if digest[0] % 2 == 0 else "F"
+
+
+def _ensure_gender(user: User) -> str:
+    return user.gender or _default_gender_for_identity(user.email or user.user_id)
+
+
 def to_user_response(user: User) -> UserResponse:
     return UserResponse(
         user_id=user.user_id,
@@ -57,7 +67,7 @@ def to_user_response(user: User) -> UserResponse:
         notion_url=user.notion_url,
         invite_code=user.phone,
         name=user.name,
-        gender=user.gender,
+        gender=_ensure_gender(user),
         birth_date=user.birth_date,
         residence=user.residence,
         phone=user.phone,
@@ -85,12 +95,25 @@ def sync_admin_seed(db: Session) -> None:
                 password_hash=hash_password(ADMIN_SEED_PASSWORD),
                 is_admin=True,
                 is_verified=True,
+                gender=_default_gender_for_identity(ADMIN_SEED_EMAIL),
             )
         )
     else:
         admin.is_admin = True
         admin.is_verified = True
         admin.email = ADMIN_SEED_EMAIL
+        admin.gender = _ensure_gender(admin)
+    db.commit()
+
+
+def sync_user_gender_defaults(db: Session) -> None:
+    users = db.scalars(select(User).where(User.gender.is_(None))).all()
+    if not users:
+        return
+
+    for user in users:
+        user.gender = _default_gender_for_identity(user.email or user.user_id)
+
     db.commit()
 
 
@@ -125,6 +148,7 @@ def create_user(payload: SignupRequest, db: Session) -> UserResponse:
         otp_code=None,
         otp_expires_at=None,
         is_admin=False,
+        gender=_default_gender_for_identity(payload.email),
     )
     db.add(user)
     try:

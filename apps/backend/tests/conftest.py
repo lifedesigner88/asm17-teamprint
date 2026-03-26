@@ -13,6 +13,7 @@ os.environ.setdefault("JWT_SECRET_KEY", "persona-mirror-test-secret-key-2026")
 os.environ.setdefault("AUTH_COOKIE_SECURE", "false")
 os.environ.setdefault("BACKEND_CORS_ORIGINS", "http://localhost:3000")
 os.environ.setdefault("ADMIN_SEED_EMAIL", "parksejong88@gmail.com")
+os.environ.setdefault("TEAMFIT_DEMO_SEED_ENABLED", "false")
 os.environ.setdefault(
     "DATABASE_URL",
     f"sqlite+pysqlite:///{Path(tempfile.gettempdir()) / 'persona_mirror_backend_test.sqlite3'}",
@@ -49,17 +50,19 @@ def client():
 @pytest.fixture()
 def signup_user(client):
     def _signup_user(user_id: str = "ALI001", email: str = DEFAULT_EMAIL, password: str = DEFAULT_PASSWORD):
-        response = client.post("/auth/signup", json={"user_id": user_id, "email": email, "password": password})
+        response = client.post("/auth/signup", json={"email": email, "password": password})
         assert response.status_code == 201
         # Bypass email: read OTP directly from DB and verify
         from sqlalchemy import select
         from app.features.auth.models import User
+
         with SessionLocal() as db:
             user = db.scalar(select(User).where(User.email == email))
+            assert user is not None
             otp = user.otp_code
         verify_response = client.post("/auth/verify", json={"email": email, "otp": otp})
         assert verify_response.status_code == 204
-        return {"user_id": user_id, "email": email, "password": password, "response": response}
+        return {"user_id": user.user_id, "email": email, "password": password, "response": response}
 
     return _signup_user
 

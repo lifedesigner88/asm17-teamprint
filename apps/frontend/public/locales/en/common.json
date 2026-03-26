@@ -7,6 +7,7 @@
     "comingSoon": "Planned",
     "signup": "Sign up",
     "login": "Login",
+    "teamFitExplorer": "Team-fit explorer",
     "cohortVerification": "17th acceptance verification",
     "editVerification": "Edit my verification",
     "adminUsers": "Admin users",
@@ -166,6 +167,300 @@
     "logoAlt": "ASM 17 logo",
     "logoTitle": "asm 17",
     "logoSubtitle": "AI Software Maestro 17"
+  },
+  "teamfit": {
+    "errors": {
+      "title": "Team-fit explorer",
+      "loadFailed": "Failed to load the team-fit explorer.",
+      "sessionLoadFailed": "Failed to load the current session.",
+      "profileLoadFailed": "Failed to load your team-fit profile.",
+      "profileSaveFailed": "Failed to save your team-fit profile.",
+      "recommendationsLoadFailed": "Failed to load recommendations.",
+      "loginRequired": "Log in to save your team-fit profile. Recommendations unlock after 17th-cohort approval.",
+      "step1Incomplete": "Please fill every required field in step 1.",
+      "mbtiIncomplete": "To save MBTI, please select all {{count}} axes.",
+      "impactTagsRequireFour": "If you choose Sustainable Development Goals, please select all {{count}}.",
+      "saveFailed": "Something went wrong while saving your profile."
+    },
+    "access": {
+      "guestTitle": "You are previewing the Team-fit Explorer UI",
+      "guestBody": "Once you log in, you can save your team-fit profile. Recommendations unlock after 17th-cohort approval.",
+      "approvalTitle": "You can save your team-fit profile now",
+      "approvalBody": "Recommendations unlock after 17th-cohort approval. You can still save your information in advance."
+    },
+    "hero": {
+      "pill": "Team-fit explorer",
+      "title": "Fit teammates.",
+      "description": "Share your problem focus, working style, and pace. We group people into similar, complementary, and interesting matches.",
+      "statusLabel": "Status",
+      "accountLabel": "Account",
+      "guestAccount": "Guest preview",
+      "githubLabel": "GitHub",
+      "notionLabel": "Notion",
+      "githubLinked": "GitHub linked",
+      "githubMissing": "GitHub not linked",
+      "notionLinked": "Notion linked",
+      "notionMissing": "Notion not linked",
+      "step": "Current step",
+      "stepValue": "Step {{step}} of 2",
+      "requiredProgress": "Required fields",
+      "requiredProgressValue": "{{filled}} / {{total}} complete",
+      "activeProfiles": "Active profiles",
+      "loading": "Loading...",
+      "activeProfilesValue": "{{count}} people"
+    },
+    "howItWorks": {
+      "button": "How it works",
+      "badge": "Logic summary",
+      "title": "Team-fit ranking logic",
+      "description": "We normalize your profile, find close candidates, and split them into three buckets.",
+      "captureLabel": "1. Signals",
+      "captureBody": "On save, we clean and bundle your role, style, pace, interests, problems, domains, and stack into one profile.",
+      "embeddingLabel": "2. Retrieval",
+      "embeddingBody": "That profile becomes an embedding, and vector search or a local fallback finds close candidates first.",
+      "rankingLabel": "3. Ranking",
+      "rankingBody": "Similarity, overlap, style, pace, and role balance are combined into similar, complementary, and interesting matches.",
+      "deliveryLabel": "4. Access",
+      "deliveryBody": "Guests can preview, logged-in users can save, and recommendations unlock after 17th-cohort approval. Results refresh only when you save.",
+      "runtimeLabel": "Runtime path",
+      "runtimeBody": "OpenAI embeddings or local fallback · pgvector search or in-memory fallback",
+      "close": "Close"
+    },
+    "form": {
+      "pill": "Onboarding",
+      "title": "Build your matching profile",
+      "description": "Step 1 is the high-signal core. Step 2 adds optional detail only if you want a better ranking surface.",
+      "guestPreviewTitle": "You can preview this screen without logging in",
+      "guestPreviewBody": "Right now you are previewing the Team-fit Explorer UI. Once you log in, you can save your profile, and recommendations unlock after 17th-cohort approval.",
+      "stepOneLabel": "Step 1",
+      "stepTwoLabel": "Step 2",
+      "stepOneNote": "Finish the required profile first. We will use these fields as filters and weights for matching."
+    },
+    "fields": {
+      "interests": "Interests *",
+      "interestsHint": "Pick the themes you naturally want to spend time on.",
+      "problemFocus": "Problems you want to solve *",
+      "problemFocusHint": "Choose the kinds of product or team problems you care about.",
+      "domains": "Domains you care about *",
+      "domainsHint": "Use one or more domains as a light positioning signal.",
+      "preferredRole": "Preferred role *",
+      "preferredRoleHint": "Pick the role you most want to own right now.",
+      "techStack": "Tech stack *",
+      "techStackHint": "Tech stack is a filter and weight, not the whole match.",
+      "workingStyle": "Working style *",
+      "workingStyleHint": "These are the collaboration habits you bring into a team.",
+      "commitmentPace": "Expected pace / commitment *",
+      "commitmentPaceHint": "Be honest about the pace you can sustain.",
+      "mbti": "MBTI",
+      "mbtiPlaceholder": "Prefer not to say",
+      "oneLiner": "One-line self-intro",
+      "oneLinerPlaceholder": "A short line that tells people how you work",
+      "impactTags": "Impact / mission tags",
+      "impactTagsHint": "Choose the goals that matter most to you from the 17 UN goals.",
+      "impactTagsLimit": "You can select up to {{max}} goals.",
+      "impactTagsCount": "{{count}} / {{max}} selected",
+      "impactTagsExactRule": "If you choose any, pick exactly {{count}} goals.",
+      "impactTagsSource": "Source: Sustainable Development Goals (SDGs)",
+      "impactTagsBadge": "SDGs"
+    },
+    "actions": {
+      "saving": "Saving...",
+      "saveAndContinue": "Save essentials and continue",
+      "previewContinue": "Preview next step",
+      "back": "Back to step 1",
+      "saveProfile": "Save profile",
+      "loginToSave": "Log in to save"
+    },
+    "mbti": {
+      "placeholder": "Not selected yet",
+      "selectionRule": "You can skip this, but if you use MBTI you need to select all {{count}} axes.",
+      "selectionCount": "{{count}} / {{total}} axes selected",
+      "testLink": "Take the 16Personalities test →",
+      "clear": "Clear"
+    },
+    "mbtiDimensions": {
+      "introverted": "Introverted",
+      "extraverted": "Extraverted",
+      "intuitive": "Intuitive",
+      "observant": "Observant",
+      "feeling": "Feeling",
+      "thinking": "Thinking",
+      "judging": "Judging",
+      "prospecting": "Prospecting",
+      "turbulent": "Turbulent",
+      "assertive": "Assertive"
+    },
+    "status": {
+      "guest": "Guest",
+      "none": "Not verified",
+      "pending": "Verification pending",
+      "approved": "Verified",
+      "rejected": "Verification rejected"
+    },
+    "bucket": {
+      "similar": "Similar to you",
+      "complementary": "Complementary",
+      "unexpected": "Unexpected but interesting"
+    },
+    "bucketDescription": {
+      "similar": "People with a close working pattern, pace, and problem orientation.",
+      "complementary": "People who may fill different gaps while still sharing a core direction.",
+      "unexpected": "People who are farther away but still share enough signal to be worth a look."
+    },
+    "empty": {
+      "profile": "No team-fit profile has been saved yet.",
+      "recommendations": "No recommendations are ready for {{bucket}} yet.",
+      "guestPreview": "Log in to save your team-fit profile. Recommendations unlock after 17th-cohort approval.",
+      "verificationRequired": "You can save your team-fit profile now. Recommendations unlock after 17th-cohort approval.",
+      "mapHidden": "The distance map appears once there are enough active profiles."
+    },
+    "map": {
+      "title": "Simple distance map",
+      "description": "This is a light explorer, not a full graph. It places people by similarity and structured-fit score.",
+      "axes": {
+        "similarity": "Similarity",
+        "structuredFit": "Structured fit"
+      }
+    },
+    "profile": {
+      "pill": "Your profile",
+      "title": "Current session summary",
+      "guestTitle": "Guest preview",
+      "guestDescription": "Before login, there is no saved session to summarize, so this card stays in preview mode. Once you log in, you can save your profile, and recommendations unlock after 17th-cohort approval.",
+      "userId": "User ID",
+      "approved": "Verified access",
+      "approvedYes": "Yes",
+      "approvedNo": "No",
+      "githubAvailable": "GitHub available",
+      "notionAvailable": "Notion available"
+    },
+    "card": {
+      "unnamed": "Unnamed teammate",
+      "matchScore": "Match score",
+      "matchRank": "Match rank",
+      "rankValue": "#{{rank}}",
+      "reasonLabel": "Reason",
+      "noReason": "No visible reason yet.",
+      "reasonSentence": {
+        "similar": "{{name}} feels especially close to your current team-fit in terms of {{reasons}}.",
+        "complementary": "{{name}} could complement your current team well through {{reasons}}.",
+        "unexpected": "{{name}} still looks unexpectedly promising because of {{reasons}}."
+      },
+      "reasonSentenceFallback": {
+        "similar": "{{name}} was recommended because the overall team-fit signal is strong.",
+        "complementary": "{{name}} was recommended because they may add a useful new balance to your team.",
+        "unexpected": "{{name}} was recommended because there is still an interesting signal worth a closer look."
+      },
+      "detailsTitle": "Details",
+      "linksLabel": "Links",
+      "close": "Close",
+      "roleFallback": "Role not set",
+      "noIntro": "No one-line intro yet.",
+      "github": "GitHub",
+      "notion": "Notion",
+      "contact": "Email",
+      "noGithub": "GitHub unavailable",
+      "noNotion": "Notion unavailable",
+      "noContact": "Email unavailable"
+    },
+    "reasonCodes": {
+      "shared_problems": "Shared problems",
+      "shared_domains": "Shared domains",
+      "shared_stack": "Common stack",
+      "same_style": "Same style",
+      "same_pace": "Same pace",
+      "different_role": "Different role",
+      "different_stack": "Different stack",
+      "shared_impact": "Shared impact"
+    },
+    "options": {
+      "interests": {
+        "product_building": "Product building",
+        "ai_tools": "AI tools",
+        "education": "Education",
+        "community": "Community",
+        "design": "Design",
+        "research": "Research"
+      },
+      "problems": {
+        "find_teammates": "Find teammates",
+        "ship_fast": "Ship faster",
+        "clarify_scope": "Clarify scope",
+        "validate_users": "Validate with users",
+        "keep_momentum": "Keep momentum",
+        "own_operations": "Own operations"
+      },
+      "domains": {
+        "team_building": "Team building",
+        "education": "Education",
+        "accessibility": "Accessibility",
+        "mental_health": "Mental health",
+        "productivity": "Productivity",
+        "climate": "Climate",
+        "community": "Community",
+        "inequality": "Inequality reduction",
+        "creator_tools": "Creator tools"
+      },
+      "roles": {
+        "founder_pm": "Founder-PM",
+        "backend_ai_infra": "Backend-AI-Infra",
+        "frontend_ux_product": "Frontend-UX-Product",
+        "fullstack_builder": "Full-stack Builder",
+        "data_ai_research": "Data-AI Research",
+        "pm_operator": "PM-Operator",
+        "design": "Design",
+        "backend": "Backend",
+        "fullstack": "Full stack"
+      },
+      "stack": {
+        "typescript": "TypeScript",
+        "react": "React",
+        "python": "Python",
+        "fastapi": "FastAPI",
+        "postgresql": "PostgreSQL",
+        "supabase": "Supabase",
+        "docker": "Docker",
+        "aws": "AWS",
+        "figma": "Figma",
+        "sql": "SQL",
+        "notion": "Notion",
+        "analytics": "Analytics"
+      },
+      "style": {
+        "async": "Async-first",
+        "clear_ownership": "Clear ownership",
+        "fast_iteration": "Fast iteration",
+        "documentation": "Documentation",
+        "user_interviews": "User interviews",
+        "research_first": "Research first",
+        "structured_planning": "Structured planning"
+      },
+      "pace": {
+        "steady_daily": "Steady daily push",
+        "weeknights_and_weekends": "Weeknights + weekends",
+        "sprint_mode": "Sprint mode",
+        "steady_deep_work": "Steady deep work"
+      },
+      "impact": {
+        "no_poverty": "No Poverty",
+        "zero_hunger": "Zero Hunger",
+        "good_health_well_being": "Good Health and Well-being",
+        "quality_education": "Quality Education",
+        "gender_equality": "Gender Equality",
+        "clean_water_sanitation": "Clean Water and Sanitation",
+        "affordable_clean_energy": "Affordable and Clean Energy",
+        "decent_work_economic_growth": "Decent Work and Economic Growth",
+        "industry_innovation_infrastructure": "Industry, Innovation and Infrastructure",
+        "reduced_inequalities": "Reduced Inequalities",
+        "sustainable_cities_communities": "Sustainable Cities and Communities",
+        "responsible_consumption_production": "Responsible Consumption and Production",
+        "climate_action": "Climate Action",
+        "life_below_water": "Life Below Water",
+        "life_on_land": "Life on Land",
+        "peace_justice_strong_institutions": "Peace, Justice and Strong Institutions",
+        "partnerships_for_the_goals": "Partnerships for the Goals"
+      }
+    }
   },
   "dashboardBusanPage": {
     "pill": "ASM17 Busan",

@@ -5,15 +5,15 @@ export function Field({
   hint,
   children,
 }: {
-  label: string;
+  label: ReactNode;
   hint?: string;
   children: ReactNode;
 }) {
   return (
     <label className="block text-sm font-medium text-foreground/80">
-      <span className="mb-1.5 block">{label}</span>
+      <div className="mb-1.5 block">{label}</div>
       {children}
-      {hint ? <span className="mt-1.5 block text-xs font-normal text-muted-foreground">{hint}</span> : null}
+      {hint ? <div className="mt-1.5 text-xs font-normal text-muted-foreground">{hint}</div> : null}
     </label>
   );
 }

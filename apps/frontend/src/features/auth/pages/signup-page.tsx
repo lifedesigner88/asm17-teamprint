@@ -138,9 +138,11 @@ export function SignupPage() {
             </Button>
           </div>
         </Field>
-        <div className="flex items-center justify-between gap-4">
+        <div className="space-y-3">
           <p className="text-xs text-muted-foreground">{t("signup.pinNote")}</p>
-          <Button type="submit">{t("signup.createAccount")}</Button>
+          <Button className="w-full" type="submit">
+            {t("signup.createAccount")}
+          </Button>
         </div>
       </Form>
 

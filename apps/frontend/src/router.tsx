@@ -30,6 +30,7 @@ import {
 } from "./features/capture";
 import { BusanDashboardPage, DashboardPage } from "./features/dashboard";
 import { PersonaPage, personaLoader, sejongPersonaLoader } from "./features/persona";
+import { TeamFitPage, teamFitLoader } from "./features/teamfit";
 import { VerificationPage } from "./features/verification";
 import { AdminVerificationsPage } from "./features/admin";
 
@@ -148,6 +149,11 @@ export const router = createBrowserRouter([
         path: "ai/:personId",
         element: <PersonaPage pageMode="chat" />,
         loader: personaLoader
+      },
+      {
+        path: "team-fit",
+        element: <TeamFitPage />,
+        loader: teamFitLoader
       }
     ]
   }

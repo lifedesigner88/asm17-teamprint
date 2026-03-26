@@ -33,6 +33,14 @@ function getNavigationItemClasses(item: NavigationItem, isActive: boolean): stri
     );
   }
 
+  if (item.to === "/team-fit") {
+    return cn(
+      FEATURED_NAV_BASE,
+      "border-emerald-200/80 bg-[linear-gradient(135deg,rgba(240,253,244,0.98),rgba(236,253,245,0.92))] font-medium text-emerald-950 hover:border-emerald-300/80 hover:bg-emerald-50/92 hover:text-emerald-950",
+      isActive && "ring-1 ring-emerald-300/80 shadow-[0_12px_26px_rgba(16,185,129,0.12)]"
+    );
+  }
+
   if (item.to === "/seoul/dashboard") {
     return cn(
       FEATURED_NAV_BASE,
@@ -122,6 +130,7 @@ export function App() {
   const contentRef = useRef<HTMLDivElement | null>(null);
   const navigationItems: NavigationItem[] = [
     { to: "/ai/sejong", label: t("nav.sejongAiChat") },
+    { to: "/team-fit", label: t("nav.teamFitExplorer") },
     ...(sessionUser
       ? [
           {
@@ -135,8 +144,8 @@ export function App() {
       : []),
     ...(!sessionUser
       ? [
-          { to: "/auth/signup", label: t("nav.signup") },
-          { to: "/auth/login", label: t("nav.login") }
+          { to: "/auth/login", label: t("nav.login") },
+          { to: "/auth/signup", label: t("nav.signup") }
         ]
       : []),
     ...(sessionUser?.is_admin

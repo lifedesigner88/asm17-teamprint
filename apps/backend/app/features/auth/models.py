@@ -29,7 +29,7 @@ class User(Base):
     )
     # 소프트웨어마에스트로 17기 합격자 인증 필드
     name: Mapped[str | None] = mapped_column(String(50), nullable=True)
-    gender: Mapped[str | None] = mapped_column(String(1), nullable=True)  # 'M' | 'F'
+    gender: Mapped[str] = mapped_column(String(1), nullable=False, server_default=text("'M'"))  # 'M' | 'F'
     birth_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     residence: Mapped[str | None] = mapped_column(String(100), nullable=True)
     phone: Mapped[str | None] = mapped_column(String(20), nullable=True)

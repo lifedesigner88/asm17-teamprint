@@ -7,6 +7,7 @@
     "comingSoon": "예정",
     "signup": "회원가입",
     "login": "로그인",
+    "teamFitExplorer": "팀핏 탐색",
     "cohortVerification": "17기 합격 인증",
     "editVerification": "내 인증정보 수정",
     "adminUsers": "관리자 목록",
@@ -161,6 +162,300 @@
     "logoAlt": "ASM 17 로고",
     "logoTitle": "asm 17",
     "logoSubtitle": "AI Software Maestro 17"
+  },
+  "teamfit": {
+    "errors": {
+      "title": "팀핏 탐색",
+      "loadFailed": "팀핏 탐색 화면을 불러오지 못했습니다.",
+      "sessionLoadFailed": "현재 세션을 불러오지 못했습니다.",
+      "profileLoadFailed": "팀핏 프로필을 불러오지 못했습니다.",
+      "profileSaveFailed": "팀핏 프로필을 저장하지 못했습니다.",
+      "recommendationsLoadFailed": "추천 결과를 불러오지 못했습니다.",
+      "loginRequired": "로그인하면 팀핏 프로필을 저장할 수 있습니다. 추천 결과는 17기 합격 인증 승인 후 열립니다.",
+      "step1Incomplete": "1단계의 필수 항목을 모두 채워주세요.",
+      "mbtiIncomplete": "MBTI를 입력하려면 {{count}}개 축을 모두 선택해 주세요.",
+      "impactTagsRequireFour": "지속가능개발목표를 선택한다면 {{count}}개를 모두 골라 주세요.",
+      "saveFailed": "프로필 저장 중 문제가 생겼습니다."
+    },
+    "access": {
+      "guestTitle": "지금은 팀핏 탐색 UI를 미리 보는 상태입니다",
+      "guestBody": "로그인하면 팀핏 프로필을 저장할 수 있습니다. 추천 결과는 17기 합격 인증 승인 후 열립니다.",
+      "approvalTitle": "지금은 팀핏 프로필 저장까지 가능합니다",
+      "approvalBody": "추천 결과는 17기 합격 인증 승인 후 열립니다. 지금 입력한 정보는 미리 저장해 둘 수 있습니다."
+    },
+    "hero": {
+      "pill": "팀핏 탐색",
+      "title": "핏 좋은 동료",
+      "description": "문제, 협업 방식, 페이스를 입력하면 비슷한 사람, 보완되는 사람, 흥미로운 사람으로 나눠 보여줍니다.",
+      "statusLabel": "상태",
+      "accountLabel": "계정",
+      "guestAccount": "게스트 미리보기",
+      "githubLabel": "GitHub",
+      "notionLabel": "Notion",
+      "githubLinked": "GitHub 연결됨",
+      "githubMissing": "GitHub 미연결",
+      "notionLinked": "Notion 연결됨",
+      "notionMissing": "Notion 미연결",
+      "step": "현재 단계",
+      "stepValue": "2단계 중 {{step}}단계",
+      "requiredProgress": "필수 항목",
+      "requiredProgressValue": "{{filled}} / {{total}} 완료",
+      "activeProfiles": "활성 프로필",
+      "loading": "불러오는 중...",
+      "activeProfilesValue": "{{count}}명"
+    },
+    "howItWorks": {
+      "button": "작동 방식 보기",
+      "badge": "로직 요약",
+      "title": "팀핏 추천 로직",
+      "description": "프로필을 정리하고, 가까운 후보를 찾은 뒤, 세 가지 추천 버킷으로 나눕니다.",
+      "captureLabel": "1. 입력 정리",
+      "captureBody": "저장 시 역할, 협업 방식, 페이스, 관심사, 문제, 도메인, 스택 같은 핵심 입력을 하나의 프로필로 정리합니다.",
+      "embeddingLabel": "2. 후보 찾기",
+      "embeddingBody": "정리된 프로필로 임베딩을 만들고, 벡터 검색이나 로컬 fallback으로 가까운 후보를 먼저 찾습니다.",
+      "rankingLabel": "3. 추천 분류",
+      "rankingBody": "유사도, 겹치는 문제와 도메인, 스타일, 페이스, 역할 차이를 합쳐 세 가지 추천으로 나눕니다.",
+      "deliveryLabel": "4. 접근 조건",
+      "deliveryBody": "게스트는 미리보기만 가능하고, 로그인 사용자는 저장할 수 있습니다. 추천은 17기 승인 후 열리며 저장할 때만 갱신됩니다.",
+      "runtimeLabel": "Runtime Path",
+      "runtimeBody": "OpenAI 임베딩 또는 로컬 fallback · pgvector 검색 또는 in-memory fallback",
+      "close": "닫기"
+    },
+    "form": {
+      "pill": "온보딩",
+      "title": "매칭용 프로필을 먼저 채워보세요",
+      "description": "1단계는 고신호 필수 정보, 2단계는 원하면 넣는 보조 정보입니다.",
+      "guestPreviewTitle": "로그인 없이도 화면은 먼저 볼 수 있습니다",
+      "guestPreviewBody": "지금은 팀핏 탐색 UI를 미리 둘러보는 상태입니다. 로그인하면 프로필을 저장할 수 있고, 추천 결과는 17기 합격 인증 승인 후 열립니다.",
+      "stepOneLabel": "1단계",
+      "stepTwoLabel": "2단계",
+      "stepOneNote": "필수 프로필부터 완성해 주세요. 이 정보는 매칭에서 필터와 가중치로 사용됩니다."
+    },
+    "fields": {
+      "interests": "관심사 *",
+      "interestsHint": "시간을 쓰고 싶은 주제를 골라주세요.",
+      "problemFocus": "풀고 싶은 문제 *",
+      "problemFocusHint": "관심 있는 제품 / 팀 문제를 골라주세요.",
+      "domains": "관심 도메인 *",
+      "domainsHint": "하나 이상 선택해서 방향성을 보여주세요.",
+      "preferredRole": "선호 역할 *",
+      "preferredRoleHint": "지금 가장 맡고 싶은 역할을 골라주세요.",
+      "techStack": "기술 스택 *",
+      "techStackHint": "스택은 전부가 아니라 필터와 가중치입니다.",
+      "workingStyle": "협업 방식 *",
+      "workingStyleHint": "팀에서 보이는 일하는 습관을 고르세요.",
+      "commitmentPace": "예상 페이스 / 커밋먼트 *",
+      "commitmentPaceHint": "지속 가능한 페이스를 솔직하게 골라주세요.",
+      "mbti": "MBTI",
+      "mbtiPlaceholder": "선택하지 않음",
+      "oneLiner": "한 줄 자기소개",
+      "oneLinerPlaceholder": "사람들이 당신의 일하는 방식을 바로 이해할 수 있는 한 줄",
+      "impactTags": "임팩트 / 미션 태그",
+      "impactTagsHint": "UN의 17개 목표 중에서 중요하게 여기는 목표를 골라주세요.",
+      "impactTagsLimit": "최대 {{max}}개까지 선택할 수 있습니다.",
+      "impactTagsCount": "{{count}} / {{max}} 선택",
+      "impactTagsExactRule": "선택하려면 정확히 {{count}}개를 골라 주세요.",
+      "impactTagsSource": "출처: 지속가능 개발목표(SDGs)",
+      "impactTagsBadge": "SDGs"
+    },
+    "actions": {
+      "saving": "저장 중...",
+      "saveAndContinue": "필수 항목 저장 후 계속",
+      "previewContinue": "다음 단계 미리보기",
+      "back": "1단계로 돌아가기",
+      "saveProfile": "프로필 저장",
+      "loginToSave": "로그인 후 저장"
+    },
+    "mbti": {
+      "placeholder": "아직 선택하지 않음",
+      "selectionRule": "선택 안 해도 되지만, 입력하려면 {{count}}개 축을 모두 골라 주세요.",
+      "selectionCount": "{{count}} / {{total}} 축 선택",
+      "testLink": "16Personalities로 검사하기 →",
+      "clear": "초기화"
+    },
+    "mbtiDimensions": {
+      "introverted": "내향형",
+      "extraverted": "외향형",
+      "intuitive": "직관형",
+      "observant": "관찰형",
+      "feeling": "감정형",
+      "thinking": "사고형",
+      "judging": "판단형",
+      "prospecting": "탐색형",
+      "turbulent": "격동형",
+      "assertive": "자기주장형"
+    },
+    "status": {
+      "guest": "게스트",
+      "none": "미인증",
+      "pending": "인증 대기",
+      "approved": "인증 완료",
+      "rejected": "인증 거절"
+    },
+    "bucket": {
+      "similar": "나와 비슷한 사람",
+      "complementary": "서로 보완되는 사람",
+      "unexpected": "멀지만 흥미로운 사람"
+    },
+    "bucketDescription": {
+      "similar": "일하는 패턴, 페이스, 문제 접근이 가까운 사람들입니다.",
+      "complementary": "방향은 비슷하지만 빈자리를 다르게 채워줄 수 있는 사람들입니다.",
+      "unexpected": "거리는 있지만 충분히 흥미로운 신호가 있는 사람들입니다."
+    },
+    "empty": {
+      "profile": "아직 저장된 팀핏 프로필이 없습니다.",
+      "recommendations": "{{bucket}}에 대한 추천이 아직 준비되지 않았습니다.",
+      "guestPreview": "로그인하면 팀핏 프로필을 저장할 수 있습니다. 추천 결과는 17기 합격 인증 승인 후 열립니다.",
+      "verificationRequired": "현재는 팀핏 프로필 저장까지 가능합니다. 추천 결과는 17기 합격 인증 승인 후 열립니다.",
+      "mapHidden": "활성 프로필이 충분해지면 거리 맵이 보입니다."
+    },
+    "map": {
+      "title": "간단한 거리 맵",
+      "description": "복잡한 그래프가 아니라, 유사도와 구조적 fit 점수로만 배치한 가벼운 탐색 화면입니다.",
+      "axes": {
+        "similarity": "유사도",
+        "structuredFit": "구조적 fit"
+      }
+    },
+    "profile": {
+      "pill": "내 프로필",
+      "title": "현재 세션 요약",
+      "guestTitle": "게스트 미리보기",
+      "guestDescription": "로그인 전에는 저장된 세션 정보가 없어 요약 대신 미리보기 상태로 보입니다. 로그인하면 프로필을 저장할 수 있고, 추천 결과는 17기 합격 인증 승인 후 열립니다.",
+      "userId": "유저 ID",
+      "approved": "인증 여부",
+      "approvedYes": "예",
+      "approvedNo": "아니오",
+      "githubAvailable": "GitHub 있음",
+      "notionAvailable": "Notion 있음"
+    },
+    "card": {
+      "unnamed": "이름 없는 팀원",
+      "matchScore": "매칭 점수",
+      "matchRank": "매칭 순위",
+      "rankValue": "#{{rank}}",
+      "reasonLabel": "이유",
+      "noReason": "아직 표시할 이유가 없습니다.",
+      "reasonSentence": {
+        "similar": "{{name}}님은 {{reasons}} 면에서 지금의 팀핏과 특히 가깝습니다.",
+        "complementary": "{{name}}님은 {{reasons}} 지점에서 지금의 팀을 보완해줄 가능성이 큽니다.",
+        "unexpected": "{{name}}님은 {{reasons}} 신호 덕분에 의외로 흥미로운 조합이 될 수 있습니다."
+      },
+      "reasonSentenceFallback": {
+        "similar": "{{name}}님은 전반적인 팀핏 신호가 좋아 추천되었습니다.",
+        "complementary": "{{name}}님은 지금의 팀에 새로운 균형을 더해줄 가능성이 있어 추천되었습니다.",
+        "unexpected": "{{name}}님은 거리가 있지만 한 번 더 볼 만한 신호가 있어 추천되었습니다."
+      },
+      "detailsTitle": "세부 정보",
+      "linksLabel": "연결 정보",
+      "close": "닫기",
+      "roleFallback": "역할 미설정",
+      "noIntro": "아직 한 줄 소개가 없습니다.",
+      "github": "GitHub",
+      "notion": "Notion",
+      "contact": "이메일",
+      "noGithub": "GitHub 없음",
+      "noNotion": "Notion 없음",
+      "noContact": "이메일 없음"
+    },
+    "reasonCodes": {
+      "shared_problems": "같은 문제의식",
+      "shared_domains": "같은 도메인",
+      "shared_stack": "겹치는 스택",
+      "same_style": "비슷한 협업 방식",
+      "same_pace": "비슷한 페이스",
+      "different_role": "다른 역할",
+      "different_stack": "다른 스택",
+      "shared_impact": "겹치는 임팩트 태그"
+    },
+    "options": {
+      "interests": {
+        "product_building": "제품 만들기",
+        "ai_tools": "AI 도구",
+        "education": "교육",
+        "community": "커뮤니티",
+        "design": "디자인",
+        "research": "리서치"
+      },
+      "problems": {
+        "find_teammates": "팀원 찾기",
+        "ship_fast": "빠르게 출시하기",
+        "clarify_scope": "범위 명확화",
+        "validate_users": "유저 검증",
+        "keep_momentum": "모멘텀 유지",
+        "own_operations": "운영 책임"
+      },
+      "domains": {
+        "team_building": "팀빌딩",
+        "education": "교육",
+        "accessibility": "접근성",
+        "mental_health": "정신건강",
+        "productivity": "생산성",
+        "climate": "기후",
+        "community": "커뮤니티",
+        "inequality": "불평등 완화",
+        "creator_tools": "크리에이터 도구"
+      },
+      "roles": {
+        "founder_pm": "Founder-PM",
+        "backend_ai_infra": "백엔드-AI-인프라",
+        "frontend_ux_product": "프론트엔드-UX-프로덕트",
+        "fullstack_builder": "풀스택 빌더",
+        "data_ai_research": "데이터-AI 리서치",
+        "pm_operator": "PM-운영",
+        "design": "디자인",
+        "backend": "백엔드",
+        "fullstack": "풀스택"
+      },
+      "stack": {
+        "typescript": "TypeScript",
+        "react": "React",
+        "python": "Python",
+        "fastapi": "FastAPI",
+        "postgresql": "PostgreSQL",
+        "supabase": "Supabase",
+        "docker": "Docker",
+        "aws": "AWS",
+        "figma": "Figma",
+        "sql": "SQL",
+        "notion": "Notion",
+        "analytics": "Analytics"
+      },
+      "style": {
+        "async": "비동기 우선",
+        "clear_ownership": "명확한 오너십",
+        "fast_iteration": "빠른 반복",
+        "documentation": "문서화",
+        "user_interviews": "유저 인터뷰",
+        "research_first": "리서치 우선",
+        "structured_planning": "구조적 계획"
+      },
+      "pace": {
+        "steady_daily": "매일 꾸준히",
+        "weeknights_and_weekends": "평일 밤 + 주말",
+        "sprint_mode": "스프린트 집중",
+        "steady_deep_work": "깊게 꾸준히"
+      },
+      "impact": {
+        "no_poverty": "빈곤 종식",
+        "zero_hunger": "기아 종식",
+        "good_health_well_being": "건강과 웰빙",
+        "quality_education": "양질의 교육",
+        "gender_equality": "성평등",
+        "clean_water_sanitation": "깨끗한 물과 위생",
+        "affordable_clean_energy": "적정 가격의 깨끗한 에너지",
+        "decent_work_economic_growth": "양질의 일자리와 경제성장",
+        "industry_innovation_infrastructure": "산업, 혁신, 사회기반시설",
+        "reduced_inequalities": "불평등 감소",
+        "sustainable_cities_communities": "지속가능한 도시와 공동체",
+        "responsible_consumption_production": "책임 있는 소비와 생산",
+        "climate_action": "기후 행동",
+        "life_below_water": "해양 생태계",
+        "life_on_land": "육상 생태계",
+        "peace_justice_strong_institutions": "평화, 정의와 강력한 제도",
+        "partnerships_for_the_goals": "목표를 위한 파트너십"
+      }
+    }
   },
   "dashboardBusanPage": {
     "pill": "ASM17 Busan",
