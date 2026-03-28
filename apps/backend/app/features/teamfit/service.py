@@ -7,6 +7,7 @@ import re
 from collections.abc import Iterable
 from functools import lru_cache
 
+import anthropic
 from fastapi import HTTPException, status
 from openai import OpenAI
 from sqlalchemy import Select, func, select, text
@@ -15,8 +16,16 @@ from sqlalchemy.orm import Session
 
 from app.features.auth.models import User
 
-from .models import TeamfitProfile
+from .models import TeamfitExplorerProfile, TeamfitExplorerTurn, TeamfitProfile
 from .schemas import (
+    TeamfitExplorerMeResponse,
+    TeamfitExplorerProfileResponse,
+    TeamfitExplorerProfileSaveRequest,
+    TeamfitFollowupAnswerRequest,
+    TeamfitInterviewQuestionRequest,
+    TeamfitInterviewQuestionResponse,
+    TeamfitInterviewTurnInput,
+    TeamfitInterviewTurnResponse,
     TeamfitMeResponse,
     TeamfitProfileResponse,
     TeamfitProfileUpsertRequest,
@@ -38,6 +47,8 @@ MBTI_AXIS_LETTERS = {
 }
 DEFAULT_MBTI_LEFT_PERCENT = 74
 DEFAULT_MBTI_RIGHT_PERCENT = 26
+TEAMFIT_INTERVIEW_MODEL = os.getenv("ANTHROPIC_TEAMFIT_MODEL", "claude-haiku-4-5-20251001")
+INITIAL_INTERVIEW_QUESTION_LIMIT = 3
 
 
 @lru_cache(maxsize=1)
@@ -46,6 +57,14 @@ def _openai_client() -> OpenAI | None:
     if not api_key:
         return None
     return OpenAI(api_key=api_key)
+
+
+@lru_cache(maxsize=1)
+def _anthropic_client() -> anthropic.Anthropic | None:
+    api_key = os.getenv("ANTHROPIC_API_KEY")
+    if not api_key:
+        return None
+    return anthropic.Anthropic(api_key=api_key)
 
 
 def is_postgres_session(db: Session) -> bool:
@@ -132,6 +151,21 @@ def _normalize_optional_text(value: str | None, *, max_length: int = 220) -> str
     if not normalized:
         return None
     return normalized[:max_length]
+
+
+def _normalize_markdown_text(value: str, label: str, *, max_length: int = 800) -> str:
+    normalized = value.replace("\r\n", "\n").strip()
+    if not normalized:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"{label}은(는) 비어 있을 수 없습니다.",
+        )
+    if len(normalized) > max_length:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"{label}은(는) 최대 {max_length}자까지 입력할 수 있습니다.",
+        )
+    return normalized
 
 
 def _normalize_string_list(
@@ -280,6 +314,45 @@ def _normalize_impact_tags(values: Iterable[str]) -> list[str]:
     return normalized
 
 
+def _normalize_sdg_tags(values: Iterable[str]) -> list[str]:
+    normalized = _normalize_string_list(
+        values,
+        "지속가능개발목표",
+        min_items=4,
+        max_items=4,
+        max_item_length=64,
+    )
+    if len(normalized) != 4:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="지속가능개발목표는 4개를 모두 선택해야 합니다.",
+        )
+    return normalized
+
+
+def _normalize_interview_turns(
+    turns: list[TeamfitInterviewTurnInput],
+    *,
+    expected_count: int | None = None,
+) -> list[TeamfitInterviewTurnInput]:
+    normalized_turns: list[TeamfitInterviewTurnInput] = []
+    for turn in turns:
+        normalized_turns.append(
+            TeamfitInterviewTurnInput(
+                question=_normalize_text(turn.question, "질문", max_length=500),
+                answer=_normalize_markdown_text(turn.answer, "답변", max_length=2000),
+            )
+        )
+
+    if expected_count is not None and len(normalized_turns) != expected_count:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"초기 인터뷰 답변은 정확히 {expected_count}개여야 합니다.",
+        )
+
+    return normalized_turns
+
+
 def _build_embedding_input(payload: TeamfitProfileUpsertRequest) -> str:
     def humanize(values: Iterable[str]) -> list[str]:
         return [value.replace("_", " ") for value in values]
@@ -364,6 +437,353 @@ def sync_pgvector_embedding(db: Session, user_id: int, values: list[float]) -> N
         ),
         {"embedding": _vector_literal(values), "user_id": user_id},
     )
+
+
+def _normalize_required_mbti(
+    mbti: str | None,
+    mbti_axis_values: dict[str, int] | None,
+) -> tuple[str, dict[str, int]]:
+    normalized_mbti = _normalize_mbti(mbti)
+    normalized_axis_values = _normalize_mbti_axis_values(mbti_axis_values, normalized_mbti)
+    if normalized_axis_values is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="MBTI 5개 축을 모두 선택해야 합니다.",
+        )
+
+    resolved_mbti = normalized_mbti or _format_mbti_from_axis_values(normalized_axis_values)
+    if not resolved_mbti:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="MBTI 문자열을 만들 수 없습니다.",
+        )
+
+    return resolved_mbti, normalized_axis_values
+
+
+def _normalize_explorer_payload(
+    problem_statement: str,
+    mbti: str | None,
+    mbti_axis_values: dict[str, int] | None,
+    sdg_tags: Iterable[str],
+    narrative_markdown: str,
+) -> tuple[str, str, dict[str, int], list[str], str]:
+    resolved_mbti, normalized_axis_values = _normalize_required_mbti(mbti, mbti_axis_values)
+    return (
+        _normalize_text(problem_statement, "풀고 싶은 문제", max_length=80),
+        resolved_mbti,
+        normalized_axis_values,
+        _normalize_sdg_tags(sdg_tags),
+        _normalize_markdown_text(narrative_markdown, "2단계 본문", max_length=800),
+    )
+
+
+def _teamfit_interview_prompt(
+    *,
+    problem_statement: str,
+    mbti: str,
+    sdg_tags: list[str],
+    narrative_markdown: str,
+    history: list[TeamfitInterviewTurnInput] | list[TeamfitExplorerTurn],
+    phase: str,
+) -> str:
+    history_lines: list[str] = []
+    for index, turn in enumerate(history, start=1):
+        history_lines.append(f"Q{index}: {turn.question}")
+        history_lines.append(f"A{index}: {turn.answer}")
+
+    phase_label = "initial 3-question interview" if phase == "initial" else "follow-up extension"
+    history_block = "\n".join(history_lines) if history_lines else "No prior interview turns yet."
+
+    return f"""
+You are an interviewer helping a user build a team-fit exploration profile.
+
+Your job:
+- Ask exactly one next question in Korean.
+- The question should help clarify collaboration fit, motivation, decision criteria, or what kind of teammate would make this problem easier to solve.
+- Avoid repeating prior questions.
+- Keep it warm, specific, and concise.
+- Output only the question itself. No bullets, no numbering, no preface.
+
+Current phase: {phase_label}
+Problem statement: {problem_statement}
+MBTI: {mbti}
+SDGs: {", ".join(sdg_tags)}
+Narrative:
+{narrative_markdown}
+
+Prior interview:
+{history_block}
+""".strip()
+
+
+def _fallback_teamfit_question(
+    *,
+    problem_statement: str,
+    history: list[TeamfitInterviewTurnInput] | list[TeamfitExplorerTurn],
+    phase: str,
+) -> str:
+    asked_questions = {turn.question.casefold().strip() for turn in history if turn.question}
+    initial_candidates = [
+        "이 문제를 직접 풀고 싶은 가장 개인적인 이유는 무엇인가요?",
+        "함께할 팀원을 고를 때 꼭 맞아야 하는 협업 장면이나 역할 조합은 무엇인가요?",
+        "6개월 뒤 이 문제를 잘 풀었다고 느끼게 해줄 가장 구체적인 결과는 무엇인가요?",
+    ]
+    followup_candidates = [
+        "이 문제를 같이 풀 사람에게 꼭 기대하는 태도나 습관이 있다면 무엇인가요?",
+        "대화를 먼저 시작할 사람을 고를 때, 가장 빨리 확인하고 싶은 신호는 무엇인가요?",
+        f"`{problem_statement}`를 붙잡고 갈 때 내가 특히 보완받고 싶은 지점은 무엇인가요?",
+    ]
+
+    candidates = initial_candidates if phase == "initial" else followup_candidates
+    for question in candidates:
+        if question.casefold() not in asked_questions:
+            return question
+
+    return "이 문제를 함께 풀 사람과 실제로 대화해보면 가장 먼저 확인하고 싶은 기준은 무엇인가요?"
+
+
+def _generate_teamfit_question(
+    *,
+    problem_statement: str,
+    mbti: str,
+    sdg_tags: list[str],
+    narrative_markdown: str,
+    history: list[TeamfitInterviewTurnInput] | list[TeamfitExplorerTurn],
+    phase: str,
+) -> str:
+    client = _anthropic_client()
+    if client is None:
+        return _fallback_teamfit_question(
+            problem_statement=problem_statement,
+            history=history,
+            phase=phase,
+        )
+
+    try:
+        response = client.messages.create(
+            model=TEAMFIT_INTERVIEW_MODEL,
+            max_tokens=120,
+            system="Ask exactly one Korean question for a team-fit interview. Output only the question.",
+            messages=[
+                {
+                    "role": "user",
+                    "content": _teamfit_interview_prompt(
+                        problem_statement=problem_statement,
+                        mbti=mbti,
+                        sdg_tags=sdg_tags,
+                        narrative_markdown=narrative_markdown,
+                        history=history,
+                        phase=phase,
+                    ),
+                }
+            ],
+        )
+        question = response.content[0].text.strip()
+    except Exception:  # noqa: BLE001
+        question = _fallback_teamfit_question(
+            problem_statement=problem_statement,
+            history=history,
+            phase=phase,
+        )
+
+    return _normalize_text(question, "추가 질문", max_length=500)
+
+
+def _active_explorer_profile_count_query() -> Select[tuple[int]]:
+    return select(func.count()).select_from(TeamfitExplorerProfile)
+
+
+def _load_explorer_turns(db: Session, user_id: int) -> list[TeamfitExplorerTurn]:
+    return list(
+        db.scalars(
+            select(TeamfitExplorerTurn)
+            .where(TeamfitExplorerTurn.user_id == user_id)
+            .order_by(TeamfitExplorerTurn.sequence_no.asc(), TeamfitExplorerTurn.id.asc())
+        ).all()
+    )
+
+
+def _explorer_turn_to_response(turn: TeamfitExplorerTurn) -> TeamfitInterviewTurnResponse:
+    return TeamfitInterviewTurnResponse(
+        id=turn.id,
+        sequence_no=turn.sequence_no,
+        phase=turn.phase,
+        question=turn.question,
+        answer=turn.answer,
+        created_at=turn.created_at,
+    )
+
+
+def _explorer_profile_to_response(
+    profile: TeamfitExplorerProfile,
+    turns: list[TeamfitExplorerTurn],
+) -> TeamfitExplorerProfileResponse:
+    return TeamfitExplorerProfileResponse(
+        user_id=profile.user_id,
+        problem_statement=profile.problem_statement,
+        mbti=profile.mbti,
+        mbti_axis_values=profile.mbti_axis_values,
+        sdg_tags=list(profile.sdg_tags or []),
+        narrative_markdown=profile.narrative_markdown,
+        history=[_explorer_turn_to_response(turn) for turn in turns],
+        can_request_followup=True,
+        updated_at=profile.updated_at,
+    )
+
+
+def get_my_teamfit_explorer_profile(current_user: User, db: Session) -> TeamfitExplorerMeResponse:
+    profile = db.get(TeamfitExplorerProfile, current_user.user_id)
+    turns = _load_explorer_turns(db, current_user.user_id) if profile else []
+    active_profile_count = int(db.scalar(_active_explorer_profile_count_query()) or 0)
+    return TeamfitExplorerMeResponse(
+        profile=_explorer_profile_to_response(profile, turns) if profile else None,
+        active_profile_count=active_profile_count,
+    )
+
+
+def get_next_teamfit_interview_question(
+    payload: TeamfitInterviewQuestionRequest,
+) -> TeamfitInterviewQuestionResponse:
+    problem_statement, resolved_mbti, _, sdg_tags, narrative_markdown = _normalize_explorer_payload(
+        payload.problem_statement,
+        payload.mbti,
+        payload.mbti_axis_values,
+        payload.sdg_tags,
+        payload.narrative_markdown,
+    )
+    normalized_history = _normalize_interview_turns(payload.history)
+
+    if len(normalized_history) >= INITIAL_INTERVIEW_QUESTION_LIMIT:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"초기 인터뷰 질문은 최대 {INITIAL_INTERVIEW_QUESTION_LIMIT}개까지입니다.",
+        )
+
+    question = _generate_teamfit_question(
+        problem_statement=problem_statement,
+        mbti=resolved_mbti,
+        sdg_tags=sdg_tags,
+        narrative_markdown=narrative_markdown,
+        history=normalized_history,
+        phase="initial",
+    )
+
+    return TeamfitInterviewQuestionResponse(
+        phase="initial",
+        sequence_no=len(normalized_history) + 1,
+        question=question,
+    )
+
+
+def save_teamfit_explorer_profile(
+    payload: TeamfitExplorerProfileSaveRequest,
+    current_user: User,
+    db: Session,
+) -> TeamfitExplorerProfileResponse:
+    problem_statement, resolved_mbti, normalized_axis_values, sdg_tags, narrative_markdown = (
+        _normalize_explorer_payload(
+            payload.problem_statement,
+            payload.mbti,
+            payload.mbti_axis_values,
+            payload.sdg_tags,
+            payload.narrative_markdown,
+        )
+    )
+    normalized_history = _normalize_interview_turns(
+        payload.history,
+        expected_count=INITIAL_INTERVIEW_QUESTION_LIMIT,
+    )
+
+    profile = db.get(TeamfitExplorerProfile, current_user.user_id)
+    if profile is None:
+        profile = TeamfitExplorerProfile(user_id=current_user.user_id)
+        db.add(profile)
+
+    profile.problem_statement = problem_statement
+    profile.mbti = resolved_mbti
+    profile.mbti_axis_values = normalized_axis_values
+    profile.sdg_tags = sdg_tags
+    profile.narrative_markdown = narrative_markdown
+
+    for turn in _load_explorer_turns(db, current_user.user_id):
+        db.delete(turn)
+
+    db.flush()
+
+    for index, turn in enumerate(normalized_history, start=1):
+        db.add(
+            TeamfitExplorerTurn(
+                user_id=current_user.user_id,
+                sequence_no=index,
+                phase="initial",
+                question=turn.question,
+                answer=turn.answer,
+            )
+        )
+
+    db.commit()
+    db.refresh(profile)
+    turns = _load_explorer_turns(db, current_user.user_id)
+    return _explorer_profile_to_response(profile, turns)
+
+
+def create_teamfit_followup_question(
+    current_user: User,
+    db: Session,
+) -> TeamfitInterviewQuestionResponse:
+    profile = db.get(TeamfitExplorerProfile, current_user.user_id)
+    if profile is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="저장된 팀핏 탐색 프로필이 없습니다.",
+        )
+
+    turns = _load_explorer_turns(db, current_user.user_id)
+    question = _generate_teamfit_question(
+        problem_statement=profile.problem_statement,
+        mbti=profile.mbti,
+        sdg_tags=list(profile.sdg_tags or []),
+        narrative_markdown=profile.narrative_markdown,
+        history=turns,
+        phase="followup",
+    )
+    return TeamfitInterviewQuestionResponse(
+        phase="followup",
+        sequence_no=len(turns) + 1,
+        question=question,
+    )
+
+
+def save_teamfit_followup_answer(
+    payload: TeamfitFollowupAnswerRequest,
+    current_user: User,
+    db: Session,
+) -> TeamfitExplorerProfileResponse:
+    profile = db.get(TeamfitExplorerProfile, current_user.user_id)
+    if profile is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="저장된 팀핏 탐색 프로필이 없습니다.",
+        )
+
+    question = _normalize_text(payload.question, "추가 질문", max_length=500)
+    answer = _normalize_markdown_text(payload.answer, "추가 답변", max_length=2000)
+    turns = _load_explorer_turns(db, current_user.user_id)
+
+    db.add(
+        TeamfitExplorerTurn(
+            user_id=current_user.user_id,
+            sequence_no=len(turns) + 1,
+            phase="followup",
+            question=question,
+            answer=answer,
+        )
+    )
+    db.commit()
+    db.refresh(profile)
+
+    return _explorer_profile_to_response(profile, _load_explorer_turns(db, current_user.user_id))
 
 
 def _active_profile_count_query() -> Select[tuple[int]]:

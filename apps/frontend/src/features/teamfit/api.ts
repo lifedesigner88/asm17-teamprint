@@ -1,11 +1,13 @@
 import i18n from "@/lib/i18n";
 
 import type {
-  TeamFitLoaderData,
-  TeamFitProfile,
-  TeamFitProfileResponse,
-  TeamFitRecommendationsResponse,
-  TeamFitUpsertRequest
+  TeamFitExplorerMeResponse,
+  TeamFitExplorerProfile,
+  TeamFitFinalSaveRequest,
+  TeamFitFollowupAnswerRequest,
+  TeamFitInterviewQuestionRequest,
+  TeamFitInterviewQuestionResponse,
+  TeamFitLoaderData
 } from "./types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
@@ -19,28 +21,34 @@ async function readJson<T>(response: Response): Promise<T> {
   return (await response.json()) as T;
 }
 
-function normalizeProfileResponse(payload: TeamFitProfileResponse | null): TeamFitProfile | null {
-  if (!payload) {
-    return null;
+async function throwTeamFitError(fallbackKey: string, response: Response): Promise<never> {
+  let detail: string | undefined;
+
+  try {
+    const payload = (await response.json()) as { detail?: string };
+    detail = typeof payload?.detail === "string" ? payload.detail : undefined;
+  } catch {
+    // Ignore parse errors and fall back to a generic message below.
   }
 
-  if ("profile" in payload) {
-    return payload.profile ?? null;
-  }
-
-  return payload as TeamFitProfile;
+  throw detail ? new Error(detail) : teamFitError(fallbackKey, response);
 }
 
-function normalizeRecommendationsResponse(payload: TeamFitRecommendationsResponse | null) {
-  return {
-    requires_profile: payload?.requires_profile ?? false,
-    requires_approval: payload?.requires_approval ?? false,
-    similar: payload?.similar ?? [],
-    complementary: payload?.complementary ?? [],
-    unexpected: payload?.unexpected ?? [],
-    map_points: payload?.map_points ?? [],
-    active_profile_count: payload?.active_profile_count ?? 0
-  };
+async function postJson<TResponse, TRequest>(path: string, payload?: TRequest): Promise<TResponse> {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: payload ? JSON.stringify(payload) : undefined
+  });
+
+  if (!response.ok) {
+    await throwTeamFitError("teamfit.errors.interviewFailed", response);
+  }
+
+  return readJson<TResponse>(response);
 }
 
 export async function teamFitLoader(): Promise<TeamFitLoaderData> {
@@ -54,7 +62,7 @@ export async function teamFitLoader(): Promise<TeamFitLoaderData> {
     };
   }
   if (!response.ok) {
-    throw teamFitError("teamfit.errors.sessionLoadFailed", response);
+    await throwTeamFitError("teamfit.errors.sessionLoadFailed", response);
   }
 
   return {
@@ -62,27 +70,36 @@ export async function teamFitLoader(): Promise<TeamFitLoaderData> {
   };
 }
 
-export async function fetchTeamFitProfile(): Promise<TeamFitProfile | null> {
+export async function fetchTeamFitMe(): Promise<TeamFitExplorerMeResponse> {
   const response = await fetch(`${API_BASE_URL}/team-fit/me`, {
     credentials: "include"
   });
 
-  if (response.status === 401) {
-    return null;
-  }
-  if (response.status === 404) {
-    return null;
+  if (response.status === 401 || response.status === 404) {
+    return {
+      profile: null,
+      active_profile_count: 0
+    };
   }
   if (!response.ok) {
-    throw teamFitError("teamfit.errors.profileLoadFailed", response);
+    await throwTeamFitError("teamfit.errors.profileLoadFailed", response);
   }
 
-  return normalizeProfileResponse((await readJson<TeamFitProfileResponse | null>(response)) ?? null);
+  return readJson<TeamFitExplorerMeResponse>(response);
+}
+
+export async function requestTeamFitInterviewQuestion(
+  payload: TeamFitInterviewQuestionRequest
+): Promise<TeamFitInterviewQuestionResponse> {
+  return postJson<TeamFitInterviewQuestionResponse, TeamFitInterviewQuestionRequest>(
+    "/team-fit/interview/next-question",
+    payload
+  );
 }
 
 export async function saveTeamFitProfile(
-  payload: TeamFitUpsertRequest
-): Promise<TeamFitProfile> {
+  payload: TeamFitFinalSaveRequest
+): Promise<TeamFitExplorerProfile> {
   const response = await fetch(`${API_BASE_URL}/team-fit/me`, {
     method: "PUT",
     credentials: "include",
@@ -93,35 +110,21 @@ export async function saveTeamFitProfile(
   });
 
   if (!response.ok) {
-    throw teamFitError("teamfit.errors.profileSaveFailed", response);
+    await throwTeamFitError("teamfit.errors.profileSaveFailed", response);
   }
 
-  const data = await readJson<TeamFitProfileResponse>(response);
-  const profile = normalizeProfileResponse(data);
-
-  if (!profile) {
-    throw new Error(i18n.t("teamfit.errors.profileSaveFailed"));
-  }
-
-  return profile;
+  return readJson<TeamFitExplorerProfile>(response);
 }
 
-export async function fetchTeamFitRecommendations() {
-  const response = await fetch(`${API_BASE_URL}/team-fit/recommendations`, {
-    credentials: "include"
-  });
+export async function requestTeamFitFollowupQuestion(): Promise<TeamFitInterviewQuestionResponse> {
+  return postJson<TeamFitInterviewQuestionResponse, undefined>("/team-fit/interview/follow-up");
+}
 
-  if (response.status === 401) {
-    return normalizeRecommendationsResponse(null);
-  }
-  if (response.status === 404) {
-    return normalizeRecommendationsResponse(null);
-  }
-  if (!response.ok) {
-    throw teamFitError("teamfit.errors.recommendationsLoadFailed", response);
-  }
-
-  return normalizeRecommendationsResponse(
-    (await readJson<TeamFitRecommendationsResponse | null>(response)) ?? null
+export async function saveTeamFitFollowupAnswer(
+  payload: TeamFitFollowupAnswerRequest
+): Promise<TeamFitExplorerProfile> {
+  return postJson<TeamFitExplorerProfile, TeamFitFollowupAnswerRequest>(
+    "/team-fit/interview/follow-up-answer",
+    payload
   );
 }

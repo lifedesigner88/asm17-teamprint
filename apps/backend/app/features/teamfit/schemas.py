@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 CompletionStage = Literal["step1", "step2"]
@@ -86,3 +86,66 @@ class TeamfitRecommendationsResponse(BaseModel):
     complementary: list[TeamfitRecommendationCard]
     unexpected: list[TeamfitRecommendationCard]
     map_points: list[TeamfitMapPoint]
+
+
+ExplorerPhase = Literal["initial", "followup"]
+
+
+class TeamfitInterviewTurnInput(BaseModel):
+    question: str = Field(..., min_length=1, max_length=500)
+    answer: str = Field(..., min_length=1, max_length=2000)
+
+
+class TeamfitInterviewTurnResponse(BaseModel):
+    id: int
+    sequence_no: int
+    phase: ExplorerPhase
+    question: str
+    answer: str
+    created_at: datetime
+
+
+class TeamfitInterviewQuestionRequest(BaseModel):
+    problem_statement: str = Field(..., min_length=1, max_length=80)
+    mbti: str | None = Field(default=None, max_length=8)
+    mbti_axis_values: dict[str, int]
+    sdg_tags: list[str]
+    narrative_markdown: str = Field(..., min_length=1, max_length=800)
+    history: list[TeamfitInterviewTurnInput] = Field(default_factory=list)
+
+
+class TeamfitInterviewQuestionResponse(BaseModel):
+    phase: ExplorerPhase
+    sequence_no: int
+    question: str
+
+
+class TeamfitExplorerProfileSaveRequest(BaseModel):
+    problem_statement: str = Field(..., min_length=1, max_length=80)
+    mbti: str | None = Field(default=None, max_length=8)
+    mbti_axis_values: dict[str, int]
+    sdg_tags: list[str]
+    narrative_markdown: str = Field(..., min_length=1, max_length=800)
+    history: list[TeamfitInterviewTurnInput]
+
+
+class TeamfitFollowupAnswerRequest(BaseModel):
+    question: str = Field(..., min_length=1, max_length=500)
+    answer: str = Field(..., min_length=1, max_length=2000)
+
+
+class TeamfitExplorerProfileResponse(BaseModel):
+    user_id: int
+    problem_statement: str
+    mbti: str
+    mbti_axis_values: dict[str, int]
+    sdg_tags: list[str]
+    narrative_markdown: str
+    history: list[TeamfitInterviewTurnResponse]
+    can_request_followup: bool
+    updated_at: datetime
+
+
+class TeamfitExplorerMeResponse(BaseModel):
+    profile: TeamfitExplorerProfileResponse | None
+    active_profile_count: int

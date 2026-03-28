@@ -35,3 +35,39 @@ class TeamfitProfile(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
     )
+
+
+class TeamfitExplorerProfile(Base):
+    __tablename__ = "teamfit_explorer_profiles"
+
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.user_id", ondelete="CASCADE"), primary_key=True
+    )
+    problem_statement: Mapped[str] = mapped_column(Text, nullable=False)
+    mbti: Mapped[str] = mapped_column(String(8), nullable=False)
+    mbti_axis_values: Mapped[dict[str, int]] = mapped_column(JSON, nullable=False, default=dict)
+    sdg_tags: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)
+    narrative_markdown: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
+
+
+class TeamfitExplorerTurn(Base):
+    __tablename__ = "teamfit_explorer_turns"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False)
+    sequence_no: Mapped[int] = mapped_column(Integer, nullable=False)
+    phase: Mapped[str] = mapped_column(String(20), nullable=False)
+    question: Mapped[str] = mapped_column(Text, nullable=False)
+    answer: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )

@@ -1,13 +1,30 @@
-export { fetchTeamFitProfile, fetchTeamFitRecommendations, saveTeamFitProfile, teamFitLoader } from "./api";
+export {
+  fetchTeamFitMe,
+  requestTeamFitFollowupQuestion,
+  requestTeamFitInterviewQuestion,
+  saveTeamFitFollowupAnswer,
+  saveTeamFitProfile,
+  teamFitLoader
+} from "./api";
 export { TeamFitPage } from "./pages/team-fit-page";
 export type {
+  TeamFitExplorerMeResponse,
+  TeamFitExplorerPhase,
+  TeamFitExplorerProfile,
+  TeamFitFinalSaveRequest,
+  TeamFitFollowupAnswerRequest,
+  TeamFitInterviewQuestionRequest,
+  TeamFitInterviewQuestionResponse,
+  TeamFitInterviewTurn,
+  TeamFitInterviewTurnDraft,
+  TeamFitLoaderData,
+  TeamFitMbtiAxisValues,
+  TeamFitSession,
   TeamFitBucket,
   TeamFitCompletionStage,
-  TeamFitLoaderData,
   TeamFitMapPoint,
   TeamFitProfile,
   TeamFitRecommendation,
   TeamFitRecommendationsResponse,
-  TeamFitSession,
   TeamFitUpsertRequest
 } from "./types";

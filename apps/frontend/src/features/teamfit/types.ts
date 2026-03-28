@@ -1,8 +1,8 @@
 import type { SessionUser } from "../auth/types";
 
 export type TeamFitBucket = "similar" | "complementary" | "unexpected";
-
 export type TeamFitCompletionStage = "step1" | "step2";
+export type TeamFitExplorerPhase = "initial" | "followup";
 
 export type TeamFitMbtiAxisValues = {
   mind: number;
@@ -10,6 +10,57 @@ export type TeamFitMbtiAxisValues = {
   nature: number;
   tactics: number;
   identity: number;
+};
+
+export type TeamFitInterviewTurnDraft = {
+  question: string;
+  answer: string;
+};
+
+export type TeamFitInterviewTurn = TeamFitInterviewTurnDraft & {
+  id: number;
+  sequence_no: number;
+  phase: TeamFitExplorerPhase;
+  created_at: string;
+};
+
+export type TeamFitExplorerProfile = {
+  user_id: number;
+  problem_statement: string;
+  mbti: string;
+  mbti_axis_values: TeamFitMbtiAxisValues;
+  sdg_tags: string[];
+  narrative_markdown: string;
+  history: TeamFitInterviewTurn[];
+  can_request_followup: boolean;
+  updated_at: string;
+};
+
+export type TeamFitExplorerMeResponse = {
+  profile: TeamFitExplorerProfile | null;
+  active_profile_count: number;
+};
+
+export type TeamFitInterviewQuestionRequest = {
+  problem_statement: string;
+  mbti?: string | null;
+  mbti_axis_values: TeamFitMbtiAxisValues;
+  sdg_tags: string[];
+  narrative_markdown: string;
+  history: TeamFitInterviewTurnDraft[];
+};
+
+export type TeamFitInterviewQuestionResponse = {
+  phase: TeamFitExplorerPhase;
+  sequence_no: number;
+  question: string;
+};
+
+export type TeamFitFinalSaveRequest = TeamFitInterviewQuestionRequest;
+
+export type TeamFitFollowupAnswerRequest = {
+  question: string;
+  answer: string;
 };
 
 export type TeamFitProfile = {

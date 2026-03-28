@@ -22,7 +22,7 @@ For the Korean README, see [README.md](README.md).
 
 As of March 28, 2026, the root experience of this project is `Team-fit exploration`, not `Park Sejong PR`.
 
-- `/` is the `Team-fit exploration` front door that explains the problem and immediately opens the profile-and-recommendation flow.
+- `/` is the `Team-fit exploration` front door that explains the problem and immediately opens the interview-style team-fit intake flow.
 - `/persona/sejong` is the dedicated builder profile page.
 - `/ai/sejong` is the login-based `AI Sejong` multi-turn chat.
 - `/seoul/dashboard` remains the ASM17 Seoul interview discovery and ops surface.
@@ -44,11 +44,12 @@ The current implementation is the first product experiment around that question.
 
 ## What Users Can Do Now
 
-- Open `/` and immediately see the problem framing plus the team-fit exploration demo
-- Preview the profile input UI and recommendation structure before logging in
-- Save a Step 1 and Step 2 team-fit profile after logging in
-- Unlock `similar / complementary / far-but-interesting` recommendations after 17th-cohort approval
-- Open recommendation cards with reasons, one-line intro, MBTI, SDGs, GitHub / Notion / contact links
+- Open `/` and immediately see the problem framing plus the team-fit exploration interview demo
+- Preview the Step 1 / Step 2 intake flow before logging in
+- In Step 1, enter `one problem sentence + MBTI 5 axes + 4 SDGs`
+- In Step 2, write up to 800 characters of Markdown context
+- After clicking save, let AI ask 3 follow-up questions one by one before the profile is finally stored
+- Continue the saved interview later through the `answer again` follow-up action
 - Open `/persona/sejong` and review Sejong's builder profile
 - Use the login-only `AI Sejong` multi-turn chat at `/ai/sejong`
 - Sign up, log in, and reset PIN
@@ -60,22 +61,22 @@ The current implementation is the first product experiment around that question.
 ## Current Core Flow
 
 1. A user enters `/` and first understands the team-building problem plus the purpose of `Team-fit exploration`.
-2. On the same surface, the user previews the profile flow and recommendation buckets.
-3. After logging in, the user saves Step 1 signals such as interests, problems, domains, role, stack, working style, and pace.
-4. If they want, they add Step 2 signals such as a one-line intro, MBTI axis values, and four SDGs.
-5. After 17th-cohort approval, the system uses structured signals and vector search to recommend `similar / complementary / far-but-interesting` people.
-6. The user reviews reasons and profile links, then narrows down who to talk to first.
+2. On the same surface, the user previews the Step 1 and Step 2 intake structure.
+3. After logging in, Step 1 captures `one problem sentence + MBTI 5 axes + 4 SDGs`.
+4. Step 2 captures up to 800 characters of Markdown context about the problem, motivation, and desired team shape.
+5. Clicking save starts an AI interview that asks 3 additional questions one at a time.
+6. Once the third answer is complete, the interview is saved and the user can later append more follow-up answers.
 7. If needed, they continue into `/persona/sejong`, `AI Sejong`, or the Seoul dashboard for more context.
 
 ## Key Features
 
 - Problem-framing + team-fit landing at `/`
-- Guest preview for the team-fit profile flow
-- Step 1 core signals + Step 2 supporting signals
-- MBTI five-axis selection and exact-four SDG validation
-- `similar / complementary / far-but-interesting` recommendation buckets
-- Recommendation cards with explanation chips and profile links
-- Preview before login / save after login / recommendations after approval
+- Guest preview for the interview-style team-fit flow
+- Step 1 `one problem sentence + MBTI 5 axes + 4 SDGs`
+- Step 2 Markdown narrative capped at 800 characters
+- AI interview dialog that generates 3 sequential follow-up questions before saving
+- Saved transcript view plus incremental follow-up questions through `answer again`
+- Recommendation surfaces temporarily hidden until they are redesigned around the new data model
 - Builder profile page at `/persona/sejong`
 - Login-only `AI Sejong`
 - Email signup, login, and PIN reset
@@ -102,7 +103,7 @@ The immediate goal is not to become a giant community platform.
 The current product direction is to make these parts sharper first:
 
 - smoother team-fit profile intake
-- clearer recommendation explanations
+- redesigning recommendations around the new interview-first team-fit data model
 - shortlist / trio support that genuinely helps decisions
 - better grounding, retrieval, and conversation quality for `AI Sejong`
 
@@ -118,8 +119,8 @@ The current product direction is to make these parts sharper first:
 
 Main directories:
 
-- `apps/frontend` — Team-fit exploration, Sejong profile, AI Sejong, dashboard, and verification flow
-- `apps/backend` — auth, verification, team-fit recommendations, dashboard, admin, and persona APIs
+- `apps/frontend` — Team-fit exploration interview, Sejong profile, AI Sejong, dashboard, and verification flow
+- `apps/backend` — auth, verification, team-fit exploration interview APIs, dashboard, admin, and persona APIs
 - `apps/ai-worker` — legacy / experimental worker for later AI features
 - `infrastructure/terraform` — infrastructure-related workspace
 

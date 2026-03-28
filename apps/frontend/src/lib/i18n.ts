@@ -3,6 +3,8 @@ import LanguageDetector from "i18next-browser-languagedetector";
 import HttpBackend from "i18next-http-backend";
 import { initReactI18next } from "react-i18next";
 
+const localeAssetVersion = encodeURIComponent(__LOCALE_ASSET_VERSION__);
+
 i18n
   .use(HttpBackend)
   .use(LanguageDetector)
@@ -13,7 +15,7 @@ i18n
     ns: ["common", "auth", "capture", "persona"],
     defaultNS: "common",
     backend: {
-      loadPath: "/locales/{{lng}}/{{ns}}.json",
+      loadPath: `${import.meta.env.BASE_URL}locales/{{lng}}/{{ns}}.json?v=${localeAssetVersion}`
     },
     detection: {
       order: ["localStorage", "navigator"],

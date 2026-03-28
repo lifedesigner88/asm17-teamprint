@@ -78,7 +78,7 @@ export function TeamFitHowItWorksButton({ className }: { className?: string }) {
                 className="absolute top-2 right-2 z-20 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/90 bg-white/96 text-slate-500 shadow-[0_18px_40px_rgba(15,23,42,0.18)] backdrop-blur transition hover:-translate-y-0.5 hover:text-slate-900 sm:top-3 sm:right-3"
               >
                 <span className="text-xl leading-none" aria-hidden="true">
-                  x
+                  ×
                 </span>
               </button>
 
